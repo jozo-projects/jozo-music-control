@@ -271,7 +271,7 @@ const Header: React.FC = () => {
       <img
         src={logo}
         alt="Jozo"
-        className="w-20 h-10 cursor-pointer animate-breathing"
+        className="w-24 h-24 object-cover cursor-pointer animate-breathing"
         onClick={handleHomeNavigation}
       />
 
