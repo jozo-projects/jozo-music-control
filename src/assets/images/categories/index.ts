@@ -14,6 +14,7 @@ export const CategoriesId = {
   RAP_VIET: "rap-viet",
   SONG_CA: "song-ca",
   TET: "tet",
+  HOT_HIT_MOT_THOI: "hot-hit-mot-thoi",
 };
 
 export const categoryImages = {
@@ -23,6 +24,7 @@ export const categoryImages = {
   [CategoriesId.ANH_TRAI_SAY_HI]: ATSH_LOGO,
   [CategoriesId.SONG_CA]: SONG_CA_LOGO,
   [CategoriesId.RAP_VIET]: RAP_VIET_LOGO,
+  [CategoriesId.HOT_HIT_MOT_THOI]: RAP_VIET_LOGO,
   // [CategoriesId.TET]: TET_LOGO,
 };
 
