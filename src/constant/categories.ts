@@ -694,6 +694,60 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "TY & KARAOKE",
       },
       {
+        video_id: "gGvCg4xfozE",
+        title:
+          "[KARAOKE] Chờ Anh Về (Beat Chuẩn) - B Ray x AMEE x Masew | Anh Trai Say Hi",
+        duration: 220,
+        url: "https://youtube.com/watch?v=gGvCg4xfozE",
+        thumbnail: "https://i.ytimg.com/vi/gGvCg4xfozE/hq720.jpg",
+        author: "TY & KARAOKE",
+      },
+      {
+        video_id: "BE2Wmfzu24Q",
+        title:
+          "[KARAOKE] Ngôi Sao Hy Vọng (Beat Chuẩn) - CONGB | Anh Trai Say Hi",
+        duration: 246,
+        url: "https://youtube.com/watch?v=BE2Wmfzu24Q",
+        thumbnail: "https://i.ytimg.com/vi/BE2Wmfzu24Q/hq720.jpg",
+        author: "TY & KARAOKE",
+      },
+      {
+        video_id: "y_24fY8Aq6o",
+        title:
+          "[KARAOKE] Mời Đoàn Mình Lên Sàn (Beat Chuẩn) - Gill (VNM) | Anh Trai Say Hi",
+        duration: 235,
+        url: "https://youtube.com/watch?v=y_24fY8Aq6o",
+        thumbnail: "https://i.ytimg.com/vi/y_24fY8Aq6o/hq720.jpg",
+        author: "TY & KARAOKE",
+      },
+      {
+        video_id: "wgJZRP1FeV8",
+        title:
+          "[KARAOKE] Giấc Mộng Vỡ (Beat Chuẩn) - Ryn Lee | Anh Trai Say Hi",
+        duration: 283,
+        url: "https://youtube.com/watch?v=wgJZRP1FeV8",
+        thumbnail: "https://i.ytimg.com/vi/wgJZRP1FeV8/hq720.jpg",
+        author: "TY & KARAOKE",
+      },
+      {
+        video_id: "l04DUYXn81Y",
+        title:
+          "[KARAOKE] Không Biết Nói Gì, Không Biết Phải Làm Sao (Beat Chuẩn) - Vương Bình | Anh Trai Say Hi",
+        duration: 327,
+        url: "https://youtube.com/watch?v=l04DUYXn81Y",
+        thumbnail: "https://i.ytimg.com/vi/l04DUYXn81Y/hq720.jpg",
+        author: "TY & KARAOKE",
+      },
+      {
+        video_id: "aC41fpme9bg",
+        title:
+          "[KARAOKE] Nhìn Về Phía Anh (Beat Chuẩn) - Ngô Kiến Huy | Anh Trai Say Hi",
+        duration: 223,
+        url: "https://youtube.com/watch?v=aC41fpme9bg",
+        thumbnail: "https://i.ytimg.com/vi/aC41fpme9bg/hq720.jpg",
+        author: "TY & KARAOKE",
+      },
+      {
         video_id: "5zMhhfGfWfY",
         title:
           "[Karaoke Beat] AAA - Liên Quân 2 | Em Xinh Say Hi (Beat Chuẩn Có Bè)",
@@ -2387,6 +2441,14 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "casauxitrai NGuyen",
       },
       {
+        video_id: "oI9gVALDkHc",
+        title: "[HD] Karaoke - Để Em Rời Xa (Beat+phối)",
+        duration: 300,
+        url: "https://youtube.com/watch?v=oI9gVALDkHc",
+        thumbnail: "https://i.ytimg.com/vi/oI9gVALDkHc/hq720.jpg",
+        author: "Kênh Giải Trí Tổng Hợp",
+      },
+      {
         video_id: "eEZpywMUzGI",
         title: "[Karaoke]Sau Tất Cả - Erik ST.319 (Full Beat)",
         duration: 238,
@@ -2532,6 +2594,15 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=XZFGatYhuHQ",
         thumbnail: "https://i.ytimg.com/vi/XZFGatYhuHQ/hq720.jpg",
         author: "ICM Studio",
+      },
+      {
+        video_id: "urCl0riMrbg",
+        title:
+          "Karaoke Anh Muốn Em Sống Sao Tone Nữ Remix Nhạc Sống | Nguyễn Linh",
+        duration: 281,
+        url: "https://youtube.com/watch?v=urCl0riMrbg",
+        thumbnail: "https://i.ytimg.com/vi/urCl0riMrbg/hq720.jpg",
+        author: "Nhạc sống Nguyễn Linh",
       },
       {
         video_id: "t4rjaYhmazo",
@@ -3325,6 +3396,30 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Sofia the First Channel",
       },
       {
+        video_id: "4IiWz_hwxrc",
+        title: "[Karaoke] Nếu như anh đến - Văn Mai Hương Full Beat",
+        duration: 223,
+        url: "https://youtube.com/watch?v=4IiWz_hwxrc",
+        thumbnail: "https://i.ytimg.com/vi/4IiWz_hwxrc/hq720.jpg",
+        author: "Newtitan Vip",
+      },
+      {
+        video_id: "gJCsBxpAx3k",
+        title: "[Karaoke] Viên đá nhỏ - Hải băng Full Beat",
+        duration: 314,
+        url: "https://youtube.com/watch?v=gJCsBxpAx3k",
+        thumbnail: "https://i.ytimg.com/vi/gJCsBxpAx3k/hq720.jpg",
+        author: "Newtitan Vip",
+      },
+      {
+        video_id: "yC5DeErMs3w",
+        title: "Trang giấy trắng karaoke Phạm Trưởng",
+        duration: 306,
+        url: "https://youtube.com/watch?v=yC5DeErMs3w",
+        thumbnail: "https://i.ytimg.com/vi/yC5DeErMs3w/hq720.jpg",
+        author: "Bui Thinh",
+      },
+      {
         video_id: "SKdYgmWLkyg",
         title: "KARAOKE - Như Một Thói Quen | Thanh Tâm | Minh Quân Official",
         duration: 260,
@@ -3363,6 +3458,22 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=9PBGCrj-QAE",
         thumbnail: "https://i.ytimg.com/vi/9PBGCrj-QAE/hq720.jpg",
         author: "Alesis",
+      },
+      {
+        video_id: "uHyrp0SO5sc",
+        title: "[Karaoke HD] ĐIỀU ƯỚC GIẢN ĐƠN - AKIRA PHAN | Beat gốc |",
+        duration: 292,
+        url: "https://youtube.com/watch?v=uHyrp0SO5sc",
+        thumbnail: "https://i.ytimg.com/vi/uHyrp0SO5sc/hqdefault.jpg",
+        author: "Akira Phan",
+      },
+      {
+        video_id: "kB1957ndIY0",
+        title: "Karaoke: Mắt Nai Cha Cha Cha | Hồng Ngọc",
+        duration: 284,
+        url: "https://youtube.com/watch?v=kB1957ndIY0",
+        thumbnail: "https://i.ytimg.com/vi/kB1957ndIY0/hqdefault.jpg",
+        author: "Phuong Nam Phim",
       },
       {
         video_id: "OrYe425Mwdc",

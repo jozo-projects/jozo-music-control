@@ -230,6 +230,10 @@ const Header: React.FC = () => {
   // State để mở/đóng modal booking code
   const [isBookingCodeModalOpen, setIsBookingCodeModalOpen] = useState(false);
 
+  // State để mở/đóng modal xác nhận gọi nhân viên
+  const [isConfirmSupportModalOpen, setIsConfirmSupportModalOpen] =
+    useState(false);
+
   const handleNotification = () => {
     const now = Date.now();
     const timeSinceLastNotification = now - lastNotificationTime;
@@ -271,7 +275,7 @@ const Header: React.FC = () => {
       <img
         src={logo}
         alt="Jozo"
-        className="w-24 h-24 object-cover cursor-pointer animate-breathing"
+        className="w-24 h-12 object-cover cursor-pointer animate-breathing"
         onClick={handleHomeNavigation}
       />
 
@@ -405,10 +409,70 @@ const Header: React.FC = () => {
           <FoodIcon />
         </button>
 
-        <button onClick={handleNotification}>
+        <button onClick={() => setIsConfirmSupportModalOpen(true)}>
           <BellAlertIcon />
         </button>
       </div>
+
+      {/* Confirm Support Modal */}
+      {isConfirmSupportModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 w-[90%] max-w-md shadow-2xl border border-gray-700 animate-fade-in">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-lightpink/20 rounded-full">
+                  <BellAlertIcon />
+                </div>
+                <h2 className="text-xl font-bold text-white">Gọi nhân viên</h2>
+              </div>
+              <button
+                onClick={() => setIsConfirmSupportModalOpen(false)}
+                className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-6 h-6 text-gray-400"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <p className="text-gray-300 text-center mb-8">
+              Bạn có muốn yêu cầu nhân viên hỗ trợ không?
+            </p>
+
+            {/* Buttons */}
+            <div className="flex gap-4">
+              <button
+                onClick={() => setIsConfirmSupportModalOpen(false)}
+                className="flex-1 py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-xl transition-colors"
+              >
+                Đóng
+              </button>
+              <button
+                onClick={() => {
+                  setIsConfirmSupportModalOpen(false);
+                  handleNotification();
+                }}
+                className="flex-1 py-3 px-4 bg-lightpink hover:bg-lightpink/80 text-white font-bold rounded-xl transition-colors shadow-lg shadow-lightpink/30"
+              >
+                Gọi nhân viên
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Booking Code Modal */}
       <BookingCodeModal

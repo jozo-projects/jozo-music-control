@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
+import BottomSheet from "@/components/BottomSheet";
+import FnbMenuItem from "@/components/FnbMenuItem";
+import OrderList from "@/components/OrderList";
+import { toast } from "@/components/ToastContainer";
 import { useFnbMenuQuery } from "@/hooks/useFnbMenuQuery";
 import { useFnbMutations } from "@/hooks/useFnbMutations";
 import { useFnbOrdersQuery } from "@/hooks/useFnbOrdersQuery";
-import { toast } from "@/components/ToastContainer";
-import FnbMenuItem from "@/components/FnbMenuItem";
-import BottomSheet from "@/components/BottomSheet";
-import OrderList from "@/components/OrderList";
-import HomeIcon from "@/assets/icons/HomeIcon";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const CATEGORIES = {
   snack: "Snacks",
@@ -35,7 +34,6 @@ const FnbOrder: React.FC = () => {
     endY: number;
   } | null>(null);
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const roomId = searchParams.get("roomId") || "1";
   const [activeTab, setActiveTab] = useState<"menu" | "orders">("menu");
   const { submitCart } = useFnbMutations();
@@ -45,11 +43,6 @@ const FnbOrder: React.FC = () => {
     isLoading: ordersLoading,
     refetch: refetchOrders,
   } = useFnbOrdersQuery(roomId);
-
-  // Hàm xử lý navigation về trang chủ
-  const handleHomeNavigation = () => {
-    navigate(`/?roomId=${roomId}`);
-  };
 
   // Tạo danh sách categories từ items
   useEffect(() => {
@@ -353,17 +346,6 @@ const FnbOrder: React.FC = () => {
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-6">
-          {/* Home Icon */}
-          <div className="flex justify-start mb-4">
-            <button
-              onClick={handleHomeNavigation}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-              title="Về trang chủ"
-            >
-              <HomeIcon />
-            </button>
-          </div>
-
           <div className="text-center mb-6">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-lightpink to-pink-600 bg-clip-text text-transparent mb-2">
               Đặt Đồ Ăn & Thức Uống
@@ -407,7 +389,7 @@ const FnbOrder: React.FC = () => {
             {/* Left: Categories */}
             <div className="lg:col-span-1 sticky top-4 self-start">
               <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-lightpink to-pink-600 bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-lightpink to-pink-600 bg-clip-text text-transparent whitespace-nowrap">
                   Danh Mục
                 </h2>
                 <div className="space-y-3">
@@ -421,7 +403,7 @@ const FnbOrder: React.FC = () => {
                       }`}
                       onClick={() => setSelectedCategory(category.id)}
                     >
-                      <span className="font-semibold">
+                      <span className="font-semibold whitespace-nowrap">
                         {CATEGORIES[category.id as keyof typeof CATEGORIES]}
                       </span>
                     </button>
