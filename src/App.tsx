@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import RoutesWrapper from "@/routes/RoutesWrapper";
 import { TimerProvider } from "@/contexts/TimerContext";
 import { SocketProvider } from "@/contexts/SocketContext";
+import { GiftProvider } from "@/contexts/GiftContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastContainer } from "@/components/ToastContainer";
@@ -24,11 +25,13 @@ const App: React.FC = () => {
       <ToastContainer />
       <BrowserRouter>
         <SocketProvider>
-          <TimerProvider>
-            <ImageBackgroundProvider>
-              <RoutesWrapper />
-            </ImageBackgroundProvider>
-          </TimerProvider>
+          <GiftProvider>
+            <TimerProvider>
+              <ImageBackgroundProvider>
+                <RoutesWrapper />
+              </ImageBackgroundProvider>
+            </TimerProvider>
+          </GiftProvider>
         </SocketProvider>
       </BrowserRouter>
     </QueryClientProvider>

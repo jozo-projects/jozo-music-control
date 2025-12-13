@@ -3,6 +3,8 @@ import { Outlet } from "react-router-dom";
 import Header from "@/components/Header";
 import ControlBar from "@/components/ControlBar";
 import QueueSidebar from "@/components/QueueSidebar";
+import GiftFloatButton from "@/components/GiftFloatButton";
+import GiftModal from "@/components/GiftModal";
 import { useImageBackground } from "@/contexts/ImageBackgroundContext";
 import { categoryImages } from "@/assets/images/categories";
 // import { categoryImages } from "@/assets/images/categories";
@@ -79,6 +81,12 @@ const Layout: React.FC = () => {
       <footer>
         <ControlBar onToggleQueue={() => setIsQueueOpen(!isQueueOpen)} />
       </footer>
+
+      {/* Gift Float Button */}
+      <GiftFloatButton />
+
+      {/* Gift Modal */}
+      <GiftModal />
     </div>
   );
 };
