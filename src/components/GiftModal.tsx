@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
+import referralGiftGif from "@/assets/gif/referral_gift.gif";
 import { useGift } from "@/contexts/GiftContext";
 import { useClaimGift } from "@/hooks/useGiftMutations";
-import referralGiftGif from "@/assets/gif/referral_gift.gif";
-import rewardLightEffectGif from "@/assets/gif/reward_light_effect.gif";
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 
 const GiftModal: React.FC = () => {
   const { isModalOpen, closeGiftModal, scheduleId, markAsClaimed, isClaimed, claimedGift } = useGift();
@@ -110,16 +109,7 @@ const GiftModal: React.FC = () => {
           </div>
         ) : (
           // Kết quả sau khi claim thành công
-          <div className="flex flex-col items-center justify-center py-8 relative">
-            {/* GIF hiệu ứng ánh sáng làm background */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <img
-                src={rewardLightEffectGif}
-                alt="Hiệu ứng ánh sáng"
-                className="w-full h-full object-cover opacity-80"
-              />
-            </div>
-            
+          <div className="flex flex-col items-center justify-center py-8 relative">      
             {(claimResult?.gift || claimedGift) && (
               <div className="relative z-10 flex flex-col items-center">
                 {/* Hiển thị hình ảnh quà ở giữa */}
@@ -128,19 +118,10 @@ const GiftModal: React.FC = () => {
                     <img
                       src={(claimResult?.gift || claimedGift)?.image}
                       alt={(claimResult?.gift || claimedGift)?.name}
-                      className="w-48 h-48 object-cover rounded-lg shadow-lg"
+                      className="w-full h-auto object-cover rounded-lg shadow-lg"
                     />
                   </div>
                 )}
-                
-                {/* Hiển thị discount nếu là loại discount */}
-                {(claimResult?.gift || claimedGift)?.type === "discount" &&
-                  (claimResult?.gift || claimedGift)?.discountPercentage && (
-                    <p className="text-2xl font-bold text-yellow-400 mb-4">
-                      Giảm {(claimResult?.gift || claimedGift)?.discountPercentage}%
-                    </p>
-                  )}
-
                 {/* Hiển thị items nếu là loại snacks_drinks */}
                 {(claimResult?.gift || claimedGift)?.type === "snacks_drinks" &&
                   (claimResult?.gift || claimedGift)?.items &&
