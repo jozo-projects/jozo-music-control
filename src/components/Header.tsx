@@ -174,6 +174,8 @@ const Header: React.FC = () => {
   });
 
   const handleSelectSuggestion = (suggestion: string) => {
+    debouncedNavigate.cancel();
+
     setSearchState({
       term: suggestion,
       debouncedTerm: suggestion,
