@@ -5,6 +5,7 @@ import { toast } from "@/components/ToastContainer";
 import { useFnbMenuQuery } from "@/hooks/useFnbMenuQuery";
 import { useFnbMutations } from "@/hooks/useFnbMutations";
 import { useFnbOrdersQuery } from "@/hooks/useFnbOrdersQuery";
+import { useGiftListQuery } from "@/hooks/useGiftQuery";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -35,7 +36,8 @@ const FnbOrder: React.FC = () => {
   } | null>(null);
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "1";
-  const [activeTab, setActiveTab] = useState<"menu" | "orders">("menu");
+  const [activeTab, setActiveTab] = useState<"menu" | "orders" | "gifts">("menu");
+  const { data: giftList, isLoading: isLoadingGifts } = useGiftListQuery();
   const { submitCart } = useFnbMutations();
   const isSubmitting = submitCart.isPending;
   const {
@@ -378,13 +380,124 @@ const FnbOrder: React.FC = () => {
               >
                 Đơn hàng ({orders?.length || 0})
               </button>
+              <button
+                onClick={() => setActiveTab("gifts")}
+                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                  activeTab === "gifts"
+                    ? "bg-gradient-to-r from-lightpink to-pink-500 text-white shadow-lg"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+              >
+                Quà
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 pb-8">
-        {activeTab === "menu" ? (
+        {activeTab === "gifts" ? (
+          // Tab Quà
+          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+            <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-lightpink to-pink-600 bg-clip-text text-transparent">
+              Danh sách quà tặng
+            </h2>
+            {isLoadingGifts ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lightpink"></div>
+              </div>
+            ) : giftList && giftList.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {giftList
+                  .filter((gift) => gift.isActive)
+                  .map((gift) => (
+                    <div
+                      key={gift._id || gift.id}
+                      className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200 shadow-md hover:shadow-lg transition-shadow"
+                    >
+                      {/* Gift Image */}
+                      {gift.image && (
+                        <div className="mb-4 flex justify-center">
+                          <img
+                            src={gift.image}
+                            alt={gift.name}
+                            className="w-32 h-32 object-cover rounded-lg"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Gift Name */}
+                      <h3 className="text-lg font-bold text-gray-800 mb-2 text-center">
+                        {gift.name}
+                      </h3>
+
+                      {/* Gift Type Badge */}
+                      <div className="flex justify-center mb-3">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            gift.type === "discount"
+                              ? "bg-yellow-200 text-yellow-800"
+                              : "bg-orange-200 text-orange-800"
+                          }`}
+                        >
+                          {gift.type === "discount" ? "Giảm giá" : "Đồ ăn & Nước uống"}
+                        </span>
+                      </div>
+
+                      {/* Gift Details */}
+                      {gift.type === "discount" && gift.discountPercentage && (
+                        <div className="text-center mb-2">
+                          <p className="text-2xl font-bold text-yellow-600">
+                            Giảm {gift.discountPercentage}%
+                          </p>
+                        </div>
+                      )}
+
+                      {gift.type === "snacks_drinks" && gift.items && (
+                        <div className="mb-2">
+                          <p className="text-sm text-gray-600 text-center">
+                            Bao gồm {gift.items.length} món
+                          </p>
+                          {gift.items.slice(0, 3).map((item, index) => (
+                            <p
+                              key={index}
+                              className="text-xs text-gray-500 text-center"
+                            >
+                              • {item.name} x{item.quantity}
+                            </p>
+                          ))}
+                          {gift.items.length > 3 && (
+                            <p className="text-xs text-gray-400 text-center mt-1">
+                              và {gift.items.length - 3} món khác...
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Remaining Quantity */}
+                      {gift.remainingQuantity !== undefined && (
+                        <div className="mt-4 pt-4 border-t border-yellow-200">
+                          <p className="text-xs text-gray-500 text-center">
+                            Còn lại: {gift.remainingQuantity} suất
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="text-6xl mb-4">🎁</div>
+                <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                  Chưa có quà tặng
+                </h3>
+                <p className="text-gray-400 text-center px-8">
+                  Hiện tại chưa có quà tặng nào khả dụng
+                </p>
+              </div>
+            )}
+          </div>
+        ) : activeTab === "menu" ? (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Left: Categories */}
             <div className="lg:col-span-1 sticky top-4 self-start">
@@ -437,7 +550,7 @@ const FnbOrder: React.FC = () => {
               </div>
             </div>
           </div>
-        ) : (
+        ) : activeTab === "orders" ? (
           /* Orders Tab */
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-6">
@@ -467,7 +580,7 @@ const FnbOrder: React.FC = () => {
             </div>
             <OrderList orders={orders || []} isLoading={ordersLoading} />
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Floating Cart Button - Chỉ hiển thị khi ở tab menu */}

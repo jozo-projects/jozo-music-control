@@ -47,12 +47,23 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
 
       socketRef.current.on("connect", () => {
-        console.log(`[Socket] Connected: ${socketRef.current?.id}`);
-        setIsConnected(true);
+        const currentSocket = socketRef.current;
+        if (currentSocket) {
+          console.log(`[Socket] Connected: ${currentSocket.id}`);
+          setIsConnected(true);
+          
+          // Join room với roomId sau khi kết nối thành công
+          if (roomId) {
+            console.log(`[Socket] Joining room: ${roomId}`);
+            currentSocket.emit("join", roomId);
+          }
+        }
       });
 
       socketRef.current.on("disconnect", () => {
-        console.log(`[Socket] Disconnected: ${socketRef.current?.id}`);
+        if (socketRef.current) {
+          console.log(`[Socket] Disconnected: ${socketRef.current.id}`);
+        }
         setIsConnected(false);
       });
 
@@ -63,9 +74,10 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     }
 
     return () => {
-      if (socketRef.current) {
-        console.log(`[Socket] Cleaning up connection: ${socketRef.current.id}`);
-        socketRef.current.disconnect();
+      const currentSocket = socketRef.current;
+      if (currentSocket) {
+        console.log(`[Socket] Cleaning up connection: ${currentSocket.id}`);
+        currentSocket.disconnect();
         socketRef.current = null;
         setIsConnected(false);
       }

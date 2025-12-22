@@ -139,3 +139,51 @@ interface Order {
   status?: "pending" | "processing" | "completed" | "cancelled";
   createdAt?: string;
 }
+
+// Gift Types
+type GiftType = "snacks_drinks" | "discount";
+
+type ScheduleGiftStatus = "assigned" | "claimed" | "removed";
+
+interface GiftBundleItem {
+  itemId: string; // ObjectId từ backend sẽ được serialize thành string
+  quantity: number;
+  name: string;
+  category?: string; // FnBCategory từ backend (snacks, drinks, etc.)
+  priceSnapshot?: number;
+  source: "fnb_menu" | "fnb_menu_item";
+}
+
+interface Gift {
+  _id?: string; // ObjectId từ backend sẽ được serialize thành string
+  id?: string; // Alias cho _id để dễ sử dụng
+  name: string;
+  type: GiftType;
+  image?: string;
+  price?: number;
+  discountPercentage?: number;
+  items?: GiftBundleItem[];
+  totalQuantity: number; // tổng số suất quà (bundle) tạo ra
+  remainingQuantity: number; // số suất còn lại để random
+  isActive: boolean;
+  createdAt?: string; // Date từ backend sẽ được serialize thành string
+  updatedAt?: string; // Date từ backend sẽ được serialize thành string
+}
+
+interface ScheduleGift {
+  giftId: string; // ObjectId từ backend sẽ được serialize thành string
+  name: string;
+  type: GiftType;
+  status: ScheduleGiftStatus;
+  assignedAt: string; // Date từ backend sẽ được serialize thành string
+  claimedAt?: string; // Date từ backend sẽ được serialize thành string
+  image?: string;
+  discountPercentage?: number;
+  items?: GiftBundleItem[];
+}
+
+interface RoomGiftResponse {
+  scheduleId: string; // ObjectId từ backend sẽ được serialize thành string
+  gift: ScheduleGift | undefined;
+  giftEnabled: boolean;
+}
