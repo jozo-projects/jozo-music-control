@@ -1,9 +1,9 @@
-import React from "react";
-import { useGift } from "@/contexts/GiftContext";
 import referralGiftGif from "@/assets/gif/referral_gift.gif";
+import { useGift } from "@/contexts/GiftContext";
+import React from "react";
 
 const GiftFloatButton: React.FC = () => {
-  const { isGiftEnabled, isClaimed, openGiftModal, claimedGift } = useGift();
+  const { isGiftEnabled, isClaimed, openGiftModal } = useGift();
 
   if (!isGiftEnabled) return null;
 
