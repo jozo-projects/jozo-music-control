@@ -421,7 +421,7 @@ const FnbOrder: React.FC = () => {
                           <img
                             src={gift.image}
                             alt={gift.name}
-                            className="w-32 h-32 object-cover rounded-lg"
+                            className="w-auto max-h-36 object-cover rounded-lg"
                           />
                         </div>
                       )}
@@ -471,15 +471,6 @@ const FnbOrder: React.FC = () => {
                               và {gift.items.length - 3} món khác...
                             </p>
                           )}
-                        </div>
-                      )}
-
-                      {/* Remaining Quantity */}
-                      {gift.remainingQuantity !== undefined && (
-                        <div className="mt-4 pt-4 border-t border-yellow-200">
-                          <p className="text-xs text-gray-500 text-center">
-                            Còn lại: {gift.remainingQuantity} suất
-                          </p>
                         </div>
                       )}
                     </div>

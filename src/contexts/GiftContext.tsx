@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -97,32 +98,32 @@ export const GiftProvider: React.FC<GiftProviderProps> = ({ children }) => {
     };
   }, [socket]);
 
-  const openGiftModal = () => {
+  const openGiftModal = useCallback(() => {
     if (isGiftEnabled) {
       setIsModalOpen(true);
     }
-  };
+  }, [isGiftEnabled]);
 
-  const closeGiftModal = () => {
+  const closeGiftModal = useCallback(() => {
     setIsModalOpen(false);
-  };
+  }, []);
 
-  const markAsClaimed = (gift?: ScheduleGift) => {
+  const markAsClaimed = useCallback((gift?: ScheduleGift) => {
     setIsClaimed(true);
     setIsGiftEnabled(true); // Vẫn giữ enabled để hiển thị float button
     if (gift) {
       setClaimedGift(gift);
     }
     // Không đóng modal, để user xem quà đã mở
-  };
+  }, []);
 
-  const resetGift = () => {
+  const resetGift = useCallback(() => {
     setScheduleId(null);
     setIsGiftEnabled(false);
     setIsClaimed(false);
     setIsModalOpen(false);
     setClaimedGift(null);
-  };
+  }, []);
 
   const value = {
     scheduleId,

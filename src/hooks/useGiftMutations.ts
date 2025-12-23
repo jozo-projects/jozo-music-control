@@ -2,19 +2,14 @@ import http from "@/utils/http";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 
-interface ClaimGiftResponse {
-  gift: ScheduleGift; // Response từ backend sẽ là ScheduleGift
-  scheduleId: string;
-}
-
 export const useClaimGift = () => {
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const roomIndex = searchParams.get("roomId") || "";
 
-  return useMutation({
+  return useMutation<ScheduleGift, Error, { scheduleId: string }>({
     mutationFn: async ({ scheduleId }: { scheduleId: string }) => {
-      const response = await http.post<ApiResponse<ClaimGiftResponse>>(
+      const response = await http.post<ApiResponse<ScheduleGift>>(
         "/gifts/claim",
         { scheduleId }
       );
