@@ -1,5 +1,4 @@
-import Lottie from "lottie-react";
-import merryChristmasAnimation from "@/assets/gif/Merry Christmas.json";
+import merryChristmasGif from "@/assets/gif/Merry Christmas.gif";
 import { useGift } from "@/contexts/GiftContext";
 import React from "react";
 
@@ -39,11 +38,10 @@ const GiftFloatButton: React.FC = () => {
           ) : (
             // GIF quà tặng khi chưa mở
             <>
-              <Lottie
-                animationData={merryChristmasAnimation}
-                loop
-                autoplay
-                className="w-24 h-24"
+              <img
+                src={merryChristmasGif}
+                alt="Merry Christmas Gift"
+                className="w-24 h-24 object-contain"
               />
               {/* Pulse effect chỉ khi chưa mở */}
               <span className="absolute inset-0 rounded-full bg-yellow-400 animate-ping opacity-75"></span>

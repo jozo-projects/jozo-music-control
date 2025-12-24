@@ -98,6 +98,40 @@ export const GiftProvider: React.FC<GiftProviderProps> = ({ children }) => {
     };
   }, [socket]);
 
+  console.log("socket", socket);
+
+  // Lắng nghe thay đổi trạng thái gift từ backend
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleGiftStatusChanged = (data: {
+      roomId: string;
+      scheduleId: string;
+      giftEnabled: boolean;
+    }) => {
+      console.log("[Gift] Received gift_status_changed event:", data);
+      setScheduleId(data.scheduleId);
+      setIsGiftEnabled(data.giftEnabled);
+
+      if (data.giftEnabled) {
+        // Khi bật quà mới, reset trạng thái để hiển thị nút mở quà
+        setIsClaimed(false);
+        setClaimedGift(null);
+      } else {
+        // Khi tắt quà, ẩn modal & trạng thái claim
+        setIsClaimed(false);
+        setIsModalOpen(false);
+        setClaimedGift(null);
+      }
+    };
+
+    socket.on("gift_status_changed", handleGiftStatusChanged);
+
+    return () => {
+      socket.off("gift_status_changed", handleGiftStatusChanged);
+    };
+  }, [socket]);
+
   const openGiftModal = useCallback(() => {
     if (isGiftEnabled) {
       setIsModalOpen(true);
