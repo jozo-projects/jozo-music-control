@@ -7,11 +7,11 @@ export const useClaimGift = () => {
   const [searchParams] = useSearchParams();
   const roomIndex = searchParams.get("roomId") || "";
 
-  return useMutation<ScheduleGift, Error, { scheduleId: string }>({
-    mutationFn: async ({ scheduleId }: { scheduleId: string }) => {
+  return useMutation<ScheduleGift, Error, { scheduleId: string; giftId: string }>({
+    mutationFn: async ({ scheduleId, giftId }) => {
       const response = await http.post<ApiResponse<ScheduleGift>>(
-        "/gifts/claim",
-        { scheduleId }
+        "/gifts/claim/by-id",
+        { scheduleId, giftId }
       );
       return response.data.result;
     },

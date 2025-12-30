@@ -1,4 +1,4 @@
-import merryChristmasGif from "@/assets/gif/Merry Christmas.gif";
+import chucMungNamMoiImg from "@/assets/images/gifts/ChucMungNamMoi.png";
 import { useGift } from "@/contexts/GiftContext";
 import React from "react";
 
@@ -39,12 +39,13 @@ const GiftFloatButton: React.FC = () => {
             // GIF quà tặng khi chưa mở
             <>
               <img
-                src={merryChristmasGif}
-                alt="Merry Christmas Gift"
+                src={chucMungNamMoiImg}
+                alt="Chúc Mừng Năm Mới"
                 className="w-24 h-24 object-contain"
               />
               {/* Pulse effect chỉ khi chưa mở */}
               <span className="absolute inset-0 rounded-full bg-yellow-400 animate-ping opacity-75"></span>
+              <span className="absolute -inset-9 text-black text-xs">Bấm vào để nhận lì xì</span>
             </>
           )}
         </div>
