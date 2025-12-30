@@ -15,7 +15,7 @@ export const useRoomGiftQuery = () => {
       return response.data.result;
     },
     enabled: !!roomIndex,
-    refetchInterval: 30000, // Refetch mỗi 30 giây để check trạng thái mới nhất
+    refetchInterval: 300000, // Refetch mỗi 5 phút để check trạng thái mới nhất
   });
 };
 
