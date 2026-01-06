@@ -30,6 +30,8 @@ const FoodIcon: React.FC = () => (
   </svg>
 );
 
+const ROOM_OPTIONS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+
 const Header: React.FC = () => {
   // Gộp trạng thái tìm kiếm vào một object
   const [searchState, setSearchState] = useState({
@@ -47,8 +49,10 @@ const Header: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  const [searchParams] = useSearchParams();
-  const roomId = searchParams.get("roomId") || "1";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const roomId = searchParams.get("roomId") || "";
+  const [isRoomScreenOpen, setIsRoomScreenOpen] = useState(!roomId);
+  const touchStartXRef = useRef<number | null>(null);
 
   const queryClient = useQueryClient();
   const { mutate: sendNotification } = useRoom();
@@ -56,6 +60,38 @@ const Header: React.FC = () => {
   // Tính toán các biến thường dùng
   const isSearchPage = location.pathname.includes("/search");
   const isHomePage = location.pathname === "/" || location.pathname === "";
+
+  const ensureRoomSelected = () => {
+    if (!roomId) {
+      setIsRoomScreenOpen(true);
+      return false;
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    setIsRoomScreenOpen(!roomId);
+  }, [roomId]);
+
+  const handleHeaderTouchStart = (e: React.TouchEvent<HTMLElement>) => {
+    touchStartXRef.current = e.touches[0]?.clientX ?? null;
+  };
+
+  const handleHeaderTouchEnd = (e: React.TouchEvent<HTMLElement>) => {
+    const startX = touchStartXRef.current;
+    const endX = e.changedTouches[0]?.clientX ?? null;
+    touchStartXRef.current = null;
+
+    if (startX === null || endX === null) return;
+
+    const deltaX = endX - startX;
+    const startedAtEdge = startX < 60; // gần mép trái mới kích hoạt
+    const isRightSwipe = deltaX > 80;
+
+    if (startedAtEdge && isRightSwipe) {
+      setIsRoomScreenOpen(true);
+    }
+  };
 
   // Đồng bộ URL params với state
   useEffect(() => {
@@ -135,6 +171,7 @@ const Header: React.FC = () => {
 
   // Effect to trigger navigation when isKaraoke changes
   useEffect(() => {
+    if (!roomId) return;
     if (isSearchPage && searchState.term) {
       const baseUrl = `/search?roomId=${roomId}`;
       // Giữ lại khoảng trắng ở cuối bằng cách dùng trực tiếp searchState.term mà không trim()
@@ -148,6 +185,7 @@ const Header: React.FC = () => {
 
   // Handle input change với cách tiếp cận tối ưu hơn
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!ensureRoomSelected()) return;
     // Lấy giá trị trực tiếp từ input để đảm bảo khoảng trắng được giữ nguyên
     const value = e.target.value;
 
@@ -170,10 +208,13 @@ const Header: React.FC = () => {
   // Query cho auto complete suggestions
   const { data: songNameSuggestions } = useSongName(searchState.debouncedTerm, {
     enabled:
-      searchState.showSuggestions && searchState.debouncedTerm.length >= 2,
+      !!roomId &&
+      searchState.showSuggestions &&
+      searchState.debouncedTerm.length >= 2,
   });
 
   const handleSelectSuggestion = (suggestion: string) => {
+    if (!ensureRoomSelected()) return;
     debouncedNavigate.cancel();
 
     setSearchState({
@@ -206,7 +247,7 @@ const Header: React.FC = () => {
 
     queryClient.removeQueries({ queryKey: ["songName"] });
 
-    if (isSearchPage) {
+    if (isSearchPage && roomId) {
       navigate(`/search?roomId=${roomId}&karaoke=${isKaraoke}`);
     }
 
@@ -219,10 +260,12 @@ const Header: React.FC = () => {
   };
 
   const handleHomeNavigation = () => {
+    if (!ensureRoomSelected()) return;
     navigate(`/?roomId=${roomId}&karaoke=${isKaraoke}`);
   };
 
   const handleFnbNavigation = () => {
+    if (!ensureRoomSelected()) return;
     navigate(`/fnb?roomId=${roomId}`);
   };
 
@@ -240,6 +283,7 @@ const Header: React.FC = () => {
     const now = Date.now();
     const timeSinceLastNotification = now - lastNotificationTime;
 
+    if (!ensureRoomSelected()) return;
     // Nếu chưa gửi notification nào hoặc đã qua 2 giây từ lần cuối
     if (lastNotificationTime === 0 || timeSinceLastNotification >= 2000) {
       // Gửi ngay lập tức
@@ -272,7 +316,11 @@ const Header: React.FC = () => {
   }, [debouncedNavigate, debouncedSetTerm, queryClient]);
 
   return (
-    <header className="bg-black text-white p-4 flex items-center justify-between shadow-md z-50">
+    <header
+      className="bg-black text-white p-4 flex items-center justify-between shadow-md z-50"
+      onTouchStart={handleHeaderTouchStart}
+      onTouchEnd={handleHeaderTouchEnd}
+    >
       {/* Logo */}
       <img
         src={logo}
@@ -294,6 +342,7 @@ const Header: React.FC = () => {
             value={inputValueRef.current}
             onChange={handleInputChange}
             onFocus={() => {
+              if (!ensureRoomSelected()) return;
               setSearchState((prev) => ({ ...prev, showSuggestions: true }));
               if (!isSearchPage) {
                 navigate(`/search?roomId=${roomId}&karaoke=${isKaraoke}`);
@@ -373,6 +422,7 @@ const Header: React.FC = () => {
           <Switch
             isChecked={isKaraoke}
             onChange={() => {
+              if (!ensureRoomSelected()) return;
               setIsKaraoke(!isKaraoke);
               if (isSearchPage) {
                 navigate(
@@ -482,6 +532,67 @@ const Header: React.FC = () => {
         onClose={() => setIsBookingCodeModalOpen(false)}
         roomId={roomId}
       />
+
+      <div
+        className={`fixed inset-0 z-[120] pointer-events-none transition-transform duration-300 ${
+          isRoomScreenOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto" />
+        <div className="absolute inset-y-0 left-0 w-full max-w-xl bg-gray-900 text-white shadow-2xl pointer-events-auto">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-white/70">
+                Room selection
+              </p>
+              <h2 className="text-lg font-bold">Chọn phòng để tiếp tục</h2>
+            </div>
+            <button
+              onClick={() => setIsRoomScreenOpen(false)}
+              className="p-2 rounded-full hover:bg-white/10"
+              aria-label="Đóng chọn phòng"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="p-4 space-y-4">
+            <p className="text-sm text-white/70">
+              Vuốt từ trái sang phải trên thanh tiêu đề để mở màn chọn phòng. Chỉ staff biết thao
+              tác này.
+            </p>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+              {ROOM_OPTIONS.map((room) => (
+                <button
+                  key={room}
+                  onClick={() => {
+                    const nextParams = new URLSearchParams(searchParams);
+                    nextParams.set("roomId", room);
+                    setSearchParams(nextParams);
+                    setIsRoomScreenOpen(false);
+                  }}
+                  className={`py-3 rounded-xl border transition-colors font-semibold ${
+                    roomId === room
+                      ? "bg-lightpink text-white border-lightpink"
+                      : "border-white/10 bg-white/5 hover:bg-white/10"
+                  }`}
+                >
+                  Phòng {room}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
   );
 };
