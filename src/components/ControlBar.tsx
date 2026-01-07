@@ -2,6 +2,12 @@
 import ForwardIcon from "@/assets/icons/ForwardIcon";
 import PauseIcon from "@/assets/icons/PauseIcon";
 import PlayIcon from "@/assets/icons/PlayIcon";
+import {
+  VolumeHighIcon,
+  VolumeLowIcon,
+  VolumeMediumIcon,
+  VolumeMutedIcon,
+} from "@/assets/icons/VolumeIcons";
 import { PlaybackState } from "@/constant/enum";
 import { usePlayNextSong } from "@/hooks/useQueueMutations";
 import { useQueueQuery } from "@/hooks/useQueueQuery";
@@ -345,6 +351,22 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
     socket?.emit("adjustVolume", newVolume);
   };
 
+  const renderVolumeIcon = () => {
+    if (volume === 0) {
+      return <VolumeMutedIcon />;
+    }
+
+    if (volume <= 33) {
+      return <VolumeLowIcon />;
+    }
+
+    if (volume <= 66) {
+      return <VolumeMediumIcon />;
+    }
+
+    return <VolumeHighIcon />;
+  };
+
   return (
     <>
       <div className="bg-black text-white px-6 py-3 flex items-center justify-between shadow-lg gap-x-6 rounded-3xl z-30">
@@ -458,7 +480,7 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className="text-lg">🔊</span>
+            <div className="text-lg text-white">{renderVolumeIcon()}</div>
             <div className="relative w-24">
               <div className="absolute top-1/2 left-0 h-2 w-full bg-gray-500 rounded-full -translate-y-1/2"></div>
               <div

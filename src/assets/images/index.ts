@@ -1,3 +1,3 @@
-import logo from "./logo.gif";
+import logo from "./jozo-logo.png";
 
 export { logo };

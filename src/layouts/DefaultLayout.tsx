@@ -11,7 +11,7 @@ import { categoryImages } from "@/assets/images/categories";
 // import { Socket } from "socket.io-client";
 
 const Layout: React.FC = () => {
-  const [isQueueOpen, setIsQueueOpen] = useState(false);
+  const [isQueueOpen, setIsQueueOpen] = useState(true);
   // const socketRef = useRef<typeof Socket | null>(null);
   // const [params] = useSearchParams();
   // const roomId = params.get("roomId") || "";
