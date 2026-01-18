@@ -5,6 +5,7 @@ import { logo } from "@/assets/images";
 import useRoom from "@/hooks/useRoom";
 import { useSongName } from "@/hooks/useSongName";
 import { useQueryClient } from "@tanstack/react-query";
+import BillSummary from "./BillSummary";
 import debounce from "lodash/debounce";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
@@ -52,6 +53,7 @@ const Header: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
   const [isRoomScreenOpen, setIsRoomScreenOpen] = useState(!roomId);
+  const [isBillModalOpen, setIsBillModalOpen] = useState(false);
   const touchStartXRef = useRef<number | null>(null);
 
   const queryClient = useQueryClient();
@@ -441,8 +443,12 @@ const Header: React.FC = () => {
         <button
           className={!isHomePage ? "opacity-100" : "opacity-0"}
           onClick={handleHomeNavigation}
+          title="Trang chủ"
         >
-          <HomeIcon />
+          <div className="flex flex-col items-center gap-1 text-xs text-white/70">
+            <HomeIcon />
+            <span>Trang chủ</span>
+          </div>
         </button>
 
         <button
@@ -450,7 +456,10 @@ const Header: React.FC = () => {
           className="text-lightpink hover:text-lightpink/80"
           title="Nhập mã đặt chỗ"
         >
-          <ListIcon />
+          <div className="flex flex-col items-center gap-1 text-xs text-white/70">
+            <ListIcon />
+            <span>Mã đặt chỗ</span>
+          </div>
         </button>
 
         <button
@@ -458,11 +467,44 @@ const Header: React.FC = () => {
           className="text-lightpink hover:text-lightpink/80"
           title="Đặt đồ ăn & thức uống"
         >
-          <FoodIcon />
+          <div className="flex flex-col items-center gap-1 text-xs text-white/70">
+            <FoodIcon />
+            <span>Order</span>
+          </div>
         </button>
 
-        <button onClick={() => setIsConfirmSupportModalOpen(true)}>
-          <BellAlertIcon />
+        <button
+          onClick={() => setIsBillModalOpen(true)}
+          className="text-lightpink hover:text-lightpink/80"
+          title="Phiên sử dụng"
+        >
+          <div className="flex flex-col items-center gap-1 text-xs text-white/70">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 7.5h6M9 12h6m-6 4.5h3M7.5 3.75h9A1.5 1.5 0 0118 5.25v13.5a1.5 1.5 0 01-1.5 1.5h-9a1.5 1.5 0 01-1.5-1.5V5.25a1.5 1.5 0 011.5-1.5z"
+              />
+            </svg>
+            <span>Phiên</span>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setIsConfirmSupportModalOpen(true)}
+          title="Gọi nhân viên hỗ trợ"
+        >
+          <div className="flex flex-col items-center gap-1 text-xs text-white/70">
+            <BellAlertIcon />
+            <span>Hỗ trợ</span>
+          </div>
         </button>
       </div>
 
@@ -533,6 +575,40 @@ const Header: React.FC = () => {
         roomId={roomId}
       />
 
+      {/* Bill Modal (chỉ fetch khi mở) */}
+      {isBillModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[130]">
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 w-[90%] max-w-xl shadow-2xl border border-gray-700 relative">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">
+                Phiên sử dụng phòng {roomId || "?"}
+              </h2>
+              <button
+                onClick={() => setIsBillModalOpen(false)}
+                className="p-2 rounded-full hover:bg-white/10"
+                aria-label="Đóng bill"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <BillSummary autoFetch onClose={() => setIsBillModalOpen(false)} />
+          </div>
+        </div>
+      )}
+
       <div
         className={`fixed inset-0 z-[120] pointer-events-none transition-transform duration-300 ${
           isRoomScreenOpen ? "translate-x-0" : "-translate-x-full"
@@ -560,15 +636,19 @@ const Header: React.FC = () => {
                 stroke="currentColor"
                 className="w-6 h-6"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
 
           <div className="p-4 space-y-4">
             <p className="text-sm text-white/70">
-              Vuốt từ trái sang phải trên thanh tiêu đề để mở màn chọn phòng. Chỉ staff biết thao
-              tác này.
+              Vuốt từ trái sang phải trên thanh tiêu đề để mở màn chọn phòng.
+              Chỉ staff biết thao tác này.
             </p>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
               {ROOM_OPTIONS.map((room) => (

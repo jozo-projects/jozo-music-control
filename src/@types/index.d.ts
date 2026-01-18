@@ -140,6 +140,59 @@ interface Order {
   createdAt?: string;
 }
 
+interface BillLineItem {
+  description: string;
+  price: number;
+  quantity: number;
+  originalPrice?: number;
+  discountPercentage?: number;
+  discountName?: string;
+}
+
+interface BillPromotion {
+  name: string;
+  discountPercentage: number;
+  appliesTo: "sing" | "all" | string[];
+}
+
+interface BillFnbOrder {
+  drinks: Record<string, number>;
+  snacks: Record<string, number>;
+  completedAt?: string;
+  completedBy?: string;
+}
+
+interface IBill {
+  _id?: string;
+  scheduleId: string;
+  roomId: string;
+  items: BillLineItem[];
+  totalAmount: number;
+  giftDiscountAmount?: number;
+  startTime: string;
+  endTime: string;
+  createdAt: string;
+  paymentMethod?: string;
+  note?: string;
+  activePromotion?: BillPromotion;
+  gift?: {
+    giftId: string;
+    name: string;
+    type: GiftType;
+    discountPercentage?: number;
+    discountAmount?: number;
+    items?: GiftBundleItem[];
+  };
+  freeHourPromotion?: {
+    freeMinutesApplied: number;
+    freeAmount: number;
+  };
+  actualEndTime?: string;
+  actualStartTime?: string;
+  invoiceCode?: string;
+  fnbOrder?: BillFnbOrder;
+}
+
 // Gift Types
 type GiftType = "snacks_drinks" | "discount";
 

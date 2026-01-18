@@ -369,7 +369,7 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
 
   return (
     <>
-      <div className="bg-black text-white px-6 py-3 flex items-center justify-between shadow-lg gap-x-6 rounded-3xl z-30">
+      <div className="bg-black text-white px-6 py-3 flex items-center justify-between shadow-lg gap-x-6 rounded-3xl z-30 mb-4">
         <div className="flex items-center space-x-4 flex-shrink-0">
           {nowPlaying ? (
             <>

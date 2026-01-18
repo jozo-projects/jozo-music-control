@@ -242,7 +242,10 @@ const SortableQueueItem = ({
   );
 };
 
-const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true, onClose }) => {
+const QueueSidebar: React.FC<QueueSidebarProps> = ({
+  isOpen = true,
+  onClose,
+}) => {
   const { data: queueData } = useQueueQuery();
 
   const { mutate: removeSongFromQueue } = useRemoveSongFromQueue();
