@@ -21,7 +21,7 @@ export const SHOW_CATEGORIES: CategoryData[] = [
   {
     id: CategoriesId.HOT_SONGS,
     image: categoryImages[CategoriesId.HOT_SONGS],
-    name: "Tháng 12 Ấm Áp",
+    name: "Tháng 1 Sum vầy",
     videos: [
       {
         video_id: "IDm9AIT-GYU",
@@ -3343,9 +3343,9 @@ export const SHOW_CATEGORIES: CategoryData[] = [
     ],
   },
   {
-    id: "abc",
+    id: CategoriesId.NHAC_2000S,
     name: "Nhạc 2000s Hồi Ấy",
-    image: categoryImages[CategoriesId.HOT_HIT_MOT_THOI],
+    image: categoryImages[CategoriesId.NHAC_2000S],
     videos: [
       {
         video_id: "SVTcXSCFzGw",
@@ -3606,6 +3606,209 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=glYeqf5BZtY",
         thumbnail: "https://i.ytimg.com/vi/glYeqf5BZtY/hq720.jpg",
         author: "Classis NT",
+      },
+    ],
+  },
+  {
+    id: CategoriesId.TET,
+    name: "Tết 2026",
+    image: categoryImages[CategoriesId.TET],
+    videos: [
+      {
+        video_id: "IdRRWi_jWns",
+        title:
+          "TẾT VỀ ĐI CON (Karaoke Tone Nam) | NGÔ KIẾN HUY Ft KARIK × TRƯỜNG GIANG x DILAN VŨ",
+        duration: 258,
+        url: "https://youtube.com/watch?v=IdRRWi_jWns",
+        thumbnail: "https://i.ytimg.com/vi/IdRRWi_jWns/hqdefault.jpg",
+        author: "VÂN ",
+      },
+      {
+        video_id: "tROW9PtCQO0",
+        title: "KARAOKE TONE NỮ | TẾT NÀY CON SẼ VỀ | BÙI CÔNG NAM",
+        duration: 207,
+        url: "https://youtube.com/watch?v=tROW9PtCQO0",
+        thumbnail: "https://i.ytimg.com/vi/tROW9PtCQO0/hq720.jpg",
+        author: "Bùi Công Nam",
+      },
+      {
+        video_id: "laL_XAZQfwg",
+        title: "[Karaoke] CÁI TẾT GIÀU - Bùi Công Nam ft. Lương Bích Hữu",
+        duration: 234,
+        url: "https://youtube.com/watch?v=laL_XAZQfwg",
+        thumbnail: "https://i.ytimg.com/vi/laL_XAZQfwg/hq720.jpg",
+        author: "HILADO Studio",
+      },
+      {
+        video_id: "fVP17UoVVJ8",
+        title:
+          "Tết đong đầy  Karaoke   KHOA x KAY TRẦN x DUCK V   BEAT CHUẨN MV",
+        duration: 207,
+        url: "https://youtube.com/watch?v=fVP17UoVVJ8",
+        thumbnail: "https://i.ytimg.com/vi/fVP17UoVVJ8/hq720.jpg",
+        author: "Vỹ William",
+      },
+      {
+        video_id: "TyFLWehXaMM",
+        title: "Karaoke Beat Chuyện Cũ Bỏ Qua- Bích Phương",
+        duration: 207,
+        url: "https://youtube.com/watch?v=TyFLWehXaMM",
+        thumbnail: "https://i.ytimg.com/vi/TyFLWehXaMM/hq720.jpg",
+        author: "Phong Triều",
+      },
+      {
+        video_id: "ol78wgAIU-0",
+        title: "[Karaoke] NĂM QUA ĐÃ LÀM GÌ - Noo Phước Thịnh (Có bè)",
+        duration: 237,
+        url: "https://youtube.com/watch?v=ol78wgAIU-0",
+        thumbnail: "https://i.ytimg.com/vi/ol78wgAIU-0/hq720.jpg",
+        author: "HILADO Studio",
+      },
+      {
+        video_id: "iM_RW4PtZlM",
+        title: "Karaoke Em Chào Tết - Bích Phương | VIP KTV | Nhạc tết 2024",
+        duration: 191,
+        url: "https://youtube.com/watch?v=iM_RW4PtZlM",
+        thumbnail: "https://i.ytimg.com/vi/iM_RW4PtZlM/hq720.jpg",
+        author: "VIP KTV Nhạc Tết",
+      },
+      {
+        video_id: "LhbtI_ttIGw",
+        title: "[Karaoke] Làm gì phải Hốt - JustaTee x Hoàng Thùy Linh x Đen",
+        duration: 195,
+        url: "https://youtube.com/watch?v=LhbtI_ttIGw",
+        thumbnail: "https://i.ytimg.com/vi/LhbtI_ttIGw/hq720.jpg",
+        author: "JustaTeeMusic",
+      },
+      {
+        video_id: "-DAP25F4N0c",
+        title: "BEAT PHỐI | ĐI VỀ NHÀ | ĐEN VÂU | JUSTATEE | KARAOKE",
+        duration: 207,
+        url: "https://youtube.com/watch?v=-DAP25F4N0c",
+        thumbnail: "https://i.ytimg.com/vi/-DAP25F4N0c/hq720.jpg",
+        author: "Pink Studio",
+      },
+      {
+        video_id: "e0qdMmO8iG8",
+        title: "ĐI ĐỂ TRỞ VỀ [Karaoke Beat Chuẩn] - SOOBIN HOÀNG SƠN",
+        duration: 208,
+        url: "https://youtube.com/watch?v=e0qdMmO8iG8",
+        thumbnail: "https://i.ytimg.com/vi/e0qdMmO8iG8/hq720.jpg",
+        author: "Phúc Lê",
+      },
+      {
+        video_id: "bb5Q5nGHgF0",
+        title:
+          "[Karaoke] Thế Là Tết - Đức Phúc ft. Hòa Minzy - Karaoke by Trung Kiên",
+        duration: 275,
+        url: "https://youtube.com/watch?v=bb5Q5nGHgF0",
+        thumbnail: "https://i.ytimg.com/vi/bb5Q5nGHgF0/hq720.jpg",
+        author: "Trung Kiên",
+      },
+      {
+        video_id: "e3KwAHfGO9E",
+        title: "Ngày Xuân Long Phụng Sum Vầy Karaoke || Beat Chuẩn",
+        duration: 232,
+        url: "https://youtube.com/watch?v=e3KwAHfGO9E",
+        thumbnail: "https://i.ytimg.com/vi/e3KwAHfGO9E/hq720.jpg",
+        author: "Bến Thành Audio Video",
+      },
+      {
+        video_id: "zPXp4wGC_rE",
+        title:
+          "Karaoke | Tết Nhà Mình | Hòa Minzy x Lăng LD | HIT TẾT 2021 | Gala Nhạc Việt (Official)",
+        duration: 234,
+        url: "https://youtube.com/watch?v=zPXp4wGC_rE",
+        thumbnail: "https://i.ytimg.com/vi/zPXp4wGC_rE/hq720.jpg",
+        author: "Gala Nhạc Việt",
+      },
+      {
+        video_id: "k1gifMrFO5Y",
+        title:
+          "[Karaoke 4K - Tone Nam] Tết Nô Lo (Ăn Bánh Uống Trà) - Bích Phương | Beat Chuẩn | Chỉ Có Ở 3CTKoK",
+        duration: 216,
+        url: "https://youtube.com/watch?v=k1gifMrFO5Y",
+        thumbnail: "https://i.ytimg.com/vi/k1gifMrFO5Y/hq720.jpg",
+        author: "3CT Group",
+      },
+      {
+        video_id: "dkyiLkUMAos",
+        title:
+          "[Karaoke 4K] Tết Hà Há Ha - Trúc Nhân ft. Ninh Dương Lan Ngọc | Beat Chuẩn Nhất | Chỉ Có Ở 3CTKoK",
+        duration: 195,
+        url: "https://youtube.com/watch?v=dkyiLkUMAos",
+        thumbnail: "https://i.ytimg.com/vi/dkyiLkUMAos/hq720.jpg",
+        author: "3CT Group",
+      },
+      {
+        video_id: "hp7LlEAv6nc",
+        title:
+          "CHÚC TẾT MỌI NHÀ | Hồ Ngọc Hà x Noo Phước Thịnh [BEAT KARAOKE LYRICS] +1 Tone (có bè)",
+        duration: 255,
+        url: "https://youtube.com/watch?v=hp7LlEAv6nc",
+        thumbnail: "https://i.ytimg.com/vi/hp7LlEAv6nc/hq720.jpg",
+        author: "Evan&Jackie Chanel",
+      },
+      {
+        video_id: "PXGTWwEDaUk",
+        title:
+          "KARAOKE | Giai Điệu Mùa Xuân - Noo Phước Thịnh | BEAT PHỐI CHUẨN (Có bè)",
+        duration: 236,
+        url: "https://youtube.com/watch?v=PXGTWwEDaUk",
+        thumbnail: "https://i.ytimg.com/vi/PXGTWwEDaUk/hq720.jpg",
+        author: "Khoa Bành",
+      },
+      {
+        video_id: "v5nowcuIJT8",
+        title:
+          "[Karaoke] Như Hoa Mùa Xuân - Bảo Thy, Ái Phương ft Văn Mai Hương",
+        duration: 306,
+        url: "https://youtube.com/watch?v=v5nowcuIJT8",
+        thumbnail: "https://i.ytimg.com/vi/v5nowcuIJT8/hq720.jpg",
+        author: "Karaoke Online",
+      },
+      {
+        video_id: "XzZq4ORx81Y",
+        title: "[KARAOKE] - HẠNH PHÚC XUÂN NGỜI - Noo Phước Thịnh",
+        duration: 240,
+        url: "https://youtube.com/watch?v=XzZq4ORx81Y",
+        thumbnail: "https://i.ytimg.com/vi/XzZq4ORx81Y/hq720.jpg",
+        author: "Yêu Ca Hát",
+      },
+      {
+        video_id: "9SV_zndgkAo",
+        title:
+          "[KARAOKE] VỀ NHÀ LÀ CÓ TẾT | BÙI CÔNG NAM | Instrumental/Beat Gốc (Tone Nam)",
+        duration: 155,
+        url: "https://youtube.com/watch?v=9SV_zndgkAo",
+        thumbnail: "https://i.ytimg.com/vi/9SV_zndgkAo/hq720.jpg",
+        author: "Avocado Entertainment ",
+      },
+      {
+        video_id: "TX6wH5gY9PU",
+        title:
+          "NHÀ LÀ NƠI TA TRỞ VỀ | KARAOKE BEAT CHUẨN | KUUN ĐỨC NAM ft XUÂN ĐỨC x LOOPER APPEARS | MV NHẠC TẾT",
+        duration: 298,
+        url: "https://youtube.com/watch?v=TX6wH5gY9PU",
+        thumbnail: "https://i.ytimg.com/vi/TX6wH5gY9PU/hq720.jpg",
+        author: "Xuân Đức Official",
+      },
+      {
+        video_id: "KB-ZQj8O0SE",
+        title:
+          "[Karaoke Beat] TẾT ỔN RỒI - ĐÔNG NHI, HIỀN THỤC, JUN PHẠM, BÙI CÔNG NAM (Beat Chuẩn Có Bè)",
+        duration: 259,
+        url: "https://youtube.com/watch?v=KB-ZQj8O0SE",
+        thumbnail: "https://i.ytimg.com/vi/KB-ZQj8O0SE/hq720.jpg",
+        author: "Hoàng Anh Potatoes",
+      },
+      {
+        video_id: "PiaW6QeJHFo",
+        title: "Tết Nhà Là Tết Nhất | LG x Bùi Công Nam | Karaoke",
+        duration: 221,
+        url: "https://youtube.com/watch?v=PiaW6QeJHFo",
+        thumbnail: "https://i.ytimg.com/vi/PiaW6QeJHFo/hq720.jpg",
+        author: "LG Vietnam",
       },
     ],
   },
