@@ -40,15 +40,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "SING KARA",
       },
       {
-        video_id: "I-znCceSs-8",
-        title:
-          "KARAOKE || MIN - chẳng phải tình đầu sao đau đến thế feat. Dangrangto, Antransax (Beat Chuẩn)",
-        duration: 279,
-        url: "https://youtube.com/watch?v=I-znCceSs-8",
-        thumbnail: "https://i.ytimg.com/vi/I-znCceSs-8/hq720.jpg",
-        author: "Bản Karaoke",
-      },
-      {
         video_id: "ijajoDzY-2k",
         title: "Chiec Khan Gio Am Karaoke - Khanh Phuong",
         duration: 263,

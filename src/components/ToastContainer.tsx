@@ -44,7 +44,7 @@ export const ToastContainer = () => {
   if (!toast) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+    <div className="fixed right-4 top-24 flex justify-end pointer-events-none z-[120]">
       <div
         key={toast.id}
         className={clsx(

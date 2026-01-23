@@ -319,7 +319,7 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
   const displayCurrentTime = isNowPlaying ? currentTime : 0;
   const displayDuration = isNowPlaying ? duration : 0;
 
-  const nowPlaying = queueData?.result.nowPlaying?.video_id;
+  const nowPlayingId = queueData?.result.nowPlaying?.video_id;
 
   const handleNextSong = useCallback(
     debounce(() => {
@@ -371,7 +371,7 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
     <>
       <div className="bg-black text-white px-6 py-3 flex items-center justify-between shadow-lg gap-x-6 rounded-3xl z-30 mb-4">
         <div className="flex items-center space-x-4 flex-shrink-0">
-          {nowPlaying ? (
+          {nowPlayingId ? (
             <>
               <img
                 src={queueData.result.nowPlaying.thumbnail}
@@ -399,9 +399,9 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
           <div className="flex items-center space-x-6">
             <button
               onClick={handlePlayback}
-              disabled={!nowPlaying}
+              disabled={!nowPlayingId}
               className={
-                !nowPlaying
+                !nowPlayingId
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:opacity-80"
               }
@@ -411,12 +411,12 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
             <button
               onClick={handleNextSong}
               disabled={
-                !nowPlaying ||
+                !nowPlayingId ||
                 !queueData?.result?.queue?.length ||
                 isNextSongPending
               }
               className={
-                !nowPlaying ||
+                !nowPlayingId ||
                 !queueData?.result?.queue?.length ||
                 isNextSongPending
                   ? "opacity-50 cursor-not-allowed"

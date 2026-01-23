@@ -4,6 +4,30 @@ import http from "@/utils/http";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 
+const CONTROLLER_PATH = "/room-music";
+
+const saveSongToLibrary = async ({
+  roomId,
+  song,
+}: {
+  roomId: string;
+  song: Pick<
+    Video,
+    "video_id" | "title" | "thumbnail" | "author" | "url" | "duration"
+  >;
+}) => {
+  const payload = {
+    video_id: song.video_id,
+    title: song.title,
+    thumbnail: song.thumbnail,
+    author: song.author,
+    ...(song.url ? { url: song.url } : {}),
+    ...(song.duration !== undefined ? { duration: song.duration } : {}),
+  };
+
+  return http.post(`${CONTROLLER_PATH}/${roomId}/save-song`, payload);
+};
+
 export const useQueueMutations = () => {
   const queryClient = useQueryClient();
 
@@ -17,9 +41,21 @@ export const useQueueMutations = () => {
       position: "top" | "end";
       roomId: string;
     }) => {
+      await saveSongToLibrary({
+        roomId,
+        song: {
+          video_id: song.video_id,
+          title: song.title,
+          thumbnail: song.thumbnail,
+          author: song.author,
+          url: song.url,
+          duration: song.duration,
+        },
+      });
+
       const response = await http.post<
         ApiResponse<{ queue: Video[]; nowPlaying: Video }>
-      >(`/room-music/${roomId}/queue`, {
+      >(`${CONTROLLER_PATH}/${roomId}/queue`, {
         ...song,
         position,
       });
@@ -64,6 +100,30 @@ export const useQueueMutations = () => {
   return { addSongToQueue };
 };
 
+export const useSaveSongToLibrary = () => {
+  return useMutation({
+    mutationFn: async ({
+      roomId,
+      song,
+    }: {
+      roomId: string;
+      song: Pick<
+        Video,
+        "video_id" | "title" | "thumbnail" | "author" | "url" | "duration"
+      >;
+    }) => {
+      const response = await saveSongToLibrary({ roomId, song });
+      return response.data;
+    },
+    onError: (error, variables) => {
+      console.error("Lưu bài hát vào thư viện thất bại", {
+        error,
+        videoId: variables.song.video_id,
+      });
+    },
+  });
+};
+
 export const useRemoveSongFromQueue = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -76,7 +136,7 @@ export const useRemoveSongFromQueue = () => {
     }) => {
       const response = await http.delete<
         ApiResponse<{ queue: Video[]; nowPlaying: Video }>
-      >(`/room-music/${roomId}/queue/${videoIndex}`);
+      >(`${CONTROLLER_PATH}/${roomId}/queue/${videoIndex}`);
       return response.data;
     },
     onSuccess: (data, variables) => {
@@ -118,7 +178,7 @@ export const usePlaybackMutations = () => {
       seekTime?: number;
     }) => {
       const response = await http.post<ApiResponse<{ action: PlaybackState }>>(
-        `/room-music/${roomId}/playback/${action}`,
+        `${CONTROLLER_PATH}/${roomId}/playback/${action}`,
         { seekTime }
       );
 
@@ -131,7 +191,7 @@ export const usePlayNextSong = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ roomId }: { roomId: string }) => {
-      const response = await http.post(`/room-music/${roomId}/play-next-song`);
+      const response = await http.post(`${CONTROLLER_PATH}/${roomId}/play-next-song`);
       return response.data;
     },
     onSuccess: (data, variables) => {
@@ -172,7 +232,7 @@ export const usePlayChosenSong = () => {
     }) => {
       // Đây là API endpoint sẽ được thêm ở backend
       const response = await http.post(
-        `/room-music/${roomId}/play-chosen-song`,
+        `${CONTROLLER_PATH}/${roomId}/play-chosen-song`,
         { videoIndex }
       );
       return response.data;
@@ -207,7 +267,7 @@ export const useRemoveAllSongs = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ roomId }: { roomId: string }) => {
-      const response = await http.delete(`/room-music/${roomId}/queue`);
+      const response = await http.delete(`${CONTROLLER_PATH}/${roomId}/queue`);
       return response.data;
     },
     onSuccess: (_, variables) => {
@@ -228,7 +288,7 @@ export const useUpdateQueueOrder = () => {
       roomId: string;
       queue: Video[];
     }) => {
-      const response = await http.put(`/room-music/${roomId}/queue`, {
+      const response = await http.put(`${CONTROLLER_PATH}/${roomId}/queue`, {
         queue,
       });
       return response.data;
@@ -248,7 +308,7 @@ export const useAddAllSongs = () => {
     }) => {
       const response = await http.post<
         ApiResponse<{ queue: Video[]; nowPlaying: Video }>
-      >(`/room-music/${roomId}/add-songs`, {
+      >(`${CONTROLLER_PATH}/${roomId}/queue/add-songs`, {
         songs,
       });
       return response.data;
