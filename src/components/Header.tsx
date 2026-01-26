@@ -124,7 +124,7 @@ const Header: React.FC = () => {
           debouncedTerm: term,
         }));
       }, 800),
-    []
+    [],
   );
 
   // Cập nhật debounced term khi term thay đổi
@@ -150,7 +150,7 @@ const Header: React.FC = () => {
           navigate(baseUrl);
         }
       }, 5000),
-    [roomId, isKaraoke, isSearchPage, isHomePage, navigate]
+    [roomId, isKaraoke, isSearchPage, isHomePage, navigate],
   );
 
   // Click outside để đóng suggestions
@@ -179,8 +179,8 @@ const Header: React.FC = () => {
       // Giữ lại khoảng trắng ở cuối bằng cách dùng trực tiếp searchState.term mà không trim()
       navigate(
         `${baseUrl}&query=${encodeURIComponent(
-          searchState.term
-        )}&karaoke=${isKaraoke}`
+          searchState.term,
+        )}&karaoke=${isKaraoke}`,
       );
     }
   }, [isKaraoke, roomId, isSearchPage, searchState.term, navigate]);
@@ -190,9 +190,6 @@ const Header: React.FC = () => {
     if (!ensureRoomSelected()) return;
     // Lấy giá trị trực tiếp từ input để đảm bảo khoảng trắng được giữ nguyên
     const value = e.target.value;
-
-    // Log giá trị để debug
-    console.log(`Input value: "${value}", length: ${value.length}`);
 
     // Lưu giá trị thực tế vào ref
     inputValueRef.current = value;
@@ -232,8 +229,8 @@ const Header: React.FC = () => {
     // Đối với suggestion, sử dụng trim() là phù hợp vì đây là text từ gợi ý
     navigate(
       `/search?roomId=${roomId}&query=${encodeURIComponent(
-        suggestion
-      )}&karaoke=${isKaraoke}`
+        suggestion,
+      )}&karaoke=${isKaraoke}`,
     );
   };
 
@@ -298,7 +295,7 @@ const Header: React.FC = () => {
           onError: () => {
             toast.error("Gặp lỗi khi yêu cầu nhân viên hỗ trợ");
           },
-        }
+        },
       );
       setLastNotificationTime(now);
     } else {
@@ -379,11 +376,11 @@ const Header: React.FC = () => {
         {searchState.showSuggestions &&
           songNameSuggestions &&
           songNameSuggestions.length > 0 && (
-            <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-lg z-50 border border-gray-200 mt-1">
-              <div className="flex justify-between items-center border-b border-gray-200">
-                <div className="p-2 text-gray-600 font-medium">Gợi ý</div>
+            <div className="absolute top-full left-0 w-full bg-white/30 backdrop-blur-md shadow-lg rounded-lg z-50 border border-gray-200/50 mt-1">
+              <div className="flex justify-between items-center border-b border-gray-200/50">
+                <div className="p-2 text-gray-800 font-medium">Gợi ý</div>
                 <button
-                  className="p-2 text-gray-500 hover:text-gray-800"
+                  className="p-2 text-gray-700 hover:text-gray-900"
                   onClick={() =>
                     setSearchState((prev) => ({
                       ...prev,
@@ -410,7 +407,7 @@ const Header: React.FC = () => {
               {songNameSuggestions?.map((suggestion, index) => (
                 <div
                   key={index}
-                  className="p-2 hover:bg-gray-100 cursor-pointer text-gray-800"
+                  className="p-2 hover:bg-white/40 cursor-pointer text-gray-900"
                   onClick={() => handleSelectSuggestion(suggestion)}
                 >
                   {suggestion}
@@ -429,8 +426,8 @@ const Header: React.FC = () => {
               if (isSearchPage) {
                 navigate(
                   `/search?query=${encodeURIComponent(
-                    searchState.term
-                  )}&karaoke=${!isKaraoke}&roomId=${roomId}`
+                    searchState.term,
+                  )}&karaoke=${!isKaraoke}&roomId=${roomId}`,
                 );
               }
             }}

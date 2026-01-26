@@ -11,6 +11,9 @@ interface Video {
   duration: number; // Nếu cần thời lượng
   url?: string; // URL của video (optional)
   position?: "top" | "end"; // Vị trí trong queue (top hoặc end)
+  source?: string;
+  is_saved?: boolean;
+  match_score?: number; // Điểm khớp từ tìm kiếm (cao hơn = khớp tốt hơn)
 }
 
 interface YouTubeSearchResponse {

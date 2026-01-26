@@ -38,8 +38,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (roomId && !socketRef.current) {
-      console.log(`[Socket] Connecting to room: ${roomId}`);
-
       socketRef.current = io(import.meta.env.VITE_SOCKET_URL, {
         query: { roomId },
         transports: ["websocket"],
@@ -49,12 +47,10 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       socketRef.current.on("connect", () => {
         const currentSocket = socketRef.current;
         if (currentSocket) {
-          console.log(`[Socket] Connected: ${currentSocket.id}`);
           setIsConnected(true);
-          
+
           // Join room với roomId sau khi kết nối thành công
           if (roomId) {
-            console.log(`[Socket] Joining room: ${roomId}`);
             currentSocket.emit("join", roomId);
           }
         }
@@ -62,7 +58,8 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
       socketRef.current.on("disconnect", () => {
         if (socketRef.current) {
-          console.log(`[Socket] Disconnected: ${socketRef.current.id}`);
+          socketRef.current.disconnect();
+          socketRef.current = null;
         }
         setIsConnected(false);
       });
@@ -76,7 +73,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     return () => {
       const currentSocket = socketRef.current;
       if (currentSocket) {
-        console.log(`[Socket] Cleaning up connection: ${currentSocket.id}`);
         currentSocket.disconnect();
         socketRef.current = null;
         setIsConnected(false);

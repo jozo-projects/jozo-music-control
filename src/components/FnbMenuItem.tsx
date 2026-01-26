@@ -6,12 +6,12 @@ interface FnbMenuItemProps {
   onAddToCart?: (
     item: FnbItem,
     variant?: FnbVariant,
-    buttonElement?: HTMLElement
+    buttonElement?: HTMLElement,
   ) => void;
   onUpdateQuantity?: (
     itemId: string,
     quantity: number,
-    variantId?: string
+    variantId?: string,
   ) => void;
   onRemoveFromCart?: (itemId: string, variantId?: string) => void;
   onOpenCart?: () => void;
@@ -33,7 +33,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
 
   // Helper function to parse variants (handle both array and JSON string)
   const parseVariants = (
-    variants: FnbVariant[] | string | undefined
+    variants: FnbVariant[] | string | undefined,
   ): FnbVariant[] => {
     if (!variants) return [];
     if (Array.isArray(variants)) return variants;
@@ -53,12 +53,12 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
   // Helper function to get quantity in cart for item
   const getItemQuantityInCart = (
     itemId: string,
-    variantId?: string
+    variantId?: string,
   ): number => {
     const cartItem = cart.find((cartItem) =>
       variantId
         ? cartItem.itemId === itemId && cartItem.variantId === variantId
-        : cartItem.itemId === itemId && !cartItem.variantId
+        : cartItem.itemId === itemId && !cartItem.variantId,
     );
     return cartItem ? cartItem.quantity : 0;
   };
@@ -67,7 +67,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
   // Vì chỉ update local state (không gọi API ngay), nên cần trừ cart quantity
   const getRemainingQuantity = (
     _itemId: string,
-    variantId?: string
+    variantId?: string,
   ): number => {
     const baseQuantity = variantId
       ? variants.find((v) => v._id === variantId)?.inventory.quantity || 0
@@ -104,7 +104,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
 
   const handleItemQuantityChange = (
     change: number,
-    buttonElement?: HTMLElement
+    buttonElement?: HTMLElement,
   ) => {
     const currentQuantity = getItemQuantityInCart(item._id);
     const newQuantity = Math.max(0, currentQuantity + change);
@@ -157,7 +157,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                 <div className="text-xl font-bold text-lightpink mb-1">
                   Từ{" "}
                   {Math.min(...variants.map((v) => v.price)).toLocaleString(
-                    "vi-VN"
+                    "vi-VN",
                   )}
                   đ
                 </div>
@@ -254,7 +254,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                   {variants.map((variant) => {
                     const remainingQuantity = getRemainingQuantity(
                       item._id,
-                      variant._id
+                      variant._id,
                     );
                     const variantAvailable = remainingQuantity > 0;
 
@@ -290,17 +290,8 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                             }
                             alt={variant.name}
                             className="w-full h-full object-cover rounded-t-xl"
-                            onLoad={() => {
-                              console.log(
-                                "Image loaded successfully:",
-                                variant.image
-                              );
-                            }}
+                            onLoad={() => {}}
                             onError={(e) => {
-                              console.log(
-                                "Image failed to load:",
-                                variant.image
-                              );
                               (e.target as HTMLImageElement).src = defaultImage;
                             }}
                           />
@@ -334,7 +325,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                                     e.stopPropagation();
                                     handleVariantQuantityChange(
                                       variant._id,
-                                      -1
+                                      -1,
                                     );
                                   }}
                                 >

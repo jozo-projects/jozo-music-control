@@ -66,7 +66,7 @@ export const useQueueMutations = () => {
       toast.success(
         `Thêm bài hát "${song.title}" thành công vào ${
           variables.position === "top" ? "đầu" : "cuối"
-        } danh sách!`
+        } danh sách!`,
       );
       queryClient.setQueryData(
         ["queue", variables.roomId],
@@ -76,7 +76,7 @@ export const useQueueMutations = () => {
                 nowPlaying: Video;
                 queue: Video[];
               }>
-            | undefined
+            | undefined,
         ) => {
           if (!oldData) return oldData;
 
@@ -87,12 +87,12 @@ export const useQueueMutations = () => {
               ...data.result,
             },
           };
-        }
+        },
       );
     },
     onError: (_: AxiosError, variables) => {
       toast.error(
-        `Không thể thêm bài hát "${variables.song.title}" vào danh sách.`
+        `Không thể thêm bài hát "${variables.song.title}" vào danh sách.`,
       );
     },
   });
@@ -148,7 +148,7 @@ export const useRemoveSongFromQueue = () => {
                 nowPlaying: Video;
                 queue: Video[];
               }>
-            | undefined
+            | undefined,
         ) => {
           if (!oldData) return oldData;
 
@@ -160,7 +160,7 @@ export const useRemoveSongFromQueue = () => {
               // nowPlaying: data.result.nowPlaying,
             },
           };
-        }
+        },
       );
     },
   });
@@ -179,7 +179,7 @@ export const usePlaybackMutations = () => {
     }) => {
       const response = await http.post<ApiResponse<{ action: PlaybackState }>>(
         `${CONTROLLER_PATH}/${roomId}/playback/${action}`,
-        { seekTime }
+        { seekTime },
       );
 
       return response.data;
@@ -191,7 +191,9 @@ export const usePlayNextSong = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ roomId }: { roomId: string }) => {
-      const response = await http.post(`${CONTROLLER_PATH}/${roomId}/play-next-song`);
+      const response = await http.post(
+        `${CONTROLLER_PATH}/${roomId}/play-next-song`,
+      );
       return response.data;
     },
     onSuccess: (data, variables) => {
@@ -203,7 +205,7 @@ export const usePlayNextSong = () => {
                 nowPlaying: Video;
                 queue: Video[];
               }>
-            | undefined
+            | undefined,
         ) => {
           if (!oldData) return oldData;
 
@@ -214,7 +216,7 @@ export const usePlayNextSong = () => {
               ...data.result,
             },
           };
-        }
+        },
       );
     },
   });
@@ -233,7 +235,7 @@ export const usePlayChosenSong = () => {
       // Đây là API endpoint sẽ được thêm ở backend
       const response = await http.post(
         `${CONTROLLER_PATH}/${roomId}/play-chosen-song`,
-        { videoIndex }
+        { videoIndex },
       );
       return response.data;
     },
@@ -246,7 +248,7 @@ export const usePlayChosenSong = () => {
                 nowPlaying: Video;
                 queue: Video[];
               }>
-            | undefined
+            | undefined,
         ) => {
           if (!oldData) return oldData;
 
@@ -257,7 +259,7 @@ export const usePlayChosenSong = () => {
               ...data.result,
             },
           };
-        }
+        },
       );
     },
   });
@@ -315,7 +317,7 @@ export const useAddAllSongs = () => {
     },
     onSuccess: (data, variables) => {
       toast.success(
-        `Đã thêm ${variables.songs.length} bài hát vào danh sách thành công!`
+        `Đã thêm ${variables.songs.length} bài hát vào danh sách thành công!`,
       );
       queryClient.setQueryData(
         ["queue", variables.roomId],
@@ -325,7 +327,7 @@ export const useAddAllSongs = () => {
                 nowPlaying: Video;
                 queue: Video[];
               }>
-            | undefined
+            | undefined,
         ) => {
           if (!oldData) return oldData;
 
@@ -336,12 +338,12 @@ export const useAddAllSongs = () => {
               ...data.result,
             },
           };
-        }
+        },
       );
     },
     onError: (_: AxiosError, variables) => {
       toast.error(
-        `Không thể thêm ${variables.songs.length} bài hát vào danh sách.`
+        `Không thể thêm ${variables.songs.length} bài hát vào danh sách.`,
       );
     },
   });

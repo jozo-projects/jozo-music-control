@@ -48,7 +48,7 @@ const FnbOrder: React.FC = () => {
   useEffect(() => {
     if (fnbMenu?.items) {
       const uniqueCategories = Array.from(
-        new Set(fnbMenu.items.map((item) => item.category))
+        new Set(fnbMenu.items.map((item) => item.category)),
       ).filter(Boolean) as string[]; // Đảm bảo các giá trị là string
 
       const categoryList: FnbCategory[] = uniqueCategories.map((category) => ({
@@ -57,8 +57,8 @@ const FnbOrder: React.FC = () => {
           category === "snacks"
             ? "Snacks"
             : category === "drinks"
-            ? "Drinks"
-            : category,
+              ? "Drinks"
+              : category,
       }));
 
       setCategories(categoryList);
@@ -75,11 +75,10 @@ const FnbOrder: React.FC = () => {
   const handleAddToCart = async (
     item: FnbItem,
     variant?: FnbVariant,
-    buttonElement?: HTMLElement
+    buttonElement?: HTMLElement,
   ) => {
     // Prevent double click
     if (isAdding) {
-      console.log("⏸️ Already processing, skipping duplicate request");
       return;
     }
 
@@ -139,7 +138,7 @@ const FnbOrder: React.FC = () => {
       const existingItem = cart.find((cartItem) =>
         variant
           ? cartItem.itemId === item._id && cartItem.variantId === variant._id
-          : cartItem.itemId === item._id && !cartItem.variantId
+          : cartItem.itemId === item._id && !cartItem.variantId,
       );
 
       if (existingItem) {
@@ -152,9 +151,9 @@ const FnbOrder: React.FC = () => {
                 ? { ...cartItem, quantity: cartItem.quantity + 1 }
                 : cartItem
               : cartItem.itemId === item._id && !cartItem.variantId
-              ? { ...cartItem, quantity: cartItem.quantity + 1 }
-              : cartItem
-          )
+                ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                : cartItem,
+          ),
         );
       } else {
         // Add new item to cart
@@ -181,7 +180,7 @@ const FnbOrder: React.FC = () => {
 
   // Helper function to parse variants (handle both array and JSON string)
   const parseVariants = (
-    variants: FnbVariant[] | string | undefined
+    variants: FnbVariant[] | string | undefined,
   ): FnbVariant[] => {
     if (!variants) return [];
     if (Array.isArray(variants)) return variants;
@@ -198,7 +197,7 @@ const FnbOrder: React.FC = () => {
   const handleUpdateQuantity = async (
     itemId: string,
     quantity: number,
-    variantId?: string
+    variantId?: string,
   ) => {
     if (quantity <= 0) {
       handleRemoveFromCart(itemId, variantId);
@@ -235,9 +234,9 @@ const FnbOrder: React.FC = () => {
             ? { ...item, quantity }
             : item
           : item.itemId === itemId && !item.variantId
-          ? { ...item, quantity }
-          : item
-      )
+            ? { ...item, quantity }
+            : item,
+      ),
     );
   };
 
@@ -248,8 +247,8 @@ const FnbOrder: React.FC = () => {
       cart.filter((item) =>
         variantId
           ? !(item.itemId === itemId && item.variantId === variantId)
-          : item.itemId !== itemId
-      )
+          : item.itemId !== itemId,
+      ),
     );
   };
 
@@ -338,7 +337,7 @@ const FnbOrder: React.FC = () => {
   }
 
   const filteredItems = fnbMenu?.items.filter(
-    (item) => item.category === selectedCategory && !item.parentId
+    (item) => item.category === selectedCategory && !item.parentId,
   );
 
   return (
@@ -528,7 +527,7 @@ const FnbOrder: React.FC = () => {
                 <div className="space-y-3">
                   {cart.map((cartItem, index) => {
                     const item = fnbMenu?.items.find(
-                      (i) => i._id === cartItem.itemId
+                      (i) => i._id === cartItem.itemId,
                     );
                     if (!item) return null;
 
@@ -540,10 +539,10 @@ const FnbOrder: React.FC = () => {
 
                     if (cartItem.variantId) {
                       const variants: FnbVariant[] = parseVariants(
-                        item.variants
+                        item.variants,
                       );
                       variant = variants.find(
-                        (v) => v._id === cartItem.variantId
+                        (v) => v._id === cartItem.variantId,
                       );
                       if (variant) {
                         itemName = `${item.name} - ${variant.name}`;
@@ -600,7 +599,7 @@ const FnbOrder: React.FC = () => {
                               handleUpdateQuantity(
                                 item._id,
                                 cartItem.quantity - 1,
-                                cartItem.variantId
+                                cartItem.variantId,
                               )
                             }
                           >
@@ -628,7 +627,7 @@ const FnbOrder: React.FC = () => {
                               handleUpdateQuantity(
                                 item._id,
                                 cartItem.quantity + 1,
-                                cartItem.variantId
+                                cartItem.variantId,
                               )
                             }
                           >

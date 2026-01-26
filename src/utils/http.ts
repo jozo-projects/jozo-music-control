@@ -14,13 +14,12 @@ const axiosInstance = axios.create({
 // Interceptor xử lý request (nếu cần thêm logic cho request)
 axiosInstance.interceptors.request.use(
   (config) => {
-    console.log(`[Request] ${config.method?.toUpperCase()} ${config.url}`);
     return config;
   },
   (error) => {
     console.error("Request Error:", error);
     return Promise.reject(error);
-  }
+  },
 );
 
 // Interceptor xử lý response
@@ -31,7 +30,6 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     // Nếu request bị cancel thì không xử lý gì thêm
     if (axios.isCancel(error)) {
-      console.log("Request cancelled:", error.message);
       return Promise.reject(error);
     }
 
@@ -60,7 +58,7 @@ axiosInstance.interceptors.response.use(
       // Không nhận được phản hồi từ server
       console.error("Network Error:", error.message);
       toast.error(
-        "Lỗi mạng hoặc server không phản hồi. Vui lòng kiểm tra kết nối."
+        "Lỗi mạng hoặc server không phản hồi. Vui lòng kiểm tra kết nối.",
       );
     } else {
       // Các lỗi khác
@@ -74,7 +72,7 @@ axiosInstance.interceptors.response.use(
     // }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosInstance;

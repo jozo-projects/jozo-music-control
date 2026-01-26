@@ -13,16 +13,10 @@ export const useFnbMutations = () => {
       payload: CreateFnbOrderPayload;
       roomId: string;
     }) => {
-      console.log(
-        "📤 Sending add request to:",
-        `/client/fnb/orders/room/${roomId}/add`
-      );
-      console.log("📤 Payload:", JSON.stringify(payload, null, 2));
       const response = await http.post<ApiResponse<FnbOrder>>(
         `/client/fnb/orders/room/${roomId}/add`,
-        payload
+        payload,
       );
-      console.log("📥 Received response:", response.data);
       return response.data.result;
     },
     onSuccess: () => {
@@ -43,7 +37,7 @@ export const useFnbMutations = () => {
     }) => {
       const response = await http.post<ApiResponse<FnbOrder>>(
         `/client/fnb/orders/room/${roomId}/remove`,
-        payload
+        payload,
       );
       return response.data.result;
     },
@@ -65,7 +59,7 @@ export const useFnbMutations = () => {
     }) => {
       const response = await http.put<ApiResponse<FnbOrder>>(
         `/client/fnb/orders/room/${roomId}`,
-        payload
+        payload,
       );
       return response.data.result;
     },
@@ -87,7 +81,7 @@ export const useFnbMutations = () => {
     }) => {
       const response = await http.put<ApiResponse<FnbOrder>>(
         `/client/fnb/orders/room/${roomId}`,
-        payload
+        payload,
       );
       return response.data.result;
     },
@@ -111,16 +105,10 @@ export const useFnbMutations = () => {
       };
       roomId: string;
     }) => {
-      console.log(
-        "📤 Submitting cart to:",
-        `/client/fnb/orders/room/${roomId}/submit-cart`
-      );
-      console.log("📤 Payload:", JSON.stringify(payload, null, 2));
       const response = await http.post<ApiResponse<FnbOrder>>(
         `/client/fnb/orders/room/${roomId}/submit-cart`,
-        payload
+        payload,
       );
-      console.log("📥 Received response:", response.data);
       return response.data.result;
     },
     onSuccess: (_, variables) => {

@@ -57,8 +57,6 @@ export const GiftProvider: React.FC<GiftProviderProps> = ({ children }) => {
   // Sync state từ API response
   useEffect(() => {
     if (roomGiftData) {
-      console.log("[Gift] Room gift data:", roomGiftData);
-      
       // Cập nhật scheduleId từ API
       if (roomGiftData.scheduleId) {
         setScheduleId(roomGiftData.scheduleId);
@@ -85,7 +83,6 @@ export const GiftProvider: React.FC<GiftProviderProps> = ({ children }) => {
     if (!socket) return;
 
     const handleGiftEnabled = (data: { scheduleId: string }) => {
-      console.log("[Gift] Received gift_enabled event:", data);
       setScheduleId(data.scheduleId);
       setIsGiftEnabled(true);
       setIsClaimed(false);
@@ -98,8 +95,6 @@ export const GiftProvider: React.FC<GiftProviderProps> = ({ children }) => {
     };
   }, [socket]);
 
-  console.log("socket", socket);
-
   // Lắng nghe thay đổi trạng thái gift từ backend
   useEffect(() => {
     if (!socket) return;
@@ -109,7 +104,6 @@ export const GiftProvider: React.FC<GiftProviderProps> = ({ children }) => {
       scheduleId: string;
       giftEnabled: boolean;
     }) => {
-      console.log("[Gift] Received gift_status_changed event:", data);
       setScheduleId(data.scheduleId);
       setIsGiftEnabled(data.giftEnabled);
 
@@ -171,8 +165,5 @@ export const GiftProvider: React.FC<GiftProviderProps> = ({ children }) => {
     resetGift,
   };
 
-  return (
-    <GiftContext.Provider value={value}>{children}</GiftContext.Provider>
-  );
+  return <GiftContext.Provider value={value}>{children}</GiftContext.Provider>;
 };
-

@@ -1,5 +1,4 @@
-import { categoryImages } from "@/assets/images/categories";
-import { CategoriesId } from "@/assets/images/categories";
+import { CategoriesId, categoryImages } from "@/assets/images/categories";
 
 export interface Video {
   video_id: string;
@@ -1850,14 +1849,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=NIZRyZX7mHM",
         thumbnail: "https://i.ytimg.com/vi/NIZRyZX7mHM/hq720.jpg",
         author: "Bản Karaoke",
-      },
-      {
-        video_id: "FxJA_EKEk2U",
-        title: "Karaoke Chơi Như Tụi Mỹ -  Andree Right Hand | ZKN Music",
-        duration: 162,
-        url: "https://youtube.com/watch?v=FxJA_EKEk2U",
-        thumbnail: "https://i.ytimg.com/vi/FxJA_EKEk2U/hq720.jpg",
-        author: "ZKN Music",
       },
       {
         video_id: "PhVO-g7i4OM",

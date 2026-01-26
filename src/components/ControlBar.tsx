@@ -100,7 +100,7 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
                     queryKey: ["queue", roomId],
                   });
                 },
-              }
+              },
             );
           } else if (!queueData?.result?.queue?.length) {
             // console.log("Không còn bài trong queue, kết thúc phát nhạc");
@@ -111,7 +111,7 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
               (
                 oldData:
                   | ApiResponse<{ nowPlaying: Video; queue: Video[] }>
-                  | undefined
+                  | undefined,
               ) => ({
                 ...oldData,
                 result: {
@@ -119,7 +119,7 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
                   nowPlaying: null,
                   queue: [],
                 },
-              })
+              }),
             );
 
             // Sau đó emit các sự kiện
@@ -197,15 +197,13 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
           roomId,
         });
 
-        console.log("song_ended");
-
         // Cập nhật lại trạng thái local
         queryClient.setQueryData(
           ["queue", roomId],
           (
             oldData:
               | ApiResponse<{ nowPlaying: Video; queue: Video[] }>
-              | undefined
+              | undefined,
           ) => ({
             ...oldData,
             result: {
@@ -213,7 +211,7 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
               nowPlaying: null,
               queue: [], // Đảm bảo queue cũng được reset
             },
-          })
+          }),
         );
 
         // Reset các trạng thái phát nhạc
@@ -255,8 +253,6 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
     sendPlaybackEvent(action);
   };
 
-  console.log("isPlaying", isPlaying);
-
   const handleDragStart = () => {
     setIsDragging(true);
   };
@@ -264,8 +260,6 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
   const handleSeek = (time: number) => {
     setIsDragging(false);
     setCurrentTime(time);
-
-    console.log("time", time);
 
     if (socket) {
       socket.emit("video_event", {
@@ -288,7 +282,7 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
         });
       }
     }, 200),
-    [socket, roomId, queueData]
+    [socket, roomId, queueData],
   );
 
   const handleDrag = (value: number) => {
@@ -337,10 +331,10 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
             setCurrentTime(0);
             setIsPlaying(true);
           },
-        }
+        },
       );
     }, 500),
-    [playNextSong, roomId, queueData?.result?.queue?.length, isNextSongPending]
+    [playNextSong, roomId, queueData?.result?.queue?.length, isNextSongPending],
   );
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
