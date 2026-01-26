@@ -57,6 +57,7 @@ const SongCard: React.FC<SongCardProps> = React.memo(
           <img
             src={thumbnail}
             alt={title}
+            loading="lazy"
             className="w-full h-40 object-cover user-select-none"
           />
           <div className="p-4 bg-black/60">
