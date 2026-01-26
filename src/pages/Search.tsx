@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import SongCard from "@/components/SongCard";
-import { useSocket } from "@/contexts/SocketContext";
-import { searchSongs, SearchSongsResponse } from "@/services/searchService";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { searchLocalSongs, searchRemoteSongs } from "@/services/searchService";
+import { useQueries } from "@tanstack/react-query";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import debounce from "lodash/debounce";
 
@@ -20,58 +18,25 @@ const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
   const karaoke = searchParams.get("karaoke") === "true";
-  const roomId = searchParams.get("roomId") || "";
   const location = useLocation();
-  const { socket } = useSocket();
-  const queryClient = useQueryClient();
 
   // State để kiểm soát khi nào thực hiện tìm kiếm
   const [shouldSearch, setShouldSearch] = useState(false);
   // Lưu trữ query đã được xử lý (loại bỏ khoảng trắng ở cuối)
   const [processedQuery, setProcessedQuery] = useState("");
-  const [localResults, setLocalResults] = useState<Video[]>([]);
-  const [remoteResults, setRemoteResults] = useState<Video[]>([]);
-  const [currentRequestId, setCurrentRequestId] = useState<string | null>(null);
-  const [remoteLoading, setRemoteLoading] = useState(false);
-  // Lưu mapping giữa requestId và queryKey để update cache đúng
-  const [requestIdToQueryKey, setRequestIdToQueryKey] = useState<
-    Map<string, any[]>
-  >(new Map());
 
   // Tạo hàm debounce để tránh gọi API quá nhiều lần
-  const debouncedSearch = useCallback(
+  const debouncedSearchRef = useRef(
     debounce((trimmedQuery: string) => {
       setProcessedQuery(trimmedQuery);
       setShouldSearch(true);
     }, 1000),
-    [],
   );
-
-  const normalizeVideos = useCallback(
-    (items: Video[] = [], sourceFallback = "yt") =>
-      items.map((item: Video) => ({
-        video_id: item.video_id,
-        title: item.title,
-        thumbnail: item.thumbnail || "",
-        author: item.author || "Unknown Artist",
-        duration: item.duration ?? 0,
-        url: item.url || `https://youtube.com/watch?v=${item.video_id}`,
-        source: item.source || sourceFallback,
-        is_saved: item.is_saved ?? true,
-        match_score: item.match_score,
-      })),
-    [],
-  );
-
-  type SearchSongsCompletedPayload = {
-    requestId: string;
-    source: string;
-    remote: Video[];
-    status: "ok" | "error" | "timeout" | string;
-  };
 
   // Theo dõi thay đổi URL để kích hoạt tìm kiếm khi người dùng nhập
   useEffect(() => {
+    const debouncedSearch = debouncedSearchRef.current;
+
     if (query.length >= 2) {
       const trimmedQuery = query.trimEnd();
       debouncedSearch(trimmedQuery);
@@ -118,179 +83,78 @@ const SearchPage: React.FC = () => {
       document.removeEventListener("submit", handleFormSubmit);
       debouncedSearch.cancel();
     };
-  }, [location.search, query, debouncedSearch]);
+  }, [location.search, query]);
 
-  // Query key để dùng cho cache update
-  const queryKey = useMemo(
-    () => [
-      "searchResults",
-      processedQuery.toLowerCase().trim(),
-      karaoke,
-      roomId,
+  // Tạo search query với keywords phù hợp
+  const searchQuery = useMemo(() => {
+    if (!processedQuery) return "";
+    const normalizedQuery = processedQuery.toLowerCase().trim();
+    const isEnglishQuery = /^[a-zA-Z\s]+$/.test(normalizedQuery);
+    return isEnglishQuery
+      ? `${normalizedQuery} ${
+          karaoke ? "karaoke beat #song #music" : "song #music"
+        }`
+      : `${normalizedQuery} ${
+          karaoke ? "nhạc beat #karaoke" : "bài hát nhạc #hat #music #nhac"
+        }`;
+  }, [processedQuery, karaoke]);
+
+  // Parallel queries sử dụng useQueries - chạy song song cả 2 API
+  const queries = useQueries({
+    queries: [
+      {
+        queryKey: ["searchLocal", searchQuery.toLowerCase().trim()],
+        queryFn: () => searchLocalSongs(searchQuery),
+        enabled: shouldSearch && processedQuery.length >= 2,
+        staleTime: 1000 * 60 * 5, // Cache 5 phút
+        retry: 2, // Retry 2 lần nếu fail
+      },
+      {
+        queryKey: ["searchRemote", searchQuery.toLowerCase().trim()],
+        queryFn: () => searchRemoteSongs(searchQuery),
+        enabled: shouldSearch && processedQuery.length >= 2,
+        staleTime: 1000 * 60 * 5, // Cache 5 phút (Redis cache ở backend)
+        retry: 2, // Retry 2 lần nếu fail
+      },
     ],
-    [processedQuery, karaoke, roomId],
-  );
-
-  // Query cho search results
-  const {
-    data: searchData,
-    isLoading,
-    isError,
-  } = useQuery<SearchSongsResponse>({
-    queryKey,
-    queryFn: () => {
-      const normalizedQuery = processedQuery.toLowerCase().trim();
-      const isEnglishQuery = /^[a-zA-Z\s]+$/.test(normalizedQuery);
-      const musicKeywords = isEnglishQuery
-        ? `${normalizedQuery} ${
-            karaoke ? "karaoke beat #song #music" : "song #music"
-          }`
-        : `${normalizedQuery} ${
-            karaoke ? "nhạc beat #karaoke" : "bài hát nhạc #hat #music #nhac"
-          }`;
-      return searchSongs(musicKeywords, roomId || "");
-    },
-    enabled: shouldSearch && processedQuery.length >= 2 && !!roomId,
-    staleTime: 1000 * 60 * 5,
   });
 
-  // Sync data từ query vào state
-  useEffect(() => {
-    if (searchData) {
-      const requestId = searchData.requestId || null;
-      setCurrentRequestId(requestId);
+  // Destructure results từ array queries
+  const [localQuery, remoteQuery] = queries;
+  const isLocalLoading = localQuery.isLoading;
+  const isLocalError = localQuery.isError;
+  const isRemoteLoading = remoteQuery.isLoading;
+  const isRemoteError = remoteQuery.isError;
 
-      // Lưu mapping giữa requestId và queryKey hiện tại
-      if (requestId) {
-        setRequestIdToQueryKey((prev) => {
-          const newMap = new Map(prev);
-          newMap.set(requestId, queryKey);
-          return newMap;
-        });
-      }
-
-      // Dữ liệu đã được normalize trong searchService rồi, không cần normalize lại
-      const remoteData = searchData.remote || [];
-      console.log("[Search] Remote data from API:", {
-        requestId,
-        queryKey,
-        remoteCount: remoteData.length,
-        remote: remoteData,
-        remote_pending: searchData.remote_pending,
-      });
-
-      setLocalResults(searchData.local || []);
-      setRemoteResults(remoteData);
-      setRemoteLoading(Boolean(searchData.remote_pending));
-    } else if (!shouldSearch || processedQuery.length < 2) {
-      // Reset state khi không search
-      setLocalResults([]);
-      setRemoteResults([]);
-      setCurrentRequestId(null);
-      setRemoteLoading(false);
-      // Cleanup mapping cũ khi không search nữa
-      setRequestIdToQueryKey(new Map());
-    }
-  }, [searchData, shouldSearch, processedQuery, queryKey]);
-
-  useEffect(() => {
-    if (!socket || !roomId) return;
-
-    const handleSearchCompleted = (payload: SearchSongsCompletedPayload) => {
-      if (!payload?.requestId) return;
-
-      // Lấy queryKey tương ứng với requestId này
-      const targetQueryKey = requestIdToQueryKey.get(payload.requestId);
-      if (!targetQueryKey) {
-        // Không tìm thấy queryKey tương ứng, bỏ qua
-        return;
-      }
-
-      // Chỉ update state nếu đây là request hiện tại
-      if (payload.requestId === currentRequestId) {
-        // Normalize remote data
-        const normalizedRemote = normalizeVideos(payload.remote || [], "yt");
-
-        console.log("[Search] Remote data from Socket:", {
-          requestId: payload.requestId,
-          currentRequestId,
-          targetQueryKey,
-          remoteCount: normalizedRemote.length,
-          remote: normalizedRemote,
-          status: payload.status,
-        });
-
-        // Update state
-        setRemoteResults(normalizedRemote);
-        setRemoteLoading(false);
-      }
-
-      // Update cache của React Query với đúng queryKey tương ứng với requestId
-      queryClient.setQueryData<SearchSongsResponse>(
-        targetQueryKey,
-        (oldData) => {
-          if (!oldData) return oldData;
-
-          // Normalize remote data cho cache
-          const normalizedRemote = normalizeVideos(payload.remote || [], "yt");
-
-          return {
-            ...oldData,
-            remote: normalizedRemote,
-            remote_pending: false,
-          };
-        },
-      );
-    };
-
-    socket.on("search_songs_completed", handleSearchCompleted);
-
-    return () => {
-      socket.off("search_songs_completed", handleSearchCompleted);
-    };
-  }, [
-    socket,
-    roomId,
-    currentRequestId,
-    normalizeVideos,
-    queryClient,
-    requestIdToQueryKey,
-  ]);
-
+  // Combine results: local + remote (loại bỏ trùng lặp)
+  // Hiển thị local ngay khi có, không cần đợi remote
   const combinedResults = useMemo(() => {
+    const localResults = (localQuery.data as Video[]) || [];
+    const remoteResults = (remoteQuery.data as Video[]) || [];
+
+    // Nếu chưa có local results, trả về remote (nếu có)
+    if (localResults.length === 0) {
+      return remoteResults;
+    }
+
     // Tạo Set chứa các video_id từ local để check trùng lặp
     const localVideoIds = new Set(localResults.map((video) => video.video_id));
-
-    // Log remote trước khi merge
-    console.log("[Search] Before merge:", {
-      localCount: localResults.length,
-      remoteCount: remoteResults.length,
-      localVideoIds: Array.from(localVideoIds),
-      remoteVideoIds: remoteResults.map((v) => v.video_id),
-    });
 
     // Filter remote để loại bỏ các video_id đã có trong local
     const uniqueRemoteResults = remoteResults.filter(
       (video) => !localVideoIds.has(video.video_id),
     );
 
-    console.log("[Search] After filter duplicates:", {
-      uniqueRemoteCount: uniqueRemoteResults.length,
-      filteredOutCount: remoteResults.length - uniqueRemoteResults.length,
-      uniqueRemoteVideoIds: uniqueRemoteResults.map((v) => v.video_id),
-    });
+    // Merge local với remote đã được filter (local trước, remote sau)
+    return [...localResults, ...uniqueRemoteResults];
+  }, [localQuery.data, remoteQuery.data]);
 
-    // Merge local với remote đã được filter
-    const merged = [...localResults, ...uniqueRemoteResults];
+  // Loading state: chỉ hiển thị loading khi local đang loading
+  // (vì local nhanh, nên nếu local xong thì hiển thị ngay, không cần đợi remote)
+  const isLoading = isLocalLoading;
 
-    console.log("[Search] Final merged results:", {
-      totalCount: merged.length,
-      localCount: localResults.length,
-      remoteCount: uniqueRemoteResults.length,
-    });
-
-    return merged;
-  }, [localResults, remoteResults]);
+  // Error state: có lỗi nếu cả 2 đều fail (nếu chỉ 1 fail thì vẫn OK)
+  const isError = isLocalError && isRemoteError;
 
   return (
     <div className="p-4 space-y-6 relative">
@@ -314,8 +178,8 @@ const SearchPage: React.FC = () => {
         <p className="text-red-500">Có lỗi xảy ra khi tải kết quả tìm kiếm.</p>
       )}
 
-      {/* Search Results */}
-      {!isLoading && combinedResults.length > 0 && (
+      {/* Search Results - Hiển thị ngay khi có local results, không cần đợi remote */}
+      {!isLocalLoading && combinedResults.length > 0 && (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {combinedResults?.map((result: Video) => (
             <SongCard key={result.video_id} {...result} />
@@ -323,19 +187,19 @@ const SearchPage: React.FC = () => {
         </div>
       )}
 
-      {/* Remote loading */}
-      {remoteLoading && !isLoading && (
+      {/* Remote loading indicator - Hiển thị khi remote đang load nhưng local đã xong */}
+      {isRemoteLoading && !isLocalLoading && combinedResults.length > 0 && (
         <div className="flex items-center justify-center gap-2 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <span className="italic">Đang tìm thêm...</span>
+            <span className="italic">Đang tìm thêm trên YouTube...</span>
           </div>
         </div>
       )}
 
       {/* No Results */}
-      {!isLoading &&
-        !remoteLoading &&
+      {!isLocalLoading &&
+        !isRemoteLoading &&
         combinedResults.length === 0 &&
         processedQuery &&
         shouldSearch && (
