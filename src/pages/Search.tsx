@@ -14,6 +14,24 @@ const isMobileOrTablet = () => {
   return isMobile;
 };
 
+// Skeleton Card Component
+const SkeletonCard: React.FC = () => (
+  <div className="shadow-md rounded-lg overflow-hidden animate-pulse">
+    {/* Image skeleton */}
+    <div className="w-full h-40 bg-gray-300 dark:bg-gray-700"></div>
+    {/* Content skeleton */}
+    <div className="p-4 bg-black/60">
+      {/* Title skeleton - 2 lines */}
+      <div className="mb-2 space-y-2">
+        <div className="h-4 bg-gray-400 dark:bg-gray-600 rounded w-full"></div>
+        <div className="h-4 bg-gray-400 dark:bg-gray-600 rounded w-3/4"></div>
+      </div>
+      {/* Author skeleton */}
+      <div className="h-3 bg-gray-400 dark:bg-gray-600 rounded w-1/2"></div>
+    </div>
+  </div>
+);
+
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
@@ -164,23 +182,7 @@ const SearchPage: React.FC = () => {
       {isLoading && (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, index) => (
-            <div
-              key={index}
-              className="shadow-md rounded-lg overflow-hidden animate-pulse"
-            >
-              {/* Image skeleton */}
-              <div className="w-full h-40 bg-gray-300 dark:bg-gray-700"></div>
-              {/* Content skeleton */}
-              <div className="p-4 bg-black/60">
-                {/* Title skeleton - 2 lines */}
-                <div className="mb-2 space-y-2">
-                  <div className="h-4 bg-gray-400 dark:bg-gray-600 rounded w-full"></div>
-                  <div className="h-4 bg-gray-400 dark:bg-gray-600 rounded w-3/4"></div>
-                </div>
-                {/* Author skeleton */}
-                <div className="h-3 bg-gray-400 dark:bg-gray-600 rounded w-1/2"></div>
-              </div>
-            </div>
+            <SkeletonCard key={index} />
           ))}
         </div>
       )}
@@ -191,21 +193,18 @@ const SearchPage: React.FC = () => {
       )}
 
       {/* Search Results - Hiển thị ngay khi có local results, không cần đợi remote */}
+      {/* Skeleton cards nối tiếp với results trong cùng grid khi remote đang loading */}
       {!isLocalLoading && combinedResults.length > 0 && (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Results từ local/remote */}
           {combinedResults?.map((result: Video) => (
             <SongCard key={result.video_id} {...result} />
           ))}
-        </div>
-      )}
-
-      {/* Remote loading indicator - Hiển thị khi remote đang load nhưng local đã xong */}
-      {isRemoteLoading && !isLocalLoading && combinedResults.length > 0 && (
-        <div className="flex items-center justify-center gap-2 py-4">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <span className="italic">Đang tìm thêm video</span>
-          </div>
+          {/* Skeleton cards nối tiếp khi remote đang loading */}
+          {isRemoteLoading &&
+            [...Array(5)].map((_, index) => (
+              <SkeletonCard key={`remote-skeleton-${index}`} />
+            ))}
         </div>
       )}
 
