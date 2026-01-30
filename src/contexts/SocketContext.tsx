@@ -41,12 +41,15 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       socketRef.current = io(import.meta.env.VITE_SOCKET_URL, {
         query: { roomId },
         transports: ["websocket"],
-        forceNew: true, // Force new connection
+        reconnection: true, // Bật auto-reconnect
+        reconnectionDelay: 1000, // Đợi 1s trước khi reconnect
+        reconnectionAttempts: 5, // Thử reconnect tối đa 5 lần
       });
 
       socketRef.current.on("connect", () => {
         const currentSocket = socketRef.current;
         if (currentSocket) {
+          console.log(`[Socket] Connected to server`);
           setIsConnected(true);
 
           // Join room với roomId sau khi kết nối thành công
@@ -56,12 +59,23 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         }
       });
 
-      socketRef.current.on("disconnect", () => {
-        if (socketRef.current) {
-          socketRef.current.disconnect();
-          socketRef.current = null;
-        }
+      socketRef.current.on("disconnect", (reason: string) => {
+        console.log(`[Socket] Disconnected: ${reason}`);
         setIsConnected(false);
+        // ✅ Không gọi disconnect() ở đây - để socket tự động reconnect
+      });
+
+      socketRef.current.on("reconnect_attempt", (attemptNumber: number) => {
+        console.log(`[Socket] Reconnect attempt ${attemptNumber}`);
+      });
+
+      socketRef.current.on("reconnect", (attemptNumber: number) => {
+        console.log(`[Socket] Reconnected after ${attemptNumber} attempts`);
+        setIsConnected(true);
+        // Rejoin room sau khi reconnect
+        if (socketRef.current && roomId) {
+          socketRef.current.emit("join", roomId);
+        }
       });
 
       socketRef.current.on("connect_error", (error: Error) => {
@@ -79,16 +93,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       }
     };
   }, [roomId]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
-    };
-  }, []);
 
   const value = {
     socket: socketRef.current,
