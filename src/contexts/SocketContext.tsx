@@ -32,12 +32,22 @@ interface SocketProviderProps {
 
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const socketRef = useRef<ReturnType<typeof io> | null>(null);
+  const roomIdRef = useRef<string>(""); // Lưu roomId để tránh effect re-run
   const [isConnected, setIsConnected] = React.useState(false);
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
 
+  // Effect để khởi tạo socket - CHỈ chạy 1 lần khi mount
   useEffect(() => {
-    if (roomId && !socketRef.current) {
+    if (!roomId) return;
+
+    // Lưu roomId hiện tại
+    roomIdRef.current = roomId;
+
+    // Chỉ tạo socket nếu chưa có
+    if (!socketRef.current) {
+      console.log(`[Socket] Creating new connection for room: ${roomId}`);
+      
       socketRef.current = io(import.meta.env.VITE_SOCKET_URL, {
         query: { roomId },
         transports: ["websocket"],
@@ -48,14 +58,12 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
       socketRef.current.on("connect", () => {
         const currentSocket = socketRef.current;
-        if (currentSocket) {
-          console.log(`[Socket] Connected to server`);
+        const currentRoomId = roomIdRef.current;
+        if (currentSocket && currentRoomId) {
+          console.log(`[Socket] Connected to server, joining room: ${currentRoomId}`);
           setIsConnected(true);
-
-          // Join room với roomId sau khi kết nối thành công
-          if (roomId) {
-            currentSocket.emit("join", roomId);
-          }
+          // Join room với roomId hiện tại
+          currentSocket.emit("join", currentRoomId);
         }
       });
 
@@ -70,11 +78,13 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
 
       socketRef.current.on("reconnect", (attemptNumber: number) => {
+        const currentRoomId = roomIdRef.current;
         console.log(`[Socket] Reconnected after ${attemptNumber} attempts`);
         setIsConnected(true);
         // Rejoin room sau khi reconnect
-        if (socketRef.current && roomId) {
-          socketRef.current.emit("join", roomId);
+        if (socketRef.current && currentRoomId) {
+          console.log(`[Socket] Rejoining room: ${currentRoomId}`);
+          socketRef.current.emit("join", currentRoomId);
         }
       });
 
@@ -84,15 +94,35 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
     }
 
+    // ✅ KHÔNG cleanup khi effect re-run - chỉ cleanup khi component unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency - chỉ chạy 1 lần
+
+  // Effect riêng để update roomId khi URL thay đổi
+  useEffect(() => {
+    if (roomId && roomId !== roomIdRef.current) {
+      console.log(`[Socket] Room ID changed: ${roomIdRef.current} -> ${roomId}`);
+      roomIdRef.current = roomId;
+      
+      // Nếu đã connected, rejoin room mới
+      if (socketRef.current?.connected) {
+        console.log(`[Socket] Rejoining new room: ${roomId}`);
+        socketRef.current.emit("join", roomId);
+      }
+    }
+  }, [roomId]);
+
+  // Cleanup chỉ khi component unmount
+  useEffect(() => {
     return () => {
-      const currentSocket = socketRef.current;
-      if (currentSocket) {
-        currentSocket.disconnect();
+      console.log(`[Socket] Component unmounting, disconnecting...`);
+      if (socketRef.current) {
+        socketRef.current.disconnect();
         socketRef.current = null;
         setIsConnected(false);
       }
     };
-  }, [roomId]);
+  }, []);
 
   const value = {
     socket: socketRef.current,
