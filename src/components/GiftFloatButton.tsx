@@ -1,16 +1,27 @@
 import chucMungNamMoiImg from "@/assets/images/gifts/ChucMungNamMoi.png";
 import { useGift } from "@/contexts/GiftContext";
 import React from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 const GiftFloatButton: React.FC = () => {
-  const { isGiftEnabled, isClaimed, openGiftModal } = useGift();
+  const { isGiftEnabled, isClaimed } = useGift();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
 
-  if (!isGiftEnabled) return null;
+  if (!isGiftEnabled || location.pathname === "/gift") return null;
+
+  const goToGift = () => {
+    const query = searchParams.toString();
+    navigate(`/gift${query ? `?${query}` : ""}`);
+  };
 
   return (
-    <div className={`fixed bottom-20 right-6 z-30 ${!isClaimed ? "animate-bounce" : ""}`}>
+    <div
+      className={`fixed bottom-32 right-6 z-30 ${!isClaimed ? "animate-bounce" : ""}`}
+    >
       <button
-        onClick={openGiftModal}
+        onClick={goToGift}
         className={`${
           isClaimed
             ? "bg-gradient-to-r from-green-400 to-green-600"
@@ -45,7 +56,9 @@ const GiftFloatButton: React.FC = () => {
               />
               {/* Pulse effect chỉ khi chưa mở */}
               <span className="absolute inset-0 rounded-full bg-yellow-400 animate-ping opacity-75"></span>
-              <span className="absolute -inset-9 text-black text-xs">Bấm vào để nhận lì xì</span>
+              <span className="absolute -inset-9 text-white text-base">
+                Bấm vào để nhận lì xì
+              </span>
             </>
           )}
         </div>
@@ -55,4 +68,3 @@ const GiftFloatButton: React.FC = () => {
 };
 
 export default GiftFloatButton;
-

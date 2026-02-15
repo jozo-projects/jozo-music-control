@@ -18,7 +18,8 @@ import { useGift } from "@/contexts/GiftContext";
 import { useClaimGift } from "@/hooks/useGiftMutations";
 import { useGiftListQuery } from "@/hooks/useGiftQuery";
 import { useEffect, useMemo, useRef, useState } from "react";
-import ReactDOM from "react-dom";
+import { useNavigate } from "react-router-dom";
+import React from "react";
 
 // Câu chúc khi mở quà thành công
 const CONGRATS_MESSAGE =
@@ -46,7 +47,7 @@ type GiftCardProps = {
 const GiftCard = ({ card, mode, onSelect, disabled, bounce }: GiftCardProps) => {
   const container = (
     <div
-      className={`relative w-[220px] flex flex-col gap-3 rounded-2xl border p-4 ${
+      className={`relative w-[220px] flex-shrink-0 flex flex-col gap-3 rounded-2xl border p-4 ${
         card.isReal
           ? "border-green-400/80 bg-green-400/10"
           : card.isRealPending
@@ -115,14 +116,50 @@ const GiftCard = ({ card, mode, onSelect, disabled, bounce }: GiftCardProps) => 
   return container;
 };
 
-const GiftModal = () => {
+const GIFT_STYLES = `
+  @keyframes giftPop {
+    0% { transform: scale(0.85); opacity: 0; }
+    60% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes realRevealGrow {
+    0% { transform: scale(0.4); opacity: 0; }
+    45% { transform: scale(1.15); opacity: 1; }
+    65% { transform: scale(0.92); opacity: 1; }
+    85% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .gift-pop {
+    animation: giftPop 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    transform-origin: center;
+  }
+  @keyframes giftBounce {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0); }
+  }
+  .animate-gift-bounce {
+    animation: giftBounce 1.6s ease-in-out infinite;
+  }
+  .fake-img {
+    filter: grayscale(65%) brightness(0.9);
+    opacity: 0.65;
+    transform: scale(0.96);
+  }
+  .real-reveal {
+    animation: realRevealGrow 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    transform-origin: center;
+  }
+`;
+
+const Gift: React.FC = () => {
+  const navigate = useNavigate();
   const {
-    isModalOpen,
-    closeGiftModal,
     scheduleId,
     markAsClaimed,
     isClaimed,
-    claimedGift
+    claimedGift,
+    isGiftEnabled,
   } = useGift();
   const { mutate: claimGift, isPending, isSuccess, data: claimResult } =
     useClaimGift();
@@ -134,7 +171,6 @@ const GiftModal = () => {
   );
   const [shuffledGifts, setShuffledGifts] = useState<Gift[]>([]);
 
-  // Shuffle helper (Fisher-Yates)
   const shuffleGifts = (gifts: Gift[]) => {
     const arr = [...gifts];
     for (let i = arr.length - 1; i > 0; i -= 1) {
@@ -144,7 +180,6 @@ const GiftModal = () => {
     return arr;
   };
 
-  // Map tên quà -> hình bao lì xì tương ứng
   const giftImageMap: Record<string, string> = useMemo(
     () => ({
       "Sức Khỏe Dồi Dào": sucKhoeDoiDaoImg,
@@ -187,20 +222,23 @@ const GiftModal = () => {
   const [showCongratsModal, setShowCongratsModal] = useState(false);
   const hasShownCongratsRef = useRef(false);
 
-  // Khi modal đóng, reset toàn bộ state
+  // Redirect nếu không có quà
   useEffect(() => {
-    if (!isModalOpen) {
-      setPhase("selection");
-      setRevealedGifts([]);
-      setShuffledGifts([]);
-    } else if (activeGifts.length > 0) {
+    if (!isGiftEnabled) {
+      navigate("/", { replace: true });
+    }
+  }, [isGiftEnabled, navigate]);
+
+  // Khởi tạo shuffle khi vào trang
+  useEffect(() => {
+    if (activeGifts.length > 0) {
       setShuffledGifts(shuffleGifts(activeGifts));
     }
-  }, [isModalOpen, activeGifts]);
+  }, [activeGifts]);
 
-  // Nếu đã claim trước đó, mở modal là hiển thị luôn kết quả thật
+  // Nếu đã claim trước đó, hiển thị luôn kết quả thật
   useEffect(() => {
-    if (isModalOpen && isClaimed && claimedGift) {
+    if (isClaimed && claimedGift) {
       const realCard: RevealCard = {
         id: claimedGift.giftId,
         name: claimedGift.name,
@@ -232,9 +270,9 @@ const GiftModal = () => {
       }
       setPhase("reveal");
     }
-  }, [isModalOpen, isClaimed, claimedGift, activeGifts, shuffledGifts]);
+  }, [isClaimed, claimedGift, activeGifts, shuffledGifts]);
 
-  // Khi claim thành công, gắn kết quả thật vào cuối danh sách reveal
+  // Khi claim thành công
   useEffect(() => {
     if (isSuccess && claimResult) {
       const realCard: RevealCard = {
@@ -247,7 +285,6 @@ const GiftModal = () => {
       };
 
       setRevealedGifts((prev) => {
-        // Nếu đã có danh sách 4 quà, thay thế quà được chọn bằng quà thật
         if (prev.length > 0) {
           let replaced = false;
           const updated = prev.map((gift) => {
@@ -257,11 +294,9 @@ const GiftModal = () => {
             }
             return gift;
           });
-          // Nếu không tìm thấy, thêm vào cuối
           return replaced ? updated : [...updated, realCard];
         }
 
-        // Nếu chưa có danh sách, fallback hiển thị tất cả activeGifts
         const source = shuffledGifts.length > 0 ? shuffledGifts : activeGifts;
         if (source.length > 0) {
           const ordered = source.map((gift) => {
@@ -284,7 +319,6 @@ const GiftModal = () => {
       });
 
       setPhase("reveal");
-
       markAsClaimed(claimResult);
     }
   }, [isSuccess, claimResult, markAsClaimed, activeGifts, shuffledGifts]);
@@ -311,17 +345,14 @@ const GiftModal = () => {
     });
 
     setRevealedGifts(ordered);
-
     claimGift({ scheduleId, giftId });
   };
 
-  const handleClose = () => {
+  const handleBack = () => {
     if (!isPending) {
-      closeGiftModal();
+      navigate(-1);
     }
   };
-
-  const realGift = revealedGifts.find((g) => g.isReal);
 
   // Hiển thị modal chúc mừng khi đã mở quà thành công (chỉ một lần)
   useEffect(() => {
@@ -332,50 +363,20 @@ const GiftModal = () => {
     }
   }, [phase, isPending, revealedGifts]);
 
-  if (!isModalOpen) return null;
+  if (!isGiftEnabled) {
+    return null;
+  }
 
-  return ReactDOM.createPortal(
+  const realGift = revealedGifts.find((g) => g.isReal);
+
+  return (
     <>
-      <style>{`
-        @keyframes giftPop {
-          0% { transform: scale(0.85); opacity: 0; }
-          60% { transform: scale(1.05); opacity: 1; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes realRevealGrow {
-          0% { transform: scale(0.4); opacity: 0; }
-          45% { transform: scale(1.15); opacity: 1; }
-          65% { transform: scale(0.92); opacity: 1; }
-          85% { transform: scale(1.05); opacity: 1; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-        .gift-pop {
-          animation: giftPop 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-          transform-origin: center;
-        }
-        @keyframes giftBounce {
-          0% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-          100% { transform: translateY(0); }
-        }
-        .animate-gift-bounce {
-          animation: giftBounce 1.6s ease-in-out infinite;
-        }
-        .fake-img {
-          filter: grayscale(65%) brightness(0.9);
-          opacity: 0.65;
-          transform: scale(0.96);
-        }
-        .real-reveal {
-          animation: realRevealGrow 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-          transform-origin: center;
-        }
-      `}</style>
+      <style>{GIFT_STYLES}</style>
 
       {/* Modal chúc mừng khi mở quà thành công */}
       {showCongratsModal && realGift && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           onClick={() => setShowCongratsModal(false)}
         >
           <div
@@ -404,136 +405,127 @@ const GiftModal = () => {
             <button
               onClick={() => {
                 setShowCongratsModal(false);
-                closeGiftModal();
+                navigate(-1);
               }}
               className="w-full rounded-full bg-lightpink hover:bg-lightpink/80 text-white font-semibold py-3 transition"
             >
-              Đóng
+              Quay lại
             </button>
           </div>
         </div>
       )}
 
-      <div
-        className="fixed inset-0 flex items-center justify-center z-50"
-        onClick={handleClose}
-      >
-        <div
-          className="p-6 overflow-y-auto bg-black bg-opacity-70 backdrop-blur-md rounded-lg relative"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Close Button */}
-          {!isPending && (
-            <button
-              onClick={handleClose}
-              className="absolute top-4 right-4 text-white hover:text-gray-200 transition-colors"
+      <div className="h-full overflow-y-auto bg-black/70 backdrop-blur-md rounded-2xl p-6 text-white relative">
+        {/* Nút quay lại */}
+        {!isPending && (
+          <button
+            onClick={handleBack}
+            className="absolute top-4 left-4 flex items-center gap-2 text-white/90 hover:text-white transition-colors z-10"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+              />
+            </svg>
+            <span>Quay lại</span>
+          </button>
+        )}
+
+        {phase === "selection" ? (
+          <div className="flex flex-col gap-6 pt-12 pb-6">
+            <div className="text-center space-y-1">
+              <p className="text-sm text-gray-200">
+                Chọn một bao lì xì bạn muốn mở
+              </p>
+            </div>
+
+            {isLoadingGifts ? (
+              <div className="flex items-center justify-center py-10">
+                <div className="w-12 h-12 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : shuffledGifts.length > 0 ? (
+              <div className="flex gap-4 pb-2 overflow-x-auto justify-center flex-wrap">
+                {shuffledGifts.map((gift) => {
+                  const giftId = gift._id || gift.id;
+                  if (!giftId) return null;
+                  return (
+                    <GiftCard
+                      key={giftId}
+                      card={{
+                        id: giftId,
+                        name: gift.name,
+                        image:
+                          giftImageMap[gift.name] ||
+                          gift.image ||
+                          referralGiftGif,
+                        type: gift.type,
+                        items: gift.items,
+                      }}
+                      mode="selection"
+                      onSelect={() => handleSelectGift(giftId)}
+                      disabled={!scheduleId || isPending}
+                      bounce
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-center text-sm text-gray-200">
+                Hiện chưa có quà khả dụng.
+              </p>
+            )}
+
+            {!scheduleId && (
+              <p className="text-center text-sm text-yellow-300">
+                Không tìm thấy scheduleId, vui lòng thử lại sau.
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4 pt-12 pb-6">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-gray-200">
+                Phần quà đã áp dụng trực tiếp vào bill hiện tại.
+              </p>
+              {isPending && (
+                <div className="w-12 h-12 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
+              )}
+            </div>
+
+            <div className="flex gap-4 overflow-x-auto pb-2 justify-center flex-wrap">
+              {revealedGifts.map((gift, index) => (
+                <GiftCard key={`${gift.id}-${index}`} card={gift} mode="reveal" />
+              ))}
+            </div>
+
+            {!isPending && revealedGifts.some((gift) => gift.isReal) && (
+              <button
+                onClick={handleBack}
+                className="mt-2 w-full rounded-full bg-white/20 px-6 py-3 font-semibold transition hover:bg-white/30"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          )}
+                Quay lại
+              </button>
+            )}
 
-          {phase === "selection" ? (
-            <div className="flex flex-col gap-6 py-6 text-white">
-              <div className="text-center space-y-1">
-                <p className="text-sm text-gray-200">
-                  Chọn một bao lì xì bạn muốn mở
-                </p>
-              </div>
-
-              {isLoadingGifts ? (
-                <div className="flex items-center justify-center py-10">
-                  <div className="w-12 h-12 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : shuffledGifts && shuffledGifts.length > 0 ? (
-                <div className="flex gap-4 pb-2 overflow-x-auto">
-                  {shuffledGifts.map((gift) => {
-                    const giftId = gift._id || gift.id;
-                    if (!giftId) return null;
-                    return (
-                      <GiftCard
-                        key={giftId}
-                        card={{
-                          id: giftId,
-                          name: gift.name,
-                          image:
-                            giftImageMap[gift.name] ||
-                            gift.image ||
-                            referralGiftGif,
-                          type: gift.type,
-                          items: gift.items,
-                        }}
-                        mode="selection"
-                        onSelect={() => handleSelectGift(giftId)}
-                        disabled={!scheduleId || isPending}
-                        bounce
-                      />
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-center text-sm text-gray-200">
-                  Hiện chưa có quà khả dụng.
-                </p>
-              )}
-
-              {!scheduleId && (
-                <p className="text-center text-sm text-yellow-300">
-                  Không tìm thấy scheduleId, vui lòng thử lại sau.
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4 py-4 text-white">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-200">
-                  Phần quà đã áp dụng trực tiếp vào bill hiện tại.
-                </p>
-                {isPending && (
-                  <div className="w-12 h-12 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
-                )}
-              </div>
-
-              <div className="flex gap-4 overflow-x-auto pb-2">
-                {revealedGifts.map((gift, index) => (
-                  <GiftCard key={`${gift.id}-${index}`} card={gift} mode="reveal" />
-                ))}
-              </div>
-
-              {!isPending && revealedGifts.some((gift) => gift.isReal) && (
-                <button
-                  onClick={handleClose}
-                  className="mt-2 w-full rounded-full bg-white/20 px-6 py-3 font-semibold transition hover:bg-white/30"
-                >
-                  Đóng
-                </button>
-              )}
-
-              {!isPending && !revealedGifts.some((gift) => gift.isReal) && (
-                <p className="text-center text-sm text-gray-200">
-                  Đang chờ kết quả thật từ API...
-                </p>
-              )}
-            </div>
-          )}
-        </div>
+            {!isPending && !revealedGifts.some((gift) => gift.isReal) && (
+              <p className="text-center text-sm text-gray-200">
+                Đang chờ kết quả thật từ API...
+              </p>
+            )}
+          </div>
+        )}
       </div>
-    </>,
-    document.body
+    </>
   );
 };
 
-export default GiftModal;
-
+export default Gift;
