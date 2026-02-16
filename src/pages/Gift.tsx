@@ -53,7 +53,7 @@ const GiftCard = ({
 }: GiftCardProps) => {
   const container = (
     <div
-      className={`relative w-[220px] flex-shrink-0 flex flex-col gap-3 rounded-2xl border p-4 ${
+      className={`relative w-full min-w-0 flex flex-col gap-1.5 rounded-xl border p-2 ${
         card.isReal
           ? "border-green-400/80 bg-green-400/10"
           : card.isRealPending
@@ -61,11 +61,11 @@ const GiftCard = ({
             : "border-white/10 bg-white/5"
       } ${mode === "selection" ? "hover:-translate-y-1 transition" : ""}`}
     >
-      <div className="relative w-full aspect-[3/4] overflow-hidden rounded-xl bg-black/10">
+      <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-black/10">
         <img
           src={card.image || referralGiftGif}
           alt={card.name}
-          className={`w-full h-full object-cover rounded-xl shadow transition-transform ${
+          className={`w-full h-full object-cover rounded-lg shadow transition-transform ${
             mode === "reveal"
               ? card.isReal
                 ? "real-reveal"
@@ -76,30 +76,30 @@ const GiftCard = ({
           }`}
         />
         {mode === "reveal" && !card.isReal && !card.isRealPending && (
-          <span className="pointer-events-none absolute inset-0 rounded-xl bg-black/15" />
+          <span className="pointer-events-none absolute inset-0 rounded-lg bg-black/15" />
         )}
       </div>
-      <div className="flex flex-col items-center gap-1 text-center">
-        <div className="text-lg font-semibold line-clamp-1">{card.name}</div>
+      <div className="flex flex-col items-center gap-0.5 text-center">
+        <div className="text-xs font-semibold line-clamp-1">{card.name}</div>
         {card.description && (
-          <p className="text-xs text-gray-300">{card.description}</p>
+          <p className="text-[10px] text-gray-300">{card.description}</p>
         )}
       </div>
 
       {card.isReal && card.type === "snacks_drinks" && card.items && (
-        <div className="w-full mt-1 space-y-2">
+        <div className="w-full mt-0.5 space-y-1">
           {card.items.map((item, idx) => (
             <div
               key={`${item.itemId}-${idx}`}
-              className="flex items-center justify-between rounded-lg bg-white/10 px-3 py-2"
+              className="flex items-center justify-between rounded bg-white/10 px-2 py-1"
             >
-              <div className="flex flex-col">
-                <span className="font-medium">{item.name}</span>
+              <div className="flex flex-col min-w-0">
+                <span className="font-medium text-xs truncate">{item.name}</span>
                 {item.category && (
-                  <span className="text-xs text-gray-200">{item.category}</span>
+                  <span className="text-[10px] text-gray-200">{item.category}</span>
                 )}
               </div>
-              <span className="font-semibold">x{item.quantity}</span>
+              <span className="font-semibold text-xs flex-shrink-0">x{item.quantity}</span>
             </div>
           ))}
         </div>
@@ -387,20 +387,20 @@ const Gift: React.FC = () => {
     <>
       <style>{GIFT_STYLES}</style>
 
-      {/* Modal chúc mừng khi mở quà thành công — tối ưu cho màn ~10 inch */}
+      {/* Modal chúc mừng khi mở quà thành công — gọn, vừa màn hình */}
       {showCongratsModal && realGift && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 bg-black/60 backdrop-blur-sm"
           onClick={() => setShowCongratsModal(false)}
         >
           <div
-            className="relative w-full max-w-[400px] rounded-xl bg-gradient-to-b from-amber-950/95 to-black/95 p-4 shadow-2xl border border-amber-500/30 text-white"
+            className="relative w-full max-w-[360px] max-h-[90vh] overflow-y-auto rounded-xl bg-gradient-to-b from-amber-950/95 to-black/95 p-3 shadow-2xl border border-amber-500/30 text-white"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setShowCongratsModal(false)}
-              className="absolute top-2 right-2 text-white/80 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
+              className="absolute top-1.5 right-1.5 text-white/80 hover:text-white transition-colors p-0.5 rounded-full hover:bg-white/10"
               aria-label="Đóng"
             >
               <svg
@@ -409,7 +409,7 @@ const Gift: React.FC = () => {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-5 h-5"
+                className="w-4 h-4"
               >
                 <path
                   strokeLinecap="round"
@@ -418,17 +418,17 @@ const Gift: React.FC = () => {
                 />
               </svg>
             </button>
-            <p className="text-center text-amber-200/90 text-xs font-medium mb-1 pr-6">
+            <p className="text-center text-amber-200/90 text-[11px] font-medium mb-0.5 pr-5">
               Phần quà của bạn
             </p>
-            <p className="text-center text-amber-300/80 text-[11px] mb-3">
+            <p className="text-center text-amber-300/80 text-[10px] mb-1.5">
               Phần quà đã được thêm trực tiếp vào bill
             </p>
-            <div className="flex justify-center mb-3 scale-90 origin-center">
+            <div className="flex justify-center mb-1.5 scale-75 origin-center">
               <GiftCard card={realGift} mode="reveal" />
             </div>
-            <div className="max-h-[100px] overflow-y-auto mb-4">
-              <p className="text-center text-white/90 text-xs leading-relaxed">
+            <div className="max-h-[72px] overflow-y-auto mb-2">
+              <p className="text-center text-white/90 text-[11px] leading-snug">
                 {CONGRATS_MESSAGE}
               </p>
             </div>
@@ -437,7 +437,7 @@ const Gift: React.FC = () => {
                 setShowCongratsModal(false);
                 navigate(-1);
               }}
-              className="w-full rounded-full bg-lightpink hover:bg-lightpink/80 text-white font-semibold py-2.5 text-sm transition"
+              className="w-full rounded-full bg-lightpink hover:bg-lightpink/80 text-white font-semibold py-2 text-sm transition"
             >
               Quay lại
             </button>
@@ -483,7 +483,7 @@ const Gift: React.FC = () => {
                 <div className="w-12 h-12 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : shuffledGifts.length > 0 ? (
-              <div className="flex gap-4 pb-2 overflow-x-auto justify-center flex-wrap">
+              <div className="grid grid-cols-5 gap-2 pb-2">
                 {shuffledGifts.map((gift) => {
                   const giftId = gift._id || gift.id;
                   if (!giftId) return null;
@@ -531,7 +531,7 @@ const Gift: React.FC = () => {
               )}
             </div>
 
-            <div className="flex gap-4 overflow-x-auto pb-2 justify-center flex-wrap">
+            <div className="grid grid-cols-5 gap-2 pb-2">
               {revealedGifts.map((gift, index) => (
                 <GiftCard
                   key={`${gift.id}-${index}`}
