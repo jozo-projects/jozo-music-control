@@ -43,7 +43,13 @@ type GiftCardProps = {
   bounce?: boolean;
 };
 
-const GiftCard = ({ card, mode, onSelect, disabled, bounce }: GiftCardProps) => {
+const GiftCard = ({
+  card,
+  mode,
+  onSelect,
+  disabled,
+  bounce,
+}: GiftCardProps) => {
   const container = (
     <div
       className={`relative w-[220px] flex flex-col gap-3 rounded-2xl border p-4 ${
@@ -122,15 +128,19 @@ const GiftModal = () => {
     scheduleId,
     markAsClaimed,
     isClaimed,
-    claimedGift
+    claimedGift,
   } = useGift();
-  const { mutate: claimGift, isPending, isSuccess, data: claimResult } =
-    useClaimGift();
+  const {
+    mutate: claimGift,
+    isPending,
+    isSuccess,
+    data: claimResult,
+  } = useClaimGift();
 
   const { data: giftList, isLoading: isLoadingGifts } = useGiftListQuery();
   const activeGifts = useMemo(
     () => (giftList || []).filter((gift) => gift.isActive !== false),
-    [giftList]
+    [giftList],
   );
   const [shuffledGifts, setShuffledGifts] = useState<Gift[]>([]);
 
@@ -179,7 +189,7 @@ const GiftModal = () => {
       "Đại Cát Đại Lợi": daiCatDaiLoiImg,
       "Đại cát đại lợi": daiCatDaiLoiImg,
     }),
-    []
+    [],
   );
 
   const [phase, setPhase] = useState<"selection" | "reveal">("selection");
@@ -326,7 +336,12 @@ const GiftModal = () => {
   // Hiển thị modal chúc mừng khi đã mở quà thành công (chỉ một lần)
   useEffect(() => {
     const hasRealGift = revealedGifts.some((g) => g.isReal);
-    if (phase === "reveal" && !isPending && hasRealGift && !hasShownCongratsRef.current) {
+    if (
+      phase === "reveal" &&
+      !isPending &&
+      hasRealGift &&
+      !hasShownCongratsRef.current
+    ) {
       hasShownCongratsRef.current = true;
       setShowCongratsModal(true);
     }
@@ -372,41 +387,57 @@ const GiftModal = () => {
         }
       `}</style>
 
-      {/* Modal chúc mừng khi mở quà thành công */}
+      {/* Modal chúc mừng khi mở quà thành công — tối ưu cho màn ~10 inch */}
       {showCongratsModal && realGift && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm"
           onClick={() => setShowCongratsModal(false)}
         >
           <div
-            className="relative w-full max-w-md rounded-2xl bg-gradient-to-b from-amber-950/95 to-black/95 p-6 shadow-2xl border border-amber-500/30 text-white"
+            className="relative w-full max-w-[360px] rounded-xl bg-gradient-to-b from-amber-950/95 to-black/95 p-4 shadow-2xl border border-amber-500/30 text-white"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setShowCongratsModal(false)}
-              className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors p-1"
+              className="absolute top-2 right-2 text-white/80 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10"
               aria-label="Đóng"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
-            <p className="text-center text-amber-200/90 text-sm mb-4">
+            <p className="text-center text-amber-200/90 text-xs font-medium mb-1 pr-6">
               Phần quà của bạn
             </p>
-            <div className="flex justify-center mb-5">
+            <p className="text-center text-amber-300/80 text-[11px] mb-3">
+              Phần quà đã được thêm trực tiếp vào bill
+            </p>
+            <div className="flex justify-center mb-3 scale-90 origin-center">
               <GiftCard card={realGift} mode="reveal" />
             </div>
-            <p className="text-center text-white/95 text-sm leading-relaxed mb-6">
-              {CONGRATS_MESSAGE}
-            </p>
+            <div className="max-h-[100px] overflow-y-auto mb-4">
+              <p className="text-center text-white/90 text-xs leading-relaxed">
+                {CONGRATS_MESSAGE}
+              </p>
+            </div>
             <button
               onClick={() => {
                 setShowCongratsModal(false);
                 closeGiftModal();
               }}
-              className="w-full rounded-full bg-lightpink hover:bg-lightpink/80 text-white font-semibold py-3 transition"
+              className="w-full rounded-full bg-lightpink hover:bg-lightpink/80 text-white font-semibold py-2.5 text-sm transition"
             >
               Đóng
             </button>
@@ -508,7 +539,11 @@ const GiftModal = () => {
 
               <div className="flex gap-4 overflow-x-auto pb-2">
                 {revealedGifts.map((gift, index) => (
-                  <GiftCard key={`${gift.id}-${index}`} card={gift} mode="reveal" />
+                  <GiftCard
+                    key={`${gift.id}-${index}`}
+                    card={gift}
+                    mode="reveal"
+                  />
                 ))}
               </div>
 
@@ -531,9 +566,8 @@ const GiftModal = () => {
         </div>
       </div>
     </>,
-    document.body
+    document.body,
   );
 };
 
 export default GiftModal;
-
