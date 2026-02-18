@@ -1,4 +1,4 @@
-import chucMungNamMoiImg from "@/assets/images/gifts/ChucMungNamMoi.png";
+import liXiImg from "@/assets/images/gifts/li-xi.png";
 import { useGift } from "@/contexts/GiftContext";
 import React from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
@@ -16,25 +16,21 @@ const GiftFloatButton: React.FC = () => {
     navigate(`/gift${query ? `?${query}` : ""}`);
   };
 
-  // Icon "ấn để mở quà" — nằm giữa màn hình
+  // Hình lì xì — nằm giữa màn hình (thay ChucMungNamMoi bằng li-xi.png)
   const centerButton = (
     <div className="fixed inset-0 z-30 flex items-center justify-center pointer-events-none">
-      <div className="pointer-events-auto animate-bounce">
+      <div className="pointer-events-auto">
         <button
           onClick={goToGift}
-          className="bg-transparent text-white p-2 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-200 flex items-center justify-center"
+          className="bg-transparent text-white p-2 rounded-full shadow-2xl transition-all duration-200 flex items-center justify-center"
           title="Mở quà"
         >
           <div className="relative">
             <img
-              src={chucMungNamMoiImg}
-              alt="Chúc Mừng Năm Mới"
-              className="w-24 h-24 object-contain"
+              src={liXiImg}
+              alt="Bấm vào để nhận lì xì"
+              className="w-72 h-72 object-contain"
             />
-            <span className="absolute inset-0 rounded-full bg-yellow-400 animate-ping opacity-75" />
-            <span className="absolute -inset-9 text-white text-base text-center whitespace-nowrap">
-              Bấm vào để nhận lì xì
-            </span>
           </div>
         </button>
       </div>

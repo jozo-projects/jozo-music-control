@@ -1,4 +1,3 @@
-import referralGiftGif from "@/assets/gif/referral_gift.gif";
 import sucKhoeDoiDaoImg from "@/assets/images/gifts/Sức khoẻ dồi dào.png";
 import vanSuNhuYImg from "@/assets/images/gifts/Vạn sự như ý.png";
 import anKhangThinhVuongImg from "@/assets/images/gifts/An khang thịnh vượng.png";
@@ -63,7 +62,7 @@ const GiftCard = ({
     >
       <div className="relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-black/10">
         <img
-          src={card.image || referralGiftGif}
+          src={card.image}
           alt={card.name}
           className={`w-full h-full object-cover rounded-lg shadow transition-transform ${
             mode === "reveal"
@@ -94,12 +93,18 @@ const GiftCard = ({
               className="flex items-center justify-between rounded bg-white/10 px-2 py-1"
             >
               <div className="flex flex-col min-w-0">
-                <span className="font-medium text-xs truncate">{item.name}</span>
+                <span className="font-medium text-xs truncate">
+                  {item.name}
+                </span>
                 {item.category && (
-                  <span className="text-[10px] text-gray-200">{item.category}</span>
+                  <span className="text-[10px] text-gray-200">
+                    {item.category}
+                  </span>
                 )}
               </div>
-              <span className="font-semibold text-xs flex-shrink-0">x{item.quantity}</span>
+              <span className="font-semibold text-xs flex-shrink-0">
+                x{item.quantity}
+              </span>
             </div>
           ))}
         </div>
@@ -266,7 +271,7 @@ const Gift: React.FC = () => {
           return {
             id: giftId || gift.name,
             name: gift.name,
-            image: gift.image || referralGiftGif,
+            image: gift.image,
             type: gift.type,
             items: gift.items,
           };
@@ -314,7 +319,7 @@ const Gift: React.FC = () => {
             return {
               id: giftId || gift.name,
               name: gift.name,
-              image: gift.image || referralGiftGif,
+              image: gift.image,
               type: gift.type,
               items: gift.items,
             };
@@ -341,7 +346,7 @@ const Gift: React.FC = () => {
       const card: RevealCard = {
         id: id || gift.name,
         name: gift.name,
-        image: gift.image || referralGiftGif,
+        image: gift.image,
         type: gift.type,
         items: gift.items,
       };
@@ -494,9 +499,7 @@ const Gift: React.FC = () => {
                         id: giftId,
                         name: gift.name,
                         image:
-                          giftImageMap[gift.name] ||
-                          gift.image ||
-                          referralGiftGif,
+                          giftImageMap[gift.name] || gift.image || gift.image,
                         type: gift.type,
                         items: gift.items,
                       }}

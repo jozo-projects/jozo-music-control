@@ -1,4 +1,3 @@
-import referralGiftGif from "@/assets/gif/referral_gift.gif";
 import sucKhoeDoiDaoImg from "@/assets/images/gifts/Sức khoẻ dồi dào.png";
 import vanSuNhuYImg from "@/assets/images/gifts/Vạn sự như ý.png";
 import anKhangThinhVuongImg from "@/assets/images/gifts/An khang thịnh vượng.png";
@@ -62,7 +61,7 @@ const GiftCard = ({
     >
       <div className="relative w-full aspect-[3/4] overflow-hidden rounded-xl bg-black/10">
         <img
-          src={card.image || referralGiftGif}
+          src={card.image}
           alt={card.name}
           className={`w-full h-full object-cover rounded-xl shadow transition-transform ${
             mode === "reveal"
@@ -231,7 +230,7 @@ const GiftModal = () => {
           return {
             id: giftId || gift.name,
             name: gift.name,
-            image: gift.image || referralGiftGif,
+            image: gift.image,
             type: gift.type,
             items: gift.items,
           };
@@ -282,7 +281,7 @@ const GiftModal = () => {
             return {
               id: giftId || gift.name,
               name: gift.name,
-              image: gift.image || referralGiftGif,
+              image: gift.image,
               type: gift.type,
               items: gift.items,
             };
@@ -309,7 +308,7 @@ const GiftModal = () => {
       const card: RevealCard = {
         id: id || gift.name,
         name: gift.name,
-        image: gift.image || referralGiftGif,
+        image: gift.image,
         type: gift.type,
         items: gift.items,
       };
@@ -499,10 +498,7 @@ const GiftModal = () => {
                         card={{
                           id: giftId,
                           name: gift.name,
-                          image:
-                            giftImageMap[gift.name] ||
-                            gift.image ||
-                            referralGiftGif,
+                          image: giftImageMap[gift.name] || gift.image,
                           type: gift.type,
                           items: gift.items,
                         }}

@@ -5,15 +5,22 @@ import GiftModal from "@/components/GiftModal";
 import Header from "@/components/Header";
 import QueueSidebar from "@/components/QueueSidebar";
 import { useImageBackground } from "@/contexts/ImageBackgroundContext";
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 // import { categoryImages } from "@/assets/images/categories";
 // import { Socket } from "socket.io-client";
 
 const Layout: React.FC = () => {
   const [isQueueOpen, setIsQueueOpen] = useState(true);
-
+  const location = useLocation();
   const { backgroundId } = useImageBackground();
+
+  // Đóng sidebar list nhạc khi vào trang chọn quà để hiển thị full
+  useEffect(() => {
+    if (location.pathname === "/gift") {
+      setIsQueueOpen(false);
+    }
+  }, [location.pathname]);
 
   return (
     <div className="flex flex-col h-screen bg-black text-white">
