@@ -11,13 +11,19 @@ export const useBillQuery = (options?: UseBillQueryOptions) => {
   const roomId = searchParams.get("roomId") || "";
   const isEnabled = options?.enabled ?? true;
 
-  return useQuery({
+  return useQuery<IBill | null>({
     queryKey: ["bill", roomId],
     queryFn: async () => {
-      const response = await http.get<ApiResponse<IBill>>(
-        `/room-music/${roomId}/bill`
+      const response = await http.get<ApiResponse<IBill | null>>(
+        `/room-music/${roomId}/bill`,
+        {
+          validateStatus: (status) =>
+            (status >= 200 && status < 300) || status === 404,
+          skipErrorToast: true,
+        }
       );
-      return response.data.result;
+      if (response.status === 404) return null;
+      return response.data.result ?? null;
     },
     enabled: !!roomId && isEnabled,
     refetchInterval: 60000, // Cập nhật mỗi phút để đồng bộ thời gian sử dụng và đơn FnB

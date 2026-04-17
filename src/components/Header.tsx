@@ -31,7 +31,7 @@ const FoodIcon: React.FC = () => (
   </svg>
 );
 
-const ROOM_OPTIONS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+const ROOM_OPTIONS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
 
 const Header: React.FC = () => {
   // Gộp trạng thái tìm kiếm vào một object
@@ -50,11 +50,14 @@ const Header: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
   const [isRoomScreenOpen, setIsRoomScreenOpen] = useState(!roomId);
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
   const touchStartXRef = useRef<number | null>(null);
+
+  /** 3 lần chạm logo trong 5s (cửa sổ trượt) mở drawer chọn phòng */
+  const logoTapTimesRef = useRef<number[]>([]);
 
   const queryClient = useQueryClient();
   const { mutate: sendNotification } = useRoom();
@@ -314,6 +317,20 @@ const Header: React.FC = () => {
     };
   }, [debouncedNavigate, debouncedSetTerm, queryClient]);
 
+  const handleLogoClick = () => {
+    const now = Date.now();
+    const windowMs = 5000;
+    const times = logoTapTimesRef.current.filter((t) => now - t < windowMs);
+    times.push(now);
+    logoTapTimesRef.current = times;
+    if (times.length >= 3) {
+      logoTapTimesRef.current = [];
+      setIsRoomScreenOpen(true);
+      return;
+    }
+    handleHomeNavigation();
+  };
+
   return (
     <header
       className="bg-black text-white p-4 flex items-center justify-between shadow-md z-50"
@@ -325,7 +342,7 @@ const Header: React.FC = () => {
         src={logo}
         alt="Jozo"
         className="w-24 h-12 object-cover cursor-pointer animate-breathing"
-        onClick={handleHomeNavigation}
+        onClick={handleLogoClick}
       />
 
       {/* Search Input */}
@@ -644,8 +661,8 @@ const Header: React.FC = () => {
 
           <div className="p-4 space-y-4">
             <p className="text-sm text-white/70">
-              Vuốt từ trái sang phải trên thanh tiêu đề để mở màn chọn phòng.
-              Chỉ staff biết thao tác này.
+              Chạm logo 3 lần trong vòng 5 giây để mở màn chọn phòng (hoặc vuốt
+              phải từ mép trái thanh tiêu đề). Chỉ staff biết thao tác này.
             </p>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
               {ROOM_OPTIONS.map((room) => (
@@ -654,8 +671,9 @@ const Header: React.FC = () => {
                   onClick={() => {
                     const nextParams = new URLSearchParams(searchParams);
                     nextParams.set("roomId", room);
-                    setSearchParams(nextParams);
-                    setIsRoomScreenOpen(false);
+                    const qs = nextParams.toString();
+                    const path = `${location.pathname}${qs ? `?${qs}` : ""}${location.hash}`;
+                    window.location.assign(path);
                   }}
                   className={`py-3 rounded-xl border transition-colors font-semibold ${
                     roomId === room

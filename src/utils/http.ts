@@ -33,6 +33,10 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    if (error.config?.skipErrorToast) {
+      return Promise.reject(error);
+    }
+
     // Xử lý các lỗi khác như cũ
     if (error.response) {
       // Lỗi từ server (status code >= 400)
