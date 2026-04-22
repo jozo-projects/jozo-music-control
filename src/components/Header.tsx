@@ -31,7 +31,20 @@ const FoodIcon: React.FC = () => (
   </svg>
 );
 
-const ROOM_OPTIONS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+const ROOM_OPTIONS = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+];
 
 const Header: React.FC = () => {
   // Gộp trạng thái tìm kiếm vào một object
@@ -468,7 +481,7 @@ const Header: React.FC = () => {
         <button
           onClick={() => setIsBookingCodeModalOpen(true)}
           className="text-lightpink hover:text-lightpink/80"
-          title="Nhập mã đặt chỗ"
+          title="Nhập mã đặt box"
         >
           <div className="flex flex-col items-center gap-1 text-xs text-white/70">
             <ListIcon />

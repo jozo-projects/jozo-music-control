@@ -23,6 +23,14 @@ const BookingCodeModal: React.FC<BookingCodeModalProps> = ({
     setIsCodeComplete(code.length === 4);
   }, [bookingCode]);
 
+  // Reset input khi đóng modal
+  useEffect(() => {
+    if (!isOpen) {
+      setBookingCode(["", "", "", ""]);
+      setIsCodeComplete(false);
+    }
+  }, [isOpen]);
+
   const handleInputChange = (index: number, value: string) => {
     // Only allow numbers
     if (value && !/^\d$/.test(value)) return;
@@ -40,7 +48,7 @@ const BookingCodeModal: React.FC<BookingCodeModalProps> = ({
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) => {
     if (e.key === "Backspace" && !bookingCode[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
@@ -60,7 +68,7 @@ const BookingCodeModal: React.FC<BookingCodeModalProps> = ({
       <div className="bg-white w-full md:w-3/4 lg:w-1/2 xl:w-1/3 rounded-lg shadow-lg p-6 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Nhập mã đặt chỗ</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Nhập mã đặt box</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
@@ -110,7 +118,7 @@ const BookingCodeModal: React.FC<BookingCodeModalProps> = ({
         )}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 

@@ -310,7 +310,7 @@ export const useAddAllSongs = () => {
     }) => {
       const response = await http.post<
         ApiResponse<{ queue: Video[]; nowPlaying: Video }>
-      >(`${CONTROLLER_PATH}/${roomId}/queue/add-songs`, {
+      >(`${CONTROLLER_PATH}/${roomId}/add-songs`, {
         songs,
       });
       return response.data;
