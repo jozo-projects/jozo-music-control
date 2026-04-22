@@ -2,10 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { useBillQuery } from "@/hooks/useBillQuery";
 import { useFnbMenuQuery } from "@/hooks/useFnbMenuQuery";
-import { useQueryClient } from "@tanstack/react-query";
+import { useRequestEndSessionMutation } from "@/hooks/useRequestEndSessionMutation";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import http from "@/utils/http";
 import { toast } from "@/components/ToastContainer";
 
 const END_REQUEST_COOLDOWN_MS = 30_000;
@@ -43,15 +42,15 @@ const BillSummary: React.FC<BillSummaryProps> = ({
   } = useBillQuery({
     enabled: autoFetch,
   });
-  const queryClient = useQueryClient();
   const { data: fnbMenu } = useFnbMenuQuery();
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
   const navigate = useNavigate();
+  const endSessionMutation = useRequestEndSessionMutation(roomId);
+  const isEndingSession = endSessionMutation.isPending;
   const [elapsedText, setElapsedText] = useState<string>("--");
   const [cooldownMs, setCooldownMs] = useState<number>(0);
   const [endRequestCooldownMs, setEndRequestCooldownMs] = useState(0);
-  const [isEndingSession, setIsEndingSession] = useState(false);
   const [isEndConfirmOpen, setIsEndConfirmOpen] = useState(false);
   const [isEndSuccessOpen, setIsEndSuccessOpen] = useState(false);
   const [confirmClock, setConfirmClock] = useState(() => new Date());
@@ -153,51 +152,35 @@ const BillSummary: React.FC<BillSummaryProps> = ({
     return () => clearInterval(timer);
   }, [isEndConfirmOpen]);
 
-  const hasActiveBillSession = !!bill && !bill.actualEndTime;
-
-  const submitRequestEndSession = async () => {
-    if (!roomId || !hasActiveBillSession || isEndingSession) return;
-    setIsEndingSession(true);
-    try {
-      await http.post(`/room-music/${roomId}/request-end`, undefined, {
-        skipErrorToast: true,
-      });
-      setIsEndConfirmOpen(false);
-      setIsEndSuccessOpen(true);
-      setEndRequestCooldownMs(END_REQUEST_COOLDOWN_MS);
-      await queryClient.invalidateQueries({ queryKey: ["bill", roomId] });
-    } catch (error) {
-      if (!axios.isAxiosError(error) || !error.response) {
-        toast.error(
-          getErrorMessageFromAxios(
-            error,
-            "Lỗi mạng hoặc server không phản hồi. Vui lòng thử lại.",
-          ),
-        );
-        return;
-      }
-      const status = error.response.status;
-      const msg = getErrorMessageFromAxios(
-        error,
-        "Đã xảy ra lỗi. Vui lòng thử lại.",
-      );
-      if (status === 404) {
-        toast.error(msg);
-        return;
-      }
-      if (status === 429) {
-        toast.error(msg);
+  const submitRequestEndSession = () => {
+    if (!roomId || !bill || isEndingSession) return;
+    endSessionMutation.mutate(undefined, {
+      onSuccess: () => {
+        setIsEndConfirmOpen(false);
+        setIsEndSuccessOpen(true);
         setEndRequestCooldownMs(END_REQUEST_COOLDOWN_MS);
-        return;
-      }
-      if (status >= 500) {
+      },
+      onError: (error) => {
+        if (!axios.isAxiosError(error) || !error.response) {
+          toast.error(
+            getErrorMessageFromAxios(
+              error,
+              "Lỗi mạng hoặc server không phản hồi. Vui lòng thử lại.",
+            ),
+          );
+          return;
+        }
+        const status = error.response.status;
+        const msg = getErrorMessageFromAxios(
+          error,
+          "Đã xảy ra lỗi. Vui lòng thử lại.",
+        );
+        if (status === 429) {
+          setEndRequestCooldownMs(END_REQUEST_COOLDOWN_MS);
+        }
         toast.error(msg);
-        return;
-      }
-      toast.error(msg);
-    } finally {
-      setIsEndingSession(false);
-    }
+      },
+    });
   };
 
   const endSessionModals =
@@ -248,7 +231,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({
                     <button
                       type="button"
                       disabled={isEndingSession}
-                      onClick={() => void submitRequestEndSession()}
+                      onClick={submitRequestEndSession}
                       className="flex-1 py-3 px-4 rounded-xl font-semibold bg-red-500/80 text-white hover:bg-red-500 transition disabled:opacity-60"
                     >
                       {isEndingSession ? "Đang gửi…" : "Xác nhận kết thúc"}
@@ -373,8 +356,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({
     );
   }
 
-  const endButtonDisabled =
-    !hasActiveBillSession || isEndingSession || endRequestCooldownMs > 0;
+  const endButtonDisabled = isEndingSession || endRequestCooldownMs > 0;
 
   const endButtonLabel = (() => {
     if (isEndingSession) return "Đang gửi…";
@@ -398,12 +380,6 @@ const BillSummary: React.FC<BillSummaryProps> = ({
               {formattedStart && (
                 <p className="text-xs text-gray-400 mt-1">
                   Bắt đầu: {formattedStart}
-                </p>
-              )}
-              {bill.actualEndTime && (
-                <p className="text-xs text-amber-200/90 mt-2">
-                  Phiên đã ghi nhận kết thúc; không thể gửi yêu cầu kết thúc lại
-                  từ tablet.
                 </p>
               )}
             </div>
@@ -482,12 +458,10 @@ const BillSummary: React.FC<BillSummaryProps> = ({
                 </p>
                 <button
                   onClick={() => {
-                    if (!hasActiveBillSession) return;
                     onClose?.();
                     navigate(`/fnb?roomId=${roomId}`);
                   }}
-                  disabled={!hasActiveBillSession}
-                  className="w-full px-4 py-3 bg-lightpink text-white font-semibold rounded-xl hover:bg-lightpink/90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-lightpink text-white font-semibold rounded-xl hover:bg-lightpink/90 transition"
                 >
                   Đặt đồ ăn & thức uống
                 </button>
