@@ -48,6 +48,11 @@ const SongCard: React.FC<SongCardProps> = React.memo(
       );
     };
 
+    const addQueuePending =
+      addSongToQueue.isPending && addSongToQueue.variables
+        ? addSongToQueue.variables.position
+        : null;
+
     return (
       <>
         <div
@@ -76,6 +81,7 @@ const SongCard: React.FC<SongCardProps> = React.memo(
           onAddToTop={handleAddToTop}
           onAddToEnd={handleAddToEnd}
           songTitle={title}
+          addQueuePending={addQueuePending}
         />
       </>
     );

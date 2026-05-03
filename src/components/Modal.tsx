@@ -6,6 +6,34 @@ interface ModalProps {
   onAddToTop: () => void;
   onAddToEnd: () => void;
   songTitle: string;
+  /** Nút đang xử lý thêm queue — khóa cả hai nút để tránh spam */
+  addQueuePending?: "end" | "top" | null;
+}
+
+function AddQueueSpinner() {
+  return (
+    <svg
+      className="size-6 animate-spin text-gray-900"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      aria-hidden={true}
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+  );
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -14,8 +42,11 @@ const Modal: React.FC<ModalProps> = ({
   onAddToTop,
   onAddToEnd,
   songTitle,
+  addQueuePending = null,
 }) => {
   if (!isOpen) return null;
+
+  const isBusy = addQueuePending !== null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -26,45 +57,57 @@ const Modal: React.FC<ModalProps> = ({
         </p>
         <div className="flex items-center justify-center space-x-4">
           <button
+            type="button"
+            disabled={isBusy}
             onClick={onAddToEnd}
-            className="bg-lightpink text-gray-900 w-full py-2 px-4 rounded-lg hover:bg-opacity-80 flex flex-col items-center gap-y-2"
+            className="bg-lightpink text-gray-900 w-full py-2 px-4 rounded-lg hover:bg-opacity-80 flex flex-col items-center gap-y-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-opacity-100"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-              />
-            </svg>
-            Thêm vào cuối danh sách
+            {addQueuePending === "end" ? (
+              <AddQueueSpinner />
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+                />
+              </svg>
+            )}
+            {addQueuePending === "end" ? "Đang thêm…" : "Thêm vào cuối danh sách"}
           </button>
 
           <button
+            type="button"
+            disabled={isBusy}
             onClick={onAddToTop}
-            className="bg-lightpink text-gray-900 py-2 w-full px-4 rounded-lg hover:bg-opacity-80 flex flex-col items-center gap-y-2"
+            className="bg-lightpink text-gray-900 py-2 w-full px-4 rounded-lg hover:bg-opacity-80 flex flex-col items-center gap-y-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-opacity-100"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
-              />
-            </svg>
-            Thêm vào đầu danh sách
+            {addQueuePending === "top" ? (
+              <AddQueueSpinner />
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
+                />
+              </svg>
+            )}
+            {addQueuePending === "top" ? "Đang thêm…" : "Thêm vào đầu danh sách"}
           </button>
         </div>
 
