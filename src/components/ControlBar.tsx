@@ -363,34 +363,34 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
 
   return (
     <>
-      <div className="bg-black text-white px-6 py-2 flex items-center justify-between shadow-lg gap-x-6 rounded-3xl z-30 mb-4">
-        <div className="flex items-center space-x-4 flex-shrink-0">
+      <div className="z-30 flex items-center justify-between gap-x-3 rounded-2xl border border-primary/25 bg-brand-950 px-3 py-1.5 text-white shadow-md sm:px-4 sm:py-2">
+        <div className="flex min-w-0 flex-shrink-0 items-center space-x-2 sm:space-x-3">
           {nowPlayingId ? (
             <>
               <img
                 src={queueData.result.nowPlaying.thumbnail}
                 alt="Current Song"
-                className="w-12 h-12 object-cover rounded"
+                className="h-10 w-10 shrink-0 rounded object-cover sm:h-11 sm:w-11"
               />
-              <div>
-                <div className="w-[200px] overflow-hidden">
-                  <p className="text-sm font-bold whitespace-nowrap animate-marquee">
+              <div className="min-w-0">
+                <div className="max-w-[9rem] overflow-hidden sm:max-w-[11rem] md:max-w-[14rem]">
+                  <p className="animate-marquee text-xs font-bold whitespace-nowrap sm:text-sm">
                     {queueData.result.nowPlaying.title}
                   </p>
                 </div>
-                <p className="text-xs text-gray-400">
+                <p className="truncate text-[10px] text-gray-400 sm:text-xs">
                   {queueData.result.nowPlaying.author}
                 </p>
               </div>
             </>
           ) : (
-            <div className="text-gray-400">
+            <div className="text-[10px] text-gray-400 sm:text-xs">
               Hãy tìm kiếm và thêm bài hát vào danh sách phát
             </div>
           )}
         </div>
-        <div className="flex flex-col items-center w-full gap-y-4">
-          <div className="flex items-center space-x-6">
+        <div className="flex w-full min-w-0 flex-col items-center gap-y-2">
+          <div className="flex items-center space-x-4 sm:space-x-5">
             <button
               onClick={handlePlayback}
               disabled={!nowPlayingId}
@@ -436,15 +436,15 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
                   onMouseUp={(e) => handleSeek(Number(e.currentTarget.value))}
                   onChange={(e) => handleDrag(Number(e.target.value))}
                   className="absolute z-10 w-full appearance-none bg-transparent h-2 cursor-pointer -translate-y-1/2 
-                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-lightpink [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-30 [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
-                    [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-lightpink [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:relative [&::-moz-range-thumb]:z-30 [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
-                    [&::-ms-thumb]:appearance-none [&::-ms-thumb]:bg-lightpink [&::-ms-thumb]:w-4 [&::-ms-thumb]:h-4 [&::-ms-thumb]:rounded-full [&::-ms-thumb]:relative [&::-ms-thumb]:z-30 [&::-ms-thumb]:transition-all [&::-ms-thumb]:duration-150"
+                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-30 [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
+                    [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:relative [&::-moz-range-thumb]:z-30 [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
+                    [&::-ms-thumb]:appearance-none [&::-ms-thumb]:bg-primary [&::-ms-thumb]:w-4 [&::-ms-thumb]:h-4 [&::-ms-thumb]:rounded-full [&::-ms-thumb]:relative [&::-ms-thumb]:z-30 [&::-ms-thumb]:transition-all [&::-ms-thumb]:duration-150"
                   style={{
                     WebkitTapHighlightColor: "transparent",
                   }}
                 />
                 <div
-                  className="absolute z-10 top-1/2 left-0 h-2 bg-lightpink rounded-full -translate-y-1/2 transition-all duration-75"
+                  className="absolute z-10 top-1/2 left-0 h-2 bg-primary rounded-full -translate-y-1/2 transition-all duration-75"
                   style={{
                     width: `${(displayCurrentTime / displayDuration) * 100}%`,
                   }}
@@ -453,32 +453,32 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
               <span>{formatTime(displayDuration)}</span>
             </div>
           ) : (
-            <div className="w-full h-4" />
+            <div className="h-2 w-full sm:h-3" />
           )}
         </div>
 
-        <div className="flex items-center space-x-6">
+        <div className="flex flex-shrink-0 items-center space-x-3 sm:space-x-4">
           <div className="relative">
             <button
               onClick={onToggleQueue}
-              className="text-xl hover:text-blue-500"
+              className="text-lg hover:text-blue-400 sm:text-xl"
             >
               🎵
             </button>
             {!!queueData?.result?.queue?.length &&
               queueData?.result?.queue?.length > 0 && (
-                <span className="absolute -top-3 -right-3 bg-lightpink text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground sm:h-5 sm:w-5 sm:text-[10px]">
                   {queueData?.result?.queue?.length}
                 </span>
               )}
           </div>
 
-          <div className="flex items-center space-x-2">
-            <div className="text-lg text-white">{renderVolumeIcon()}</div>
-            <div className="relative w-24">
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            <div className="text-white">{renderVolumeIcon()}</div>
+            <div className="relative w-20 sm:w-24">
               <div className="absolute top-1/2 left-0 h-2 w-full bg-gray-500 rounded-full -translate-y-1/2"></div>
               <div
-                className="absolute z-10 top-1/2 left-0 h-2 bg-lightpink rounded-full -translate-y-1/2 transition-all duration-75"
+                className="absolute z-10 top-1/2 left-0 h-2 bg-primary rounded-full -translate-y-1/2 transition-all duration-75"
                 style={{
                   width: `${volume}%`,
                 }}
@@ -490,8 +490,8 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
                 value={volume}
                 onChange={handleVolumeChange}
                 className="absolute z-10 w-full appearance-none bg-transparent h-2 cursor-pointer -translate-y-1/2
-                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-lightpink [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-30
-                    [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-lightpink [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:relative [&::-moz-range-thumb]:z-30"
+                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-30
+                    [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:relative [&::-moz-range-thumb]:z-30"
               />
             </div>
           </div>

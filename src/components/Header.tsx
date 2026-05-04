@@ -21,7 +21,7 @@ const FoodIcon: React.FC = () => (
     viewBox="0 0 24 24"
     strokeWidth={1.5}
     stroke="currentColor"
-    className="size-6"
+    className="size-5"
   >
     <path
       strokeLinecap="round"
@@ -346,21 +346,25 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className="bg-black text-white p-4 flex items-center justify-between shadow-md z-50"
+      className="relative z-50 flex items-center justify-between border-b border-primary/35 bg-gradient-to-r from-brand-950 via-brand-900 to-brand-950 px-3 py-2 text-white shadow-[0_3px_18px_-4px_rgba(0,0,0,0.4)]"
       onTouchStart={handleHeaderTouchStart}
       onTouchEnd={handleHeaderTouchEnd}
     >
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-95"
+        aria-hidden
+      />
       {/* Logo */}
       <img
         src={logo}
         alt="Jozo"
-        className="w-24 h-12 object-cover cursor-pointer animate-breathing"
+        className="h-9 w-20 shrink-0 cursor-pointer object-cover animate-breathing sm:h-10 sm:w-24"
         onClick={handleLogoClick}
       />
 
       {/* Search Input */}
       <div
-        className="w-1/2 flex items-center gap-x-4 relative"
+        className="relative flex w-1/2 min-w-0 items-center gap-x-2"
         ref={searchContainerRef}
       >
         <div className="relative w-full">
@@ -377,12 +381,12 @@ const Header: React.FC = () => {
                 navigate(`/search?roomId=${roomId}&karaoke=${isKaraoke}`);
               }
             }}
-            className="w-full p-3 bg-secondary text-white rounded-lg shadow-md focus:outline-none"
+            className="w-full rounded-lg border border-white/10 bg-black/25 py-2 pl-2.5 pr-8 text-sm text-white shadow-inner backdrop-blur-sm placeholder:text-white/45 focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow]"
           />
           {searchState.term && (
             <button
               onClick={handleClearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -390,7 +394,7 @@ const Header: React.FC = () => {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-5 h-5"
+                className="h-4 w-4"
               >
                 <path
                   strokeLinecap="round"
@@ -406,11 +410,11 @@ const Header: React.FC = () => {
         {searchState.showSuggestions &&
           songNameSuggestions &&
           songNameSuggestions.length > 0 && (
-            <div className="absolute top-full left-0 w-full bg-white/30 backdrop-blur-md shadow-lg rounded-lg z-50 border border-gray-200/50 mt-1">
-              <div className="flex justify-between items-center border-b border-gray-200/50">
-                <div className="p-2 text-gray-800 font-medium">Gợi ý</div>
+            <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-primary/25 bg-brand-950/92 shadow-xl backdrop-blur-md">
+              <div className="flex items-center justify-between border-b border-primary/20 bg-primary/10">
+                <div className="p-1.5 text-xs font-medium text-white">Gợi ý</div>
                 <button
-                  className="p-2 text-gray-700 hover:text-gray-900"
+                  className="p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                   onClick={() =>
                     setSearchState((prev) => ({
                       ...prev,
@@ -424,7 +428,7 @@ const Header: React.FC = () => {
                     viewBox="0 0 24 24"
                     strokeWidth={2}
                     stroke="currentColor"
-                    className="w-6 h-6"
+                    className="h-4 w-4"
                   >
                     <path
                       strokeLinecap="round"
@@ -437,7 +441,7 @@ const Header: React.FC = () => {
               {songNameSuggestions?.map((suggestion, index) => (
                 <div
                   key={index}
-                  className="p-2 hover:bg-white/40 cursor-pointer text-gray-900"
+                  className="cursor-pointer border-b border-white/5 p-2 text-xs text-white/90 last:border-b-0 hover:bg-primary/15 hover:text-white"
                   onClick={() => handleSelectSuggestion(suggestion)}
                 >
                   {suggestion}
@@ -446,8 +450,9 @@ const Header: React.FC = () => {
             </div>
           )}
 
-        <div className="flex items-center gap-x-2">
-          <span className="text-sm whitespace-nowrap">Lời nhạc</span>
+        <div className="flex items-center gap-x-1.5 rounded-full border border-white/10 bg-black/20 px-2 py-1 backdrop-blur-sm">
+          <span className="whitespace-nowrap text-xs text-white/85">Lời nhạc</span>
+          <div className="origin-right scale-90">
           <Switch
             isChecked={isKaraoke}
             onChange={() => {
@@ -462,17 +467,22 @@ const Header: React.FC = () => {
               }
             }}
           />
+          </div>
         </div>
       </div>
 
       {/* Right: Contact with server */}
-      <div className="flex items-center space-x-4">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-2 [&_svg]:size-5">
         <button
-          className={!isHomePage ? "opacity-100" : "opacity-0"}
+          className={
+            !isHomePage
+              ? "opacity-100 rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
+              : "opacity-0"
+          }
           onClick={handleHomeNavigation}
           title="Trang chủ"
         >
-          <div className="flex flex-col items-center gap-1 text-xs text-white/70">
+          <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
             <HomeIcon />
             <span>Trang chủ</span>
           </div>
@@ -480,10 +490,10 @@ const Header: React.FC = () => {
 
         <button
           onClick={() => setIsBookingCodeModalOpen(true)}
-          className="text-lightpink hover:text-lightpink/80"
+          className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
           title="Nhập mã đặt box"
         >
-          <div className="flex flex-col items-center gap-1 text-xs text-white/70">
+          <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
             <ListIcon />
             <span>Mã đặt chỗ</span>
           </div>
@@ -491,10 +501,10 @@ const Header: React.FC = () => {
 
         <button
           onClick={handleFnbNavigation}
-          className="text-lightpink hover:text-lightpink/80"
+          className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
           title="Đặt đồ ăn & thức uống"
         >
-          <div className="flex flex-col items-center gap-1 text-xs text-white/70">
+          <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
             <FoodIcon />
             <span>Order</span>
           </div>
@@ -502,17 +512,17 @@ const Header: React.FC = () => {
 
         <button
           onClick={() => setIsBillModalOpen(true)}
-          className="text-lightpink hover:text-lightpink/80"
+          className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
           title="Phiên sử dụng"
         >
-          <div className="flex flex-col items-center gap-1 text-xs text-white/70">
+          <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="size-6"
+              className="size-5"
             >
               <path
                 strokeLinecap="round"
@@ -526,9 +536,10 @@ const Header: React.FC = () => {
 
         <button
           onClick={() => setIsConfirmSupportModalOpen(true)}
+          className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
           title="Gọi nhân viên hỗ trợ"
         >
-          <div className="flex flex-col items-center gap-1 text-xs text-white/70">
+          <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
             <BellAlertIcon />
             <span>Hỗ trợ</span>
           </div>
@@ -542,7 +553,7 @@ const Header: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-lightpink/20 rounded-full">
+                <div className="p-3 bg-primary/20 rounded-full">
                   <BellAlertIcon />
                 </div>
                 <h2 className="text-xl font-bold text-white">Gọi nhân viên</h2>
@@ -586,7 +597,7 @@ const Header: React.FC = () => {
                   setIsConfirmSupportModalOpen(false);
                   handleNotification();
                 }}
-                className="flex-1 py-3 px-4 bg-lightpink hover:bg-lightpink/80 text-white font-bold rounded-xl transition-colors shadow-lg shadow-lightpink/30"
+                className="flex-1 py-3 px-4 bg-gradient-to-r from-primary to-primary-deep hover:from-primary-hover hover:to-primary-deeper text-primary-foreground font-bold rounded-xl transition-all shadow-brand-glow"
               >
                 Gọi nhân viên
               </button>
@@ -690,7 +701,7 @@ const Header: React.FC = () => {
                   }}
                   className={`py-3 rounded-xl border transition-colors font-semibold ${
                     roomId === room
-                      ? "bg-lightpink text-white border-lightpink"
+                      ? "bg-primary-hover text-primary-foreground border-primary"
                       : "border-white/10 bg-white/5 hover:bg-white/10"
                   }`}
                 >

@@ -92,7 +92,7 @@ const BookingSongList: React.FC<BookingSongListProps> = ({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lightpink"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -105,7 +105,7 @@ const BookingSongList: React.FC<BookingSongListProps> = ({
         </div>
         <button
           onClick={onClearCode}
-          className="px-4 py-2 bg-lightpink text-gray-900 rounded-lg hover:bg-opacity-80"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors"
         >
           Thử lại
         </button>
@@ -119,7 +119,7 @@ const BookingSongList: React.FC<BookingSongListProps> = ({
         <div className="text-gray-600 mb-4">Không có bài hát nào</div>
         <button
           onClick={onClearCode}
-          className="px-4 py-2 bg-lightpink text-gray-900 rounded-lg hover:bg-opacity-80"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors"
         >
           Thử lại
         </button>
@@ -163,7 +163,7 @@ const BookingSongList: React.FC<BookingSongListProps> = ({
                 className={`px-4 py-2 rounded-lg font-semibold ${
                   isAdded
                     ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                    : "bg-lightpink text-gray-900 hover:bg-opacity-80"
+                    : "bg-primary text-primary-foreground hover:bg-primary-hover"
                 }`}
               >
                 {isAdded ? "Đã thêm" : "Thêm"}
@@ -181,13 +181,13 @@ const BookingSongList: React.FC<BookingSongListProps> = ({
         </button>
         <button
           onClick={onAddAll}
-          className="px-4 py-2 bg-lightpink text-gray-900 rounded-lg hover:bg-opacity-80"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors"
         >
           Thêm tất cả
         </button>
         <button
           onClick={onClose}
-          className="px-4 py-2 bg-lightpink text-gray-900 rounded-lg hover:bg-opacity-80"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors"
         >
           Hoàn tất
         </button>

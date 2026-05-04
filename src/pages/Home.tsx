@@ -39,8 +39,8 @@ const Home: React.FC = () => {
               key={category.id}
               className={`p-2 rounded-lg text-sm font-medium shadow-sm transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${
                 backgroundId === category.id
-                  ? "bg-pink-500 text-white shadow-lg scale-105"
-                  : "bg-pink-100 text-pink-700 hover:bg-pink-200 hover:scale-105"
+                  ? "bg-primary text-primary-foreground shadow-brand-soft ring-2 ring-white/35 scale-105"
+                  : "bg-white/95 text-brand-700 border border-brand-200 hover:bg-brand-50 hover:border-brand-300 hover:scale-105"
               }`}
               onClick={() => handleCategoryClick(category.id)}
             >

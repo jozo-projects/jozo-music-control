@@ -142,7 +142,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders, isLoading }) => {
                         <span className="text-gray-800 font-medium">
                           {getItemName(itemId)}
                         </span>
-                        <span className="text-lightpink font-bold">
+                        <span className="text-brand-600 font-bold">
                           x{quantity}
                         </span>
                       </div>
@@ -168,7 +168,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders, isLoading }) => {
                         <span className="text-gray-800 font-medium">
                           {getItemName(itemId)}
                         </span>
-                        <span className="text-lightpink font-bold">
+                        <span className="text-brand-600 font-bold">
                           x{quantity}
                         </span>
                       </div>

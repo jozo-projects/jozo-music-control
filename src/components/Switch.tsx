@@ -9,7 +9,7 @@ const Switch: React.FC<SwitchProps> = ({ isChecked, onChange }) => {
   return (
     <div
       className={`relative inline-block w-12 h-6 ${
-        isChecked ? "bg-lightpink" : "bg-gray-400"
+        isChecked ? "bg-primary" : "bg-gray-400"
       } rounded-full cursor-pointer transition-colors`}
       onClick={onChange}
     >

@@ -68,7 +68,7 @@ const PlayNowModal = ({
         <div className="flex items-center justify-center space-x-4">
           <button
             onClick={onPlayNow}
-            className="bg-lightpink text-gray-900 py-2 w-full px-4 rounded-lg hover:bg-opacity-80 flex flex-col items-center gap-y-2"
+            className="bg-primary text-primary-foreground py-2 w-full px-4 rounded-lg hover:bg-primary-hover transition-colors flex flex-col items-center gap-y-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -90,7 +90,7 @@ const PlayNowModal = ({
 
         <button
           onClick={onClose}
-          className="w-full mt-4 py-2 px-4 rounded-lg text-gray-900 hover:bg-lightpink hover:bg-opacity-20 flex items-center gap-x-2 justify-center"
+          className="w-full mt-4 py-2 px-4 rounded-lg text-gray-900 hover:bg-primary/15 flex items-center gap-x-2 justify-center transition-colors"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

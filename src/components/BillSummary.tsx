@@ -212,7 +212,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({
                   <p className="text-gray-300 text-sm leading-relaxed mb-2">
                     Bạn đang yêu cầu kết thúc phiên sử dụng tại thời điểm:
                   </p>
-                  <p className="text-2xl font-bold text-lightpink tabular-nums mb-6 text-center">
+                  <p className="text-2xl font-bold text-brand-400 tabular-nums mb-6 text-center">
                     {formatNowTimeVi(confirmClock)}
                   </p>
                   <p className="text-xs text-gray-500 mb-6">
@@ -270,7 +270,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsEndSuccessOpen(false)}
-                    className="w-full mt-8 py-3 px-4 rounded-xl font-semibold bg-lightpink text-white hover:bg-lightpink/90 transition"
+                    className="w-full mt-8 py-3 px-4 rounded-xl font-semibold bg-gradient-to-r from-primary to-primary-deep text-primary-foreground hover:from-primary-hover hover:to-primary-deeper transition-all shadow-brand-soft"
                   >
                     Đóng
                   </button>
@@ -428,7 +428,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({
                       <span className="text-sm text-white">
                         {getItemName(itemId)}
                       </span>
-                      <span className="text-sm text-lightpink font-bold">
+                      <span className="text-sm text-brand-400 font-bold">
                         x{quantity}
                       </span>
                     </div>
@@ -444,7 +444,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({
                       <span className="text-sm text-white">
                         {getItemName(itemId)}
                       </span>
-                      <span className="text-sm text-lightpink font-bold">
+                      <span className="text-sm text-brand-400 font-bold">
                         x{quantity}
                       </span>
                     </div>
@@ -461,7 +461,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({
                     onClose?.();
                     navigate(`/fnb?roomId=${roomId}`);
                   }}
-                  className="w-full px-4 py-3 bg-lightpink text-white font-semibold rounded-xl hover:bg-lightpink/90 transition"
+                  className="w-full px-4 py-3 bg-gradient-to-r from-primary to-primary-deep text-primary-foreground font-semibold rounded-xl hover:from-primary-hover hover:to-primary-deeper transition-all shadow-brand-soft"
                 >
                   Đặt đồ ăn & thức uống
                 </button>

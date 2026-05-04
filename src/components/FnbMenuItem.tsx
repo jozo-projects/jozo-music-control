@@ -154,7 +154,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
               )}
 
               <div className="mb-4">
-                <div className="text-xl font-bold text-lightpink mb-1">
+                <div className="text-xl font-bold text-brand-600 mb-1">
                   Từ{" "}
                   {Math.min(...variants.map((v) => v.price)).toLocaleString(
                     "vi-VN",
@@ -169,7 +169,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
 
             {/* Choose Variant Button */}
             <button
-              className="w-full py-3 rounded-xl font-semibold transition-all duration-200 bg-gradient-to-r from-lightpink to-pink-500 text-white hover:from-lightpink/90 hover:to-pink-500/90 hover:shadow-lg transform hover:-translate-y-0.5"
+              className="w-full py-3 rounded-xl font-semibold transition-all duration-200 bg-gradient-to-r from-primary to-primary-deep text-primary-foreground hover:from-primary-hover hover:to-primary-deeper hover:shadow-brand-soft transform hover:-translate-y-0.5"
               onClick={() => setShowVariantsModal(true)}
             >
               Chọn loại
@@ -219,7 +219,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                           />
                         </svg>
                         {cart.length > 0 && (
-                          <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border border-white">
+                          <div className="absolute -top-1 -right-1 bg-primary-hover text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border border-white">
                             {cart.reduce((sum, item) => sum + item.quantity, 0)}
                           </div>
                         )}
@@ -263,7 +263,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                         key={variant._id}
                         className={`relative rounded-xl border-2 transition-all duration-300 ${
                           variantAvailable
-                            ? "border-gray-200 hover:border-lightpink"
+                            ? "border-gray-200 hover:border-brand-400"
                             : "border-gray-200 opacity-75"
                         }`}
                         onClick={() => {
@@ -306,7 +306,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                           <h4 className="font-semibold text-gray-800 text-sm mb-1 line-clamp-1">
                             {variant.name}
                           </h4>
-                          <div className="text-sm font-bold text-lightpink mb-2">
+                          <div className="text-sm font-bold text-brand-600 mb-2">
                             {variant.price.toLocaleString("vi-VN")}đ
                           </div>
 
@@ -319,7 +319,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
 
                               <div className="flex items-center space-x-1">
                                 <button
-                                  className="w-6 h-6 rounded-full bg-lightpink text-white flex items-center justify-center hover:bg-pink-600 transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary-deeper transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                                   disabled={isSubmitting}
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -344,12 +344,12 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                                   </svg>
                                 </button>
 
-                                <span className="text-xs font-bold text-lightpink min-w-[1rem] text-center">
+                                <span className="text-xs font-bold text-brand-600 min-w-[1rem] text-center">
                                   {getItemQuantityInCart(item._id, variant._id)}
                                 </span>
 
                                 <button
-                                  className="w-6 h-6 rounded-full bg-lightpink text-white flex items-center justify-center hover:bg-pink-600 transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary-deeper transition-colors text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                                   disabled={isSubmitting}
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -431,7 +431,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
           )}
 
           <div className="mb-4">
-            <div className="text-xl font-bold text-lightpink mb-1">
+            <div className="text-xl font-bold text-brand-600 mb-1">
               {item.price.toLocaleString("vi-VN")}đ
             </div>
           </div>
@@ -446,7 +446,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
 
             <div className="flex items-center space-x-2">
               <button
-                className="w-8 h-8 rounded-full bg-lightpink text-white flex items-center justify-center hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary-deeper transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isSubmitting}
                 onClick={() => handleItemQuantityChange(-1)}
               >
@@ -465,12 +465,12 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                 </svg>
               </button>
 
-              <span className="text-sm font-bold text-lightpink min-w-[2rem] text-center">
+              <span className="text-sm font-bold text-brand-600 min-w-[2rem] text-center">
                 {getItemQuantityInCart(item._id)}
               </span>
 
               <button
-                className="w-8 h-8 rounded-full bg-lightpink text-white flex items-center justify-center hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary-deeper transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isSubmitting}
                 onClick={(e) => handleItemQuantityChange(1, e.currentTarget)}
               >

@@ -1,6 +1,6 @@
 type IconProps = React.SVGProps<SVGSVGElement>;
 
-const baseClass = "w-8 h-8";
+const baseClass = "h-6 w-6 sm:h-7 sm:w-7";
 
 export function VolumeMutedIcon({ className = "", ...rest }: IconProps) {
   return (

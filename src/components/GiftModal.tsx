@@ -436,7 +436,7 @@ const GiftModal = () => {
                 setShowCongratsModal(false);
                 closeGiftModal();
               }}
-              className="w-full rounded-full bg-lightpink hover:bg-lightpink/80 text-white font-semibold py-2.5 text-sm transition"
+              className="w-full rounded-full bg-gradient-to-r from-primary to-primary-deep hover:from-primary-hover hover:to-primary-deeper text-primary-foreground font-semibold py-2.5 text-sm transition-all shadow-brand-soft"
             >
               Đóng
             </button>
@@ -485,7 +485,7 @@ const GiftModal = () => {
 
               {isLoadingGifts ? (
                 <div className="flex items-center justify-center py-10">
-                  <div className="w-12 h-12 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : shuffledGifts && shuffledGifts.length > 0 ? (
                 <div className="flex gap-4 pb-2 overflow-x-auto">
@@ -529,7 +529,7 @@ const GiftModal = () => {
                   Phần quà đã áp dụng trực tiếp vào bill hiện tại.
                 </p>
                 {isPending && (
-                  <div className="w-12 h-12 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                 )}
               </div>
 

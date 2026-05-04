@@ -341,12 +341,12 @@ const FnbOrder: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-white via-brand-50/90 to-neutral-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-6">
           <div className="text-center mb-6">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-lightpink to-pink-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-hover via-primary to-primary-deeper bg-clip-text text-transparent mb-2">
               Đặt Đồ Ăn & Thức Uống
             </h1>
             <p className="text-gray-600">
@@ -361,7 +361,7 @@ const FnbOrder: React.FC = () => {
                 onClick={() => setActiveTab("menu")}
                 className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
                   activeTab === "menu"
-                    ? "bg-gradient-to-r from-lightpink to-pink-500 text-white shadow-lg"
+                    ? "bg-gradient-to-r from-primary to-primary-deep text-primary-foreground shadow-brand-soft"
                     : "text-gray-600 hover:text-gray-800"
                 }`}
               >
@@ -371,7 +371,7 @@ const FnbOrder: React.FC = () => {
                 onClick={() => setActiveTab("orders")}
                 className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
                   activeTab === "orders"
-                    ? "bg-gradient-to-r from-lightpink to-pink-500 text-white shadow-lg"
+                    ? "bg-gradient-to-r from-primary to-primary-deep text-primary-foreground shadow-brand-soft"
                     : "text-gray-600 hover:text-gray-800"
                 }`}
               >
@@ -388,7 +388,7 @@ const FnbOrder: React.FC = () => {
             {/* Left: Categories */}
             <div className="lg:col-span-1 sticky top-4 self-start">
               <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-lightpink to-pink-600 bg-clip-text text-transparent whitespace-nowrap">
+                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary-hover via-primary to-primary-deeper bg-clip-text text-transparent whitespace-nowrap">
                   Danh Mục
                 </h2>
                 <div className="space-y-3">
@@ -397,7 +397,7 @@ const FnbOrder: React.FC = () => {
                       key={category.id}
                       className={`w-full p-4 rounded-xl text-left transition-all transform hover:scale-105 ${
                         selectedCategory === category.id
-                          ? "bg-gradient-to-r from-lightpink to-pink-500 text-white shadow-lg"
+                          ? "bg-gradient-to-r from-primary to-primary-deep text-primary-foreground shadow-brand-soft"
                           : "bg-gray-50 hover:bg-gray-100 text-gray-700 hover:shadow-md"
                       }`}
                       onClick={() => setSelectedCategory(category.id)}
@@ -440,13 +440,13 @@ const FnbOrder: React.FC = () => {
           /* Orders Tab */
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-lightpink to-pink-600 bg-clip-text text-transparent">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-hover via-primary to-primary-deeper bg-clip-text text-transparent">
                 Đơn hàng đã đặt
               </h2>
               <button
                 onClick={() => refetchOrders()}
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-gradient-to-r from-lightpink to-pink-500 text-white rounded-xl hover:from-lightpink/90 hover:to-pink-500/90 transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-gradient-to-r from-primary to-primary-deep text-primary-foreground rounded-xl hover:from-primary-hover hover:to-primary-deeper transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-brand-soft"
               >
                 <svg
                   className="w-4 h-4"
@@ -475,7 +475,7 @@ const FnbOrder: React.FC = () => {
           <button
             onClick={() => setIsCartModalOpen(true)}
             disabled={isSubmitting}
-            className="floating-cart-button bg-gradient-to-r from-lightpink to-pink-500 text-white p-3 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="floating-cart-button bg-gradient-to-br from-primary to-primary-deeper text-primary-foreground p-3 rounded-full shadow-brand-glow hover:shadow-2xl transform hover:scale-110 transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ring-2 ring-white/90"
           >
             <div className="relative">
               <svg
@@ -493,7 +493,7 @@ const FnbOrder: React.FC = () => {
                 />
               </svg>
               {cart.length > 0 && (
-                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold border-2 border-white">
+                <div className="absolute -top-2 -right-2 bg-primary-hover text-primary-foreground text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold border-2 border-white">
                   {cart.reduce((sum, item) => sum + item.quantity, 0)}
                 </div>
               )}
@@ -585,7 +585,7 @@ const FnbOrder: React.FC = () => {
                           <h3 className="font-semibold text-gray-800 text-sm truncate mb-1">
                             {itemName}
                           </h3>
-                          <p className="text-sm text-lightpink font-bold">
+                          <p className="text-sm text-brand-600 font-bold">
                             {totalItemPrice}đ
                           </p>
                         </div>
@@ -617,7 +617,7 @@ const FnbOrder: React.FC = () => {
                               />
                             </svg>
                           </button>
-                          <span className="text-sm font-bold text-lightpink min-w-[1.5rem] text-center">
+                          <span className="text-sm font-bold text-brand-600 min-w-[1.5rem] text-center">
                             {cartItem.quantity}
                           </span>
                           <button
@@ -681,12 +681,12 @@ const FnbOrder: React.FC = () => {
                   <span className="text-base font-semibold text-gray-800">
                     Tổng cộng:
                   </span>
-                  <span className="text-lg font-bold text-lightpink">
+                  <span className="text-lg font-bold text-brand-600">
                     {calculateTotal().toLocaleString("vi-VN")}đ
                   </span>
                 </div>
                 <button
-                  className="w-full py-2.5 rounded-2xl font-semibold text-base transition-all bg-gradient-to-r from-lightpink to-pink-500 text-white hover:from-lightpink/90 hover:to-pink-500/90 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none relative"
+                  className="w-full py-2.5 rounded-2xl font-semibold text-base transition-all bg-gradient-to-r from-primary to-primary-deep text-primary-foreground hover:from-primary-hover hover:to-primary-deeper hover:shadow-brand-soft disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none relative"
                   onClick={handleSubmitOrder}
                   disabled={isSubmitting}
                 >

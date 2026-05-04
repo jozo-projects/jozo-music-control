@@ -442,7 +442,7 @@ const Gift: React.FC = () => {
                 setShowCongratsModal(false);
                 navigate(-1);
               }}
-              className="w-full rounded-full bg-lightpink hover:bg-lightpink/80 text-white font-semibold py-2 text-sm transition"
+              className="w-full rounded-full bg-gradient-to-r from-primary to-primary-deep hover:from-primary-hover hover:to-primary-deeper text-primary-foreground font-semibold py-2 text-sm transition-all shadow-brand-soft"
             >
               Quay lại
             </button>
@@ -485,7 +485,7 @@ const Gift: React.FC = () => {
 
             {isLoadingGifts ? (
               <div className="flex items-center justify-center py-10">
-                <div className="w-12 h-12 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
             ) : shuffledGifts.length > 0 ? (
               <div className="grid grid-cols-5 gap-2 pb-2">
@@ -530,7 +530,7 @@ const Gift: React.FC = () => {
                 Phần quà đã áp dụng trực tiếp vào bill hiện tại.
               </p>
               {isPending && (
-                <div className="w-12 h-12 border-4 border-pink-400 border-t-transparent rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
               )}
             </div>
 

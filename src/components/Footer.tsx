@@ -1,11 +1,13 @@
-import React from "react";
+import React, { type ReactNode } from "react";
 
-const Footer: React.FC = () => {
+type FooterProps = {
+  children: ReactNode;
+};
+
+/** Chân layout: padding tối thiểu cho tablet, nội dung (ControlBar) gọn bên trong */
+const Footer: React.FC<FooterProps> = ({ children }) => {
   return (
-    <></>
-    // <footer className="bg-gray-800 text-gray-400 text-center py-2 text-sm z-50 fixed bottom-0 w-full">
-    //   <p>Bản quyền thuộc về Quang Do</p>
-    // </footer>
+    <footer className="shrink-0 px-2 pb-1.5 pt-0.5">{children}</footer>
   );
 };
 

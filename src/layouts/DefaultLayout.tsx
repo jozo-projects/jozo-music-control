@@ -1,5 +1,6 @@
 import { categoryImages } from "@/assets/images/categories";
 import ControlBar from "@/components/ControlBar";
+import Footer from "@/components/Footer";
 import GiftFloatButton from "@/components/GiftFloatButton";
 import GiftModal from "@/components/GiftModal";
 import Header from "@/components/Header";
@@ -23,7 +24,7 @@ const Layout: React.FC = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex flex-col h-screen bg-black text-white">
+    <div className="flex flex-col h-screen bg-brand-950 text-white">
       {/* Header */}
       <Header />
 
@@ -47,7 +48,7 @@ const Layout: React.FC = () => {
           <div
             className={`${
               isQueueOpen ? "col-span-8" : "col-span-12"
-            } overflow-y-auto h-[calc(100vh-200px)]`}
+            } h-[calc(100vh-9.5rem)] overflow-y-auto`}
           >
             <Outlet />
           </div>
@@ -66,10 +67,9 @@ const Layout: React.FC = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer>
+      <Footer>
         <ControlBar onToggleQueue={() => setIsQueueOpen(!isQueueOpen)} />
-      </footer>
+      </Footer>
 
       {/* Gift Float Button */}
       <GiftFloatButton />

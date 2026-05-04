@@ -65,7 +65,7 @@ const SongCard: React.FC<SongCardProps> = React.memo(
             loading="lazy"
             className="w-full h-40 object-cover user-select-none"
           />
-          <div className="p-4 bg-black/60">
+          <div className="p-4 bg-brand-950/90 border-t-2 border-primary/40">
             <h3 className="text-sm font-semibold mb-1 line-clamp-2 min-h-10 user-select-none">
               {title}
             </h3>

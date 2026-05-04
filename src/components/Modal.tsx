@@ -60,7 +60,7 @@ const Modal: React.FC<ModalProps> = ({
             type="button"
             disabled={isBusy}
             onClick={onAddToEnd}
-            className="bg-lightpink text-gray-900 w-full py-2 px-4 rounded-lg hover:bg-opacity-80 flex flex-col items-center gap-y-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-opacity-100"
+            className="bg-primary text-primary-foreground w-full py-2 px-4 rounded-lg hover:bg-primary-hover transition-colors flex flex-col items-center gap-y-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-primary"
           >
             {addQueuePending === "end" ? (
               <AddQueueSpinner />
@@ -87,7 +87,7 @@ const Modal: React.FC<ModalProps> = ({
             type="button"
             disabled={isBusy}
             onClick={onAddToTop}
-            className="bg-lightpink text-gray-900 py-2 w-full px-4 rounded-lg hover:bg-opacity-80 flex flex-col items-center gap-y-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-opacity-100"
+            className="bg-primary text-primary-foreground py-2 w-full px-4 rounded-lg hover:bg-primary-hover transition-colors flex flex-col items-center gap-y-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-primary"
           >
             {addQueuePending === "top" ? (
               <AddQueueSpinner />
@@ -113,7 +113,7 @@ const Modal: React.FC<ModalProps> = ({
 
         <button
           onClick={onClose}
-          className="w-full mt-4 py-2 px-4 rounded-lg text-gray-900 hover:bg-lightpink hover:bg-opacity-20 flex items-center gap-x-2 justify-center"
+          className="w-full mt-4 py-2 px-4 rounded-lg text-gray-900 hover:bg-primary/15 flex items-center gap-x-2 justify-center transition-colors"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

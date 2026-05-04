@@ -101,7 +101,7 @@ const BookingCodeModal: React.FC<BookingCodeModalProps> = ({
               value={digit}
               onChange={(e) => handleInputChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(e, index)}
-              className="w-14 h-14 text-center text-2xl font-bold rounded-lg border-2 border-gray-300 focus:border-lightpink focus:outline-none"
+              className="w-14 h-14 text-center text-2xl font-bold rounded-lg border-2 border-gray-300 focus:border-primary focus:outline-none ring-primary/25 focus:ring-2"
               autoFocus={index === 0}
             />
           ))}
