@@ -124,15 +124,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Hát Cùng Huy",
       },
       {
-        video_id: "wMkJ1siCVC8",
-        title:
-          "Karaoke “Nước Mắt Cá Sấu” | HIEUTHUHAI – Beat Chuẩn - Tone Nam - Gm",
-        duration: 209,
-        url: "https://youtube.com/watch?v=wMkJ1siCVC8",
-        thumbnail: "https://i.ytimg.com/vi/wMkJ1siCVC8/hq720.jpg",
-        author: "Tôi Mê Karaoke",
-      },
-      {
         video_id: "VVm769D2bok",
         title: "Orange - 'CHÚNG TA CÒN Ở ĐÓ KHÔNG?' Karaoke - Tone Nữ",
         duration: 246,
@@ -214,14 +205,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=G5k_z1GQ-3Y",
         thumbnail: "https://i.ytimg.com/vi/G5k_z1GQ-3Y/hq720.jpg",
         author: "Funny Network",
-      },
-      {
-        video_id: "omVVmZ_yQJ0",
-        title: "(Karaoke Beat Chuẩn) Low G | In Love (ft. JustaTee)",
-        duration: 299,
-        url: "https://youtube.com/watch?v=omVVmZ_yQJ0",
-        thumbnail: "https://i.ytimg.com/vi/omVVmZ_yQJ0/hq720.jpg",
-        author: "chó sủa meo meo?",
       },
       {
         video_id: "VSjW9maC8VA",
@@ -357,14 +340,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Vie Channel - MUSIC",
       },
       {
-        video_id: "gpE-YNXQtUo",
-        title: "[KARAOKE] Make Up (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 257,
-        url: "https://youtube.com/watch?v=gpE-YNXQtUo",
-        thumbnail: "https://i.ytimg.com/vi/gpE-YNXQtUo/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
         video_id: "cEo_iv6vApw",
         title:
           '[KARAOKE] NGƯỜI NHƯ ANH XỨNG ĐÁNG CÔ ĐƠN | Anh Trai "Say Hi" 2025',
@@ -388,14 +363,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=DkYWa3BUzVE",
         thumbnail: "https://i.ytimg.com/vi/DkYWa3BUzVE/hq720.jpg",
         author: "Vie Channel - MUSIC",
-      },
-      {
-        video_id: "LxfmuDvZI_o",
-        title: "[KARAOKE] CAN I GET YOUR LOVE (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 301,
-        url: "https://youtube.com/watch?v=LxfmuDvZI_o",
-        thumbnail: "https://i.ytimg.com/vi/LxfmuDvZI_o/hq720.jpg",
-        author: "TY & KARAOKE",
       },
       {
         video_id: "-UrQItsPkMQ",
@@ -429,14 +396,7 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         thumbnail: "https://i.ytimg.com/vi/8A-U-2QqWN8/hq720.jpg",
         author: "Vie Channel - MUSIC",
       },
-      {
-        video_id: "Aqhxecx7nxg",
-        title: "[KARAOKE] Sớm Muộn Thì (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 336,
-        url: "https://youtube.com/watch?v=Aqhxecx7nxg",
-        thumbnail: "https://i.ytimg.com/vi/Aqhxecx7nxg/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
+
       {
         video_id: "bK64n-D30ts",
         title: '[KARAOKE] ĐÃ TỪNG | Anh Trai "Say Hi" 2025',
@@ -445,15 +405,7 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         thumbnail: "https://i.ytimg.com/vi/bK64n-D30ts/hq720.jpg",
         author: "Vie Channel - MUSIC",
       },
-      {
-        video_id: "kMHPR6QunK8",
-        title:
-          "[KARAOKE] Cũng May Là Ế (Beat Chuẩn) | Có Rap | Anh Trai Say Hi",
-        duration: 226,
-        url: "https://youtube.com/watch?v=kMHPR6QunK8",
-        thumbnail: "https://i.ytimg.com/vi/kMHPR6QunK8/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
+
       {
         video_id: "Ow5tyXewNJU",
         title: '[KARAOKE] ẢO ẢNH | Anh Trai "Say Hi" 2025',
@@ -497,23 +449,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "VieShows and 2 more",
       },
       {
-        video_id: "KyDwuXhioVo",
-        title: "[KARAOKE] CRAZY (Beat Chuẩn) | Có Bè | Anh Trai Say Hi",
-        duration: 213,
-        url: "https://youtube.com/watch?v=KyDwuXhioVo",
-        thumbnail: "https://i.ytimg.com/vi/KyDwuXhioVo/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "XOj1_J_3pjw",
-        title:
-          "[KARAOKE] Dẫu Có Đến Đâu – Lohan, Nhâm Phương Nam, Vương Bình, CONGB | Beat Có Bè | Anh Trai Say Hi",
-        duration: 229,
-        url: "https://youtube.com/watch?v=XOj1_J_3pjw",
-        thumbnail: "https://i.ytimg.com/vi/XOj1_J_3pjw/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
         video_id: "v10nTunkUqU",
         title: '[KARAOKE] 3 CHÌM 7 NỔI | Anh Trai "Say Hi" 2025',
         duration: 263,
@@ -531,156 +466,12 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Quang Say2",
       },
       {
-        video_id: "izcXKZPLCFU",
-        title: "[KARAOKE] TO YOUR EX (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 268,
-        url: "https://youtube.com/watch?v=izcXKZPLCFU",
-        thumbnail: "https://i.ytimg.com/vi/izcXKZPLCFU/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "v56DUdv8RNQ",
-        title: "[KARAOKE] Em Đã Chờ Anh Bao Lâu (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 323,
-        url: "https://youtube.com/watch?v=v56DUdv8RNQ",
-        thumbnail: "https://i.ytimg.com/vi/v56DUdv8RNQ/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "pTovcq9j8dU",
-        title:
-          "[KARAOKE] Ở Đây Ai Cũng Thương Con (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 280,
-        url: "https://youtube.com/watch?v=pTovcq9j8dU",
-        thumbnail: "https://i.ytimg.com/vi/pTovcq9j8dU/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "H1ZgpQfcySQ",
-        title: "[KARAOKE] Thức (Tone Nữ) | Có Bè | Anh Trai Say Hi",
-        duration: 327,
-        url: "https://youtube.com/watch?v=H1ZgpQfcySQ",
-        thumbnail: "https://i.ytimg.com/vi/H1ZgpQfcySQ/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "FUvfA6CK3iI",
-        title: "[KARAOKE] Vô Số Lần Tình Cờ (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 237,
-        url: "https://youtube.com/watch?v=FUvfA6CK3iI",
-        thumbnail: "https://i.ytimg.com/vi/FUvfA6CK3iI/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "RH3Sal9ZbIQ",
-        title: "[KARAOKE] Kẻ Hai Lời (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 258,
-        url: "https://youtube.com/watch?v=RH3Sal9ZbIQ",
-        thumbnail: "https://i.ytimg.com/vi/RH3Sal9ZbIQ/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "l1AC0uaZXuc",
-        title: "[KARAOKE] Đêm Giáng Sinh Mùa Hạ (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 334,
-        url: "https://youtube.com/watch?v=l1AC0uaZXuc",
-        thumbnail: "https://i.ytimg.com/vi/l1AC0uaZXuc/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "UU0X4OITljI",
-        title: "[KARAOKE] Nỡ Lòng Đồng Ý (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 297,
-        url: "https://youtube.com/watch?v=UU0X4OITljI",
-        thumbnail: "https://i.ytimg.com/vi/UU0X4OITljI/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "ORiWvpGZG90",
-        title: "[KARAOKE] Trực Giác (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 318,
-        url: "https://youtube.com/watch?v=ORiWvpGZG90",
-        thumbnail: "https://i.ytimg.com/vi/ORiWvpGZG90/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "ge9ELv8Fi3E",
-        title: "[KARAOKE] BOUNCE (Beat Chuẩn) | Anh Trai Say Hi",
-        duration: 240,
-        url: "https://youtube.com/watch?v=ge9ELv8Fi3E",
-        thumbnail: "https://i.ytimg.com/vi/ge9ELv8Fi3E/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
         video_id: "GeT1EGP-oRs",
         title:
           "[KARAOKE] Trở Thành Người Em Muốn (Beat Chuẩn) - Jey B | Anh Trai Say Hi",
         duration: 255,
         url: "https://youtube.com/watch?v=GeT1EGP-oRs",
         thumbnail: "https://i.ytimg.com/vi/GeT1EGP-oRs/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "0kc7M2Heal4",
-        title:
-          "[KARAOKE] Đừng Biến Mất Hôm Nay (Beat Chuẩn) - Phạm Đình Thái Ngân |   Anh Trai Say Hi",
-        duration: 246,
-        url: "https://youtube.com/watch?v=0kc7M2Heal4",
-        thumbnail: "https://i.ytimg.com/vi/0kc7M2Heal4/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "8b99rI7Wmdw",
-        title:
-          "[KARAOKE] Bí Mật Nhỏ (Beat Chuẩn) - Mason Nguyễn | Anh Trai Say Hi",
-        duration: 215,
-        url: "https://youtube.com/watch?v=8b99rI7Wmdw",
-        thumbnail: "https://i.ytimg.com/vi/8b99rI7Wmdw/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "du9NtTrAj2A",
-        title:
-          "[KARAOKE] Anh Không Đến Để Rời Đi (Beat Chuẩn) - OgeNus | Anh Trai Say Hi",
-        duration: 238,
-        url: "https://youtube.com/watch?v=du9NtTrAj2A",
-        thumbnail: "https://i.ytimg.com/vi/du9NtTrAj2A/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "vPSEL2eKE7Q",
-        title:
-          "[KARAOKE] Vạn Lý Độc Hành (Beat Chuẩn) - Karik | Anh Trai Say Hi",
-        duration: 243,
-        url: "https://youtube.com/watch?v=vPSEL2eKE7Q",
-        thumbnail: "https://i.ytimg.com/vi/vPSEL2eKE7Q/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "fWkMHP39V0I",
-        title:
-          "[KARAOKE] Đường Chân Trời (Beat Chuẩn) - Bùi Trường Linh | Anh Trai Say Hi",
-        duration: 296,
-        url: "https://youtube.com/watch?v=fWkMHP39V0I",
-        thumbnail: "https://i.ytimg.com/vi/fWkMHP39V0I/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "DXH1s0cnOCs",
-        title:
-          "[KARAOKE] Một Tâm Hồn Bình Thản (Beat Chuẩn) - HUSTLANG Robber | Anh Trai Say Hi",
-        duration: 263,
-        url: "https://youtube.com/watch?v=DXH1s0cnOCs",
-        thumbnail: "https://i.ytimg.com/vi/DXH1s0cnOCs/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "yXfZCQXwKCI",
-        title:
-          "[KARAOKE] IT'S GON' BE ALRIGHT (Beat Chuẩn) - Negav | Anh Trai Say Hi",
-        duration: 242,
-        url: "https://youtube.com/watch?v=yXfZCQXwKCI",
-        thumbnail: "https://i.ytimg.com/vi/yXfZCQXwKCI/hq720.jpg",
         author: "TY & KARAOKE",
       },
       {
@@ -699,42 +490,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         duration: 246,
         url: "https://youtube.com/watch?v=BE2Wmfzu24Q",
         thumbnail: "https://i.ytimg.com/vi/BE2Wmfzu24Q/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "y_24fY8Aq6o",
-        title:
-          "[KARAOKE] Mời Đoàn Mình Lên Sàn (Beat Chuẩn) - Gill (VNM) | Anh Trai Say Hi",
-        duration: 235,
-        url: "https://youtube.com/watch?v=y_24fY8Aq6o",
-        thumbnail: "https://i.ytimg.com/vi/y_24fY8Aq6o/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "wgJZRP1FeV8",
-        title:
-          "[KARAOKE] Giấc Mộng Vỡ (Beat Chuẩn) - Ryn Lee | Anh Trai Say Hi",
-        duration: 283,
-        url: "https://youtube.com/watch?v=wgJZRP1FeV8",
-        thumbnail: "https://i.ytimg.com/vi/wgJZRP1FeV8/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "l04DUYXn81Y",
-        title:
-          "[KARAOKE] Không Biết Nói Gì, Không Biết Phải Làm Sao (Beat Chuẩn) - Vương Bình | Anh Trai Say Hi",
-        duration: 327,
-        url: "https://youtube.com/watch?v=l04DUYXn81Y",
-        thumbnail: "https://i.ytimg.com/vi/l04DUYXn81Y/hq720.jpg",
-        author: "TY & KARAOKE",
-      },
-      {
-        video_id: "aC41fpme9bg",
-        title:
-          "[KARAOKE] Nhìn Về Phía Anh (Beat Chuẩn) - Ngô Kiến Huy | Anh Trai Say Hi",
-        duration: 223,
-        url: "https://youtube.com/watch?v=aC41fpme9bg",
-        thumbnail: "https://i.ytimg.com/vi/aC41fpme9bg/hq720.jpg",
         author: "TY & KARAOKE",
       },
       {
@@ -1181,15 +936,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Quang Hùng MasterD",
       },
       {
-        video_id: "MCqsm3a69bE",
-        title:
-          "[KARAOKE - Beat Chuẩn] Sao Hạng A - HIEUTHUHAI, Jsol, Song Luân, Dương Domic | Anh Trai Say Hi",
-        duration: 252,
-        url: "https://youtube.com/watch?v=MCqsm3a69bE",
-        thumbnail: "https://i.ytimg.com/vi/MCqsm3a69bE/hq720.jpg",
-        author: "Moonlight 2",
-      },
-      {
         video_id: "iy8YBm0LBuY",
         title:
           "KARAOKE CATCH ME IF YOU CAN - Negav, Quang Hùng MasterD, Nicky, Công Dương",
@@ -1261,14 +1007,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Sunemee Karaoke",
       },
       {
-        video_id: "CFm_nCPUgec",
-        title: "[Karaoke Beat Chuẩn] QUAY ĐI QUAY LẠI - Hieuthuhai",
-        duration: 210,
-        url: "https://youtube.com/watch?v=CFm_nCPUgec",
-        thumbnail: "https://i.ytimg.com/vi/CFm_nCPUgec/hq720.jpg",
-        author: "Vkaraoke",
-      },
-      {
         video_id: "N0SSCuPFK_Q",
         title:
           "[KARAOKE - Bè Rap] WALK - HIEUTHUHAI, Hurrykng, Negav, Isaac, Pháp Kiều | Anh Trai Say Hi - VieOn",
@@ -1326,15 +1064,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         duration: 260,
         url: "https://youtube.com/watch?v=40_mQYQpIts",
         thumbnail: "https://i.ytimg.com/vi/40_mQYQpIts/hq720.jpg",
-        author: "Moonlight 2",
-      },
-      {
-        video_id: "B3vI4AVk3eg",
-        title:
-          "[KARAOKE - Bè Rap] S.O.S - Rhyder, WEAN, Quang Hùng MasterD, Ali Hoàng  Dương, Captain | ATSH",
-        duration: 267,
-        url: "https://youtube.com/watch?v=B3vI4AVk3eg",
-        thumbnail: "https://i.ytimg.com/vi/B3vI4AVk3eg/hq720.jpg",
         author: "Moonlight 2",
       },
       {
@@ -1594,14 +1323,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Peaceful_Oj001",
       },
       {
-        video_id: "gWsRNHprJFI",
-        title: "[ KARAOKE ] HAI THẾ GIỚI - WOWY x KARIK | VN KARA",
-        duration: 279,
-        url: "https://youtube.com/watch?v=gWsRNHprJFI",
-        thumbnail: "https://i.ytimg.com/vi/gWsRNHprJFI/hq720.jpg",
-        author: "VN KARAOKE ",
-      },
-      {
         video_id: "-sBLkqkDeKI",
         title:
           "Karaoke Nàng - OgeNus - Team BigDaddy | Rap Việt 2023 | ZKN Music",
@@ -1745,14 +1466,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=woBak43AtJk",
         thumbnail: "https://i.ytimg.com/vi/woBak43AtJk/hq720.jpg",
         author: "G5R Karaoke",
-      },
-      {
-        video_id: "vDJmvbl-Ccc",
-        title: "KARAOKE | SIMP GÁI 808 - LOW G",
-        duration: 160,
-        url: "https://youtube.com/watch?v=vDJmvbl-Ccc",
-        thumbnail: "https://i.ytimg.com/vi/vDJmvbl-Ccc/hq720.jpg",
-        author: "HitEmUp",
       },
       {
         video_id: "4ihn97Imsr4",
@@ -1933,14 +1646,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=0FFXAKMRyjg",
         thumbnail: "https://i.ytimg.com/vi/0FFXAKMRyjg/hq720.jpg",
         author: "tlinh",
-      },
-      {
-        video_id: "iXKw9cFV2ts",
-        title: "Pháo | SỰ NGHIỆP CHƯỚNG - KARAOKE",
-        duration: 201,
-        url: "https://youtube.com/watch?v=iXKw9cFV2ts",
-        thumbnail: "https://i.ytimg.com/vi/iXKw9cFV2ts/hq720.jpg",
-        author: "Một bài Dizz",
       },
       {
         video_id: "4n33PVZ3OQ0",
@@ -2759,14 +2464,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Dương Trung KTV",
       },
       {
-        video_id: "LvAEgcdbgbc",
-        title: "KARAOKE | Dương Domic - Mất Kết Nối | EP 'Dữ Liệu Quý'",
-        duration: 202,
-        url: "https://youtube.com/watch?v=LvAEgcdbgbc",
-        thumbnail: "https://i.ytimg.com/vi/LvAEgcdbgbc/hq720.jpg",
-        author: "SInger",
-      },
-      {
         video_id: "3WaAoIGTXU0",
         title: "Chillies - VÙNG KÝ ỨC - KARAOKE (BEAT PHỐI CHUẨN)",
         duration: 299,
@@ -3009,14 +2706,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Kênh Tổng Hợp",
       },
       {
-        video_id: "UryA1pgOEqA",
-        title: "KARAOKE | SỰ NGHIỆP CHƯỚNG - PHÁO NORTHSIDE",
-        duration: 198,
-        url: "https://youtube.com/watch?v=UryA1pgOEqA",
-        thumbnail: "https://i.ytimg.com/vi/UryA1pgOEqA/hq720.jpg",
-        author: "Vịt tập bơi",
-      },
-      {
         video_id: "W1UlKq-X8gw",
         title:
           "[Karaoke HD] Làm Vợ Anh Nhé | Full Beat Gốc | Chi Dân | Newtitan",
@@ -3065,14 +2754,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=fvrCHVgfSB4",
         thumbnail: "https://i.ytimg.com/vi/fvrCHVgfSB4/hq720.jpg",
         author: "SO Music",
-      },
-      {
-        video_id: "ddWgEgTen74",
-        title: "KARAOKE EXIT SIGN HIẾU THỨ HAI",
-        duration: 230,
-        url: "https://youtube.com/watch?v=ddWgEgTen74",
-        thumbnail: "https://i.ytimg.com/vi/ddWgEgTen74/hq720.jpg",
-        author: "KARAOKE FOR HIPHOP",
       },
       {
         video_id: "b-iL0xBspuA",
@@ -3171,14 +2852,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=e0qdMmO8iG8",
         thumbnail: "https://i.ytimg.com/vi/e0qdMmO8iG8/hq720.jpg",
         author: "Phúc Lê",
-      },
-      {
-        video_id: "1Xa0WkLxuyc",
-        title: "Lắng Nghe Nước Mắt - Mr. Siro (Karaoke)",
-        duration: 338,
-        url: "https://youtube.com/watch?v=1Xa0WkLxuyc",
-        thumbnail: "https://i.ytimg.com/vi/1Xa0WkLxuyc/hqdefault.jpg",
-        author: "Mr. Siro",
       },
       {
         video_id: "LM8VLABWepU",
@@ -3295,24 +2968,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=q6xTrRId3Kc",
         thumbnail: "https://i.ytimg.com/vi/q6xTrRId3Kc/hq720.jpg",
         author: "Music Canh Tung",
-      },
-      {
-        video_id: "ix2BfGBK9RQ",
-        title:
-          "[KARAOKE] SAO ANH CHƯA VỀ NHÀ - AMEE (ft. RICKY STAR) | Instrumental/Beat Gốc (Tone Nữ)",
-        duration: 248,
-        url: "https://youtube.com/watch?v=ix2BfGBK9RQ",
-        thumbnail: "https://i.ytimg.com/vi/ix2BfGBK9RQ/hq720.jpg",
-        author: "AMEE",
-      },
-      {
-        video_id: "w6b_ZFEQvbA",
-        title:
-          "[KARAOKE] TRỜI GIẤU TRỜI MANG ĐI - AMEE x VIRUSS  | Instrumental/Beat Gốc (Tone Nữ)",
-        duration: 255,
-        url: "https://youtube.com/watch?v=w6b_ZFEQvbA",
-        thumbnail: "https://i.ytimg.com/vi/w6b_ZFEQvbA/hq720.jpg",
-        author: "AMEE",
       },
       {
         video_id: "q7QOJ_Z81KQ",
@@ -3565,14 +3220,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "CITI KARAOKE",
       },
       {
-        video_id: "Tfv3XpuEnaQ",
-        title: "(KARAOKE 4K - BEAT GỐC) Teen Vọng Cổ - Vĩnh Thuyên Kim ✔",
-        duration: 183,
-        url: "https://youtube.com/watch?v=Tfv3XpuEnaQ",
-        thumbnail: "https://i.ytimg.com/vi/Tfv3XpuEnaQ/hq720.jpg",
-        author: "Minh Toàn Bolero",
-      },
-      {
         video_id: "dDsmbIGoeIc",
         title: "[Karaoke] Ngã tư đường - Hồ Quang Hiếu Full HD",
         duration: 265,
@@ -3620,15 +3267,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=laL_XAZQfwg",
         thumbnail: "https://i.ytimg.com/vi/laL_XAZQfwg/hq720.jpg",
         author: "HILADO Studio",
-      },
-      {
-        video_id: "fVP17UoVVJ8",
-        title:
-          "Tết đong đầy  Karaoke   KHOA x KAY TRẦN x DUCK V   BEAT CHUẨN MV",
-        duration: 207,
-        url: "https://youtube.com/watch?v=fVP17UoVVJ8",
-        thumbnail: "https://i.ytimg.com/vi/fVP17UoVVJ8/hq720.jpg",
-        author: "Vỹ William",
       },
       {
         video_id: "TyFLWehXaMM",
@@ -3748,14 +3386,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=v5nowcuIJT8",
         thumbnail: "https://i.ytimg.com/vi/v5nowcuIJT8/hq720.jpg",
         author: "Karaoke Online",
-      },
-      {
-        video_id: "XzZq4ORx81Y",
-        title: "[KARAOKE] - HẠNH PHÚC XUÂN NGỜI - Noo Phước Thịnh",
-        duration: 240,
-        url: "https://youtube.com/watch?v=XzZq4ORx81Y",
-        thumbnail: "https://i.ytimg.com/vi/XzZq4ORx81Y/hq720.jpg",
-        author: "Yêu Ca Hát",
       },
       {
         video_id: "9SV_zndgkAo",
