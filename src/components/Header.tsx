@@ -4,6 +4,7 @@ import ListIcon from "@/assets/icons/ListIcon";
 import { logo } from "@/assets/images";
 import useRoom from "@/hooks/useRoom";
 import { useSongName } from "@/hooks/useSongName";
+import { setBoundRoomId } from "@/utils/boundRoomId";
 import { useQueryClient } from "@tanstack/react-query";
 import BillSummary from "./BillSummary";
 import debounce from "lodash/debounce";
@@ -693,11 +694,12 @@ const Header: React.FC = () => {
                 <button
                   key={room}
                   onClick={() => {
+                    setBoundRoomId(room);
                     const nextParams = new URLSearchParams(searchParams);
                     nextParams.set("roomId", room);
                     const qs = nextParams.toString();
                     const path = `${location.pathname}${qs ? `?${qs}` : ""}${location.hash}`;
-                    window.location.assign(path);
+                    window.location.replace(path);
                   }}
                   className={`py-3 rounded-xl border transition-colors font-semibold ${
                     roomId === room
