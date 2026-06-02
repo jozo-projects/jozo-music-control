@@ -34,7 +34,7 @@ const FnbOrder: React.FC = () => {
     endY: number;
   } | null>(null);
   const [searchParams] = useSearchParams();
-  const roomId = searchParams.get("roomId") || "1";
+  const roomId = searchParams.get("roomId") || "";
   const [activeTab, setActiveTab] = useState<"menu" | "orders">("menu");
   const { submitCart } = useFnbMutations();
   const isSubmitting = submitCart.isPending;

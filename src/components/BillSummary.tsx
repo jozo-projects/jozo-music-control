@@ -6,6 +6,7 @@ import { useRequestEndSessionMutation } from "@/hooks/useRequestEndSessionMutati
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "@/components/ToastContainer";
+import { clearBoundRoomId } from "@/utils/boundRoomId";
 
 const END_REQUEST_COOLDOWN_MS = 30_000;
 
@@ -156,6 +157,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({
     if (!roomId || !bill || isEndingSession) return;
     endSessionMutation.mutate(undefined, {
       onSuccess: () => {
+        clearBoundRoomId();
         setIsEndConfirmOpen(false);
         setIsEndSuccessOpen(true);
         setEndRequestCooldownMs(END_REQUEST_COOLDOWN_MS);

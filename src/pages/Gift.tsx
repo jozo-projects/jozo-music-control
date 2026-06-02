@@ -17,7 +17,7 @@ import { useGift } from "@/contexts/GiftContext";
 import { useClaimGift } from "@/hooks/useGiftMutations";
 import { useGiftListQuery } from "@/hooks/useGiftQuery";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import React from "react";
 
 // Câu chúc khi mở quà thành công
@@ -165,6 +165,7 @@ const GIFT_STYLES = `
 
 const Gift: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { scheduleId, markAsClaimed, isClaimed, claimedGift, isGiftEnabled } =
     useGift();
   const {
@@ -237,9 +238,10 @@ const Gift: React.FC = () => {
   // Redirect nếu không có quà
   useEffect(() => {
     if (!isGiftEnabled) {
-      navigate("/", { replace: true });
+      const qs = searchParams.toString();
+      navigate(qs ? `/?${qs}` : "/", { replace: true });
     }
-  }, [isGiftEnabled, navigate]);
+  }, [isGiftEnabled, navigate, searchParams]);
 
   // Khởi tạo shuffle khi vào trang
   useEffect(() => {
