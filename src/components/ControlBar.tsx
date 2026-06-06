@@ -17,11 +17,6 @@ import { useSearchParams } from "react-router-dom";
 import { debounce } from "lodash";
 import { useQueryClient } from "@tanstack/react-query";
 
-type Props = {
-  onToggleQueue: () => void;
-  showQueueToggle?: boolean;
-};
-
 interface Video {
   video_id: string;
   title: string;
@@ -35,10 +30,7 @@ interface ApiResponse<T> {
   // thêm các trường khác nếu cần
 }
 
-const ControlBar: React.FC<Props> = ({
-  onToggleQueue,
-  showQueueToggle = true,
-}: Props) => {
+const ControlBar: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -472,23 +464,6 @@ const ControlBar: React.FC<Props> = ({
         </div>
 
         <div className="flex flex-shrink-0 items-center space-x-3 sm:space-x-4">
-          {showQueueToggle && (
-            <div className="relative">
-              <button
-                onClick={onToggleQueue}
-                className="text-lg hover:text-blue-400 sm:text-xl"
-              >
-                🎵
-              </button>
-              {!!queueData?.result?.queue?.length &&
-                queueData?.result?.queue?.length > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground sm:h-5 sm:w-5 sm:text-[10px]">
-                    {queueData?.result?.queue?.length}
-                  </span>
-                )}
-            </div>
-          )}
-
           <div className="flex items-center space-x-1.5 sm:space-x-2">
             <div className="text-white">{renderVolumeIcon()}</div>
             <div className="relative w-20 sm:w-24">
