@@ -111,7 +111,7 @@ const CATEGORY_CONFIG: Record<
 > = {
   snack: {
     label: "Snacks",
-    helpText: "Đồ ăn vặt",
+    helpText: "",
     icon: <SnackIcon />,
   },
   snacks: {
@@ -120,8 +120,8 @@ const CATEGORY_CONFIG: Record<
     icon: <SnackIcon />,
   },
   drink: {
-    label: "Nước uống",
-    helpText: "Thức uống",
+    label: "Nước",
+    helpText: "",
     icon: <DrinkIcon />,
   },
   drinks: {
