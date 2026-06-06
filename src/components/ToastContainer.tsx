@@ -43,7 +43,7 @@ export const ToastContainer = () => {
   if (!toast) return null;
 
   return (
-    <div className="fixed right-4 top-24 flex justify-end pointer-events-none z-[120]">
+    <div className="fixed right-4 top-24 flex justify-end pointer-events-none z-[250]">
       <div
         key={toast.id}
         className="px-6 py-3 rounded-lg max-w-md text-center text-primary-foreground transition-opacity duration-300 animate-fade-in-out pointer-events-auto bg-primary/30 backdrop-blur-md border border-primary/25 shadow-brand-soft"
