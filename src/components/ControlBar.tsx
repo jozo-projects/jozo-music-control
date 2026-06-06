@@ -19,6 +19,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   onToggleQueue: () => void;
+  showQueueToggle?: boolean;
 };
 
 interface Video {
@@ -34,7 +35,10 @@ interface ApiResponse<T> {
   // thêm các trường khác nếu cần
 }
 
-const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
+const ControlBar: React.FC<Props> = ({
+  onToggleQueue,
+  showQueueToggle = true,
+}: Props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -423,55 +427,67 @@ const ControlBar: React.FC<Props> = ({ onToggleQueue }: Props) => {
           </div>
 
           {isNowPlaying ? (
-            <div className="w-full flex items-center space-x-2 text-xs text-gray-400">
-              <span>{formatTime(displayCurrentTime)}</span>
-              <div className="relative flex-1">
-                <div className="absolute top-1/2 left-0 h-2 w-full bg-gray-500 rounded-full -translate-y-1/2"></div>
-                <input
-                  type="range"
-                  min={0}
-                  max={displayDuration}
-                  value={displayCurrentTime}
-                  onMouseDown={handleDragStart}
-                  onMouseUp={(e) => handleSeek(Number(e.currentTarget.value))}
-                  onChange={(e) => handleDrag(Number(e.target.value))}
-                  className="absolute z-10 w-full appearance-none bg-transparent h-2 cursor-pointer -translate-y-1/2 
-                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-30 [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
-                    [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:relative [&::-moz-range-thumb]:z-30 [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
-                    [&::-ms-thumb]:appearance-none [&::-ms-thumb]:bg-primary [&::-ms-thumb]:w-4 [&::-ms-thumb]:h-4 [&::-ms-thumb]:rounded-full [&::-ms-thumb]:relative [&::-ms-thumb]:z-30 [&::-ms-thumb]:transition-all [&::-ms-thumb]:duration-150"
-                  style={{
-                    WebkitTapHighlightColor: "transparent",
-                  }}
-                />
+            <div className="flex w-full items-center space-x-2 text-xs text-gray-400">
+              <span className="shrink-0 tabular-nums">
+                {formatTime(displayCurrentTime)}
+              </span>
+              <div className="relative flex h-7 flex-1 touch-none items-center">
+                <div className="pointer-events-none absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gray-500" />
                 <div
-                  className="absolute z-10 top-1/2 left-0 h-2 bg-primary rounded-full -translate-y-1/2 transition-all duration-75"
+                  className="pointer-events-none absolute top-1/2 left-0 z-[5] h-2 -translate-y-1/2 rounded-full bg-primary transition-all duration-75"
                   style={{
                     width: `${(displayCurrentTime / displayDuration) * 100}%`,
                   }}
                 />
+                <input
+                  type="range"
+                  min={0}
+                  max={displayDuration}
+                  step={0.1}
+                  value={displayCurrentTime}
+                  onPointerDown={handleDragStart}
+                  onPointerUp={(e) =>
+                    handleSeek(Number(e.currentTarget.value))
+                  }
+                  onPointerCancel={(e) =>
+                    handleSeek(Number(e.currentTarget.value))
+                  }
+                  onChange={(e) => handleDrag(Number(e.target.value))}
+                  className="absolute inset-0 z-10 h-full w-full cursor-pointer appearance-none bg-transparent touch-none
+                    [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-30 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-[0_0_0_4px_rgba(0,0,0,0.2)] [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
+                    [&::-moz-range-thumb]:relative [&::-moz-range-thumb]:z-30 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
+                    [&::-ms-thumb]:relative [&::-ms-thumb]:z-30 [&::-ms-thumb]:h-4 [&::-ms-thumb]:w-4 [&::-ms-thumb]:appearance-none [&::-ms-thumb]:rounded-full [&::-ms-thumb]:bg-primary [&::-ms-thumb]:transition-all [&::-ms-thumb]:duration-150"
+                  style={{
+                    WebkitTapHighlightColor: "transparent",
+                  }}
+                />
               </div>
-              <span>{formatTime(displayDuration)}</span>
+              <span className="shrink-0 tabular-nums">
+                {formatTime(displayDuration)}
+              </span>
             </div>
           ) : (
-            <div className="h-2 w-full sm:h-3" />
+            <div className="h-7 w-full" />
           )}
         </div>
 
         <div className="flex flex-shrink-0 items-center space-x-3 sm:space-x-4">
-          <div className="relative">
-            <button
-              onClick={onToggleQueue}
-              className="text-lg hover:text-blue-400 sm:text-xl"
-            >
-              🎵
-            </button>
-            {!!queueData?.result?.queue?.length &&
-              queueData?.result?.queue?.length > 0 && (
-                <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground sm:h-5 sm:w-5 sm:text-[10px]">
-                  {queueData?.result?.queue?.length}
-                </span>
-              )}
-          </div>
+          {showQueueToggle && (
+            <div className="relative">
+              <button
+                onClick={onToggleQueue}
+                className="text-lg hover:text-blue-400 sm:text-xl"
+              >
+                🎵
+              </button>
+              {!!queueData?.result?.queue?.length &&
+                queueData?.result?.queue?.length > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground sm:h-5 sm:w-5 sm:text-[10px]">
+                    {queueData?.result?.queue?.length}
+                  </span>
+                )}
+            </div>
+          )}
 
           <div className="flex items-center space-x-1.5 sm:space-x-2">
             <div className="text-white">{renderVolumeIcon()}</div>

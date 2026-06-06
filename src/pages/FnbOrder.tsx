@@ -8,10 +8,139 @@ import { useFnbOrdersQuery } from "@/hooks/useFnbOrdersQuery";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-const CATEGORIES = {
-  snack: "Snacks",
-  drink: "Nước uống",
+const SnackIcon = ({ className = "w-7 h-7" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none">
+    <rect
+      x="9"
+      y="2"
+      width="2"
+      height="7"
+      rx="1"
+      fill="currentColor"
+      opacity="0.7"
+    />
+    <rect x="11.5" y="1.5" width="2" height="8" rx="1" fill="currentColor" />
+    <rect
+      x="14"
+      y="2.5"
+      width="2"
+      height="6.5"
+      rx="1"
+      fill="currentColor"
+      opacity="0.8"
+    />
+    <path
+      d="M5.5 9.5 7.5 20.5h9l2-11H5.5z"
+      fill="currentColor"
+      opacity="0.18"
+    />
+    <path
+      d="M5.5 9.5 7.5 20.5h9l2-11H5.5z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7 9.5h10"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M8.5 13h7M8.5 16h7"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      opacity="0.5"
+    />
+  </svg>
+);
+
+const DrinkIcon = ({ className = "w-7 h-7" }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none">
+    <path
+      d="M8.5 8.5h7l-1.1 10.2c-.1.9-.9 1.6-1.8 1.6h-1.2c-.9 0-1.7-.7-1.8-1.6L8.5 8.5z"
+      fill="currentColor"
+      opacity="0.18"
+    />
+    <path
+      d="M8.5 8.5h7l-1.1 10.2c-.1.9-.9 1.6-1.8 1.6h-1.2c-.9 0-1.7-.7-1.8-1.6L8.5 8.5z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7.5 8.5h9"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <ellipse
+      cx="12"
+      cy="8.5"
+      rx="4.5"
+      ry="1.3"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+    <path
+      d="M16 4.5v1.5M16 4.5h2.2c.3 0 .5.3.4.5l-1.6 5.5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10 12.5c1.2 1 2.8 1 4 0"
+      stroke="currentColor"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      opacity="0.6"
+    />
+    <circle cx="10.5" cy="14.5" r="0.7" fill="currentColor" opacity="0.45" />
+    <circle cx="13.5" cy="16" r="0.6" fill="currentColor" opacity="0.35" />
+  </svg>
+);
+
+const isSnackCategory = (id: string) => id === "snack" || id === "snacks";
+const isDrinkCategory = (id: string) => id === "drink" || id === "drinks";
+
+const CATEGORY_CONFIG: Record<
+  string,
+  { label: string; helpText: string; icon: React.ReactNode }
+> = {
+  snack: {
+    label: "Snacks",
+    helpText: "Đồ ăn vặt",
+    icon: <SnackIcon />,
+  },
+  snacks: {
+    label: "Snacks",
+    helpText: "Đồ ăn vặt",
+    icon: <SnackIcon />,
+  },
+  drink: {
+    label: "Nước uống",
+    helpText: "Thức uống",
+    icon: <DrinkIcon />,
+  },
+  drinks: {
+    label: "Nước uống",
+    helpText: "Thức uống",
+    icon: <DrinkIcon />,
+  },
 };
+
+const getCategoryConfig = (id: string) =>
+  CATEGORY_CONFIG[id] ?? {
+    label: id,
+    helpText: id,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
+        <path d="M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z" />
+      </svg>
+    ),
+  };
 
 const FnbOrder: React.FC = () => {
   const {
@@ -342,114 +471,126 @@ const FnbOrder: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-brand-50/90 to-neutral-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="text-center mb-6">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-hover via-primary to-primary-deeper bg-clip-text text-transparent mb-2">
-              Đặt Đồ Ăn & Thức Uống
-            </h1>
-            <p className="text-gray-600">
-              Chọn món ngon và đặt hàng ngay tại box
-            </p>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex justify-center">
-            <div className="bg-gray-100 rounded-2xl p-1 flex">
-              <button
-                onClick={() => setActiveTab("menu")}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                  activeTab === "menu"
-                    ? "bg-gradient-to-r from-primary to-primary-deep text-primary-foreground shadow-brand-soft"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
-              >
-                Menu
-              </button>
-              <button
-                onClick={() => setActiveTab("orders")}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
-                  activeTab === "orders"
-                    ? "bg-gradient-to-r from-primary to-primary-deep text-primary-foreground shadow-brand-soft"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
-              >
-                Đơn hàng ({orders?.length || 0})
-              </button>
-            </div>
+      {/* Compact Header */}
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div className="flex items-center justify-between px-4 py-3">
+          <h1 className="text-lg font-bold text-gray-800">Đặt món</h1>
+          <div className="bg-gray-100 rounded-xl p-0.5 flex">
+            <button
+              onClick={() => setActiveTab("menu")}
+              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                activeTab === "menu"
+                  ? "bg-white text-primary shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Menu
+            </button>
+            <button
+              onClick={() => setActiveTab("orders")}
+              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                activeTab === "orders"
+                  ? "bg-white text-primary shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Đơn đã đặt ({orders?.length || 0})
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 pb-8">
+      <div className="pb-8">
         {activeTab === "menu" ? (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Left: Categories */}
-            <div className="lg:col-span-1 sticky top-4 self-start">
-              <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary-hover via-primary to-primary-deeper bg-clip-text text-transparent whitespace-nowrap">
-                  Danh Mục
-                </h2>
-                <div className="space-y-3">
-                  {categories.map((category) => (
+          <div className="relative">
+            {/* macOS-style Category Dock */}
+            <div className="fixed left-2 top-1/2 -translate-y-1/2 z-20">
+              <div className="flex flex-col items-center gap-2 p-2.5 rounded-2xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+                <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wide px-1 text-center leading-tight">
+                  Chọn
+                  <br />
+                  danh mục
+                </p>
+                <div className="w-full h-px bg-gray-200/80" />
+                {categories.map((category) => {
+                  const config = getCategoryConfig(category.id);
+                  const isActive = selectedCategory === category.id;
+                  return (
                     <button
                       key={category.id}
-                      className={`w-full p-4 rounded-xl text-left transition-all transform hover:scale-105 ${
-                        selectedCategory === category.id
-                          ? "bg-gradient-to-r from-primary to-primary-deep text-primary-foreground shadow-brand-soft"
-                          : "bg-gray-50 hover:bg-gray-100 text-gray-700 hover:shadow-md"
+                      className={`group flex flex-col items-center gap-1 w-[4.5rem] py-2 px-1 rounded-xl transition-all duration-200 ${
+                        isActive
+                          ? "bg-primary/10 ring-2 ring-primary shadow-brand-soft scale-105"
+                          : "hover:bg-white hover:shadow-md hover:scale-105"
                       }`}
                       onClick={() => setSelectedCategory(category.id)}
                     >
-                      <span className="font-semibold whitespace-nowrap">
-                        {CATEGORIES[category.id as keyof typeof CATEGORIES]}
+                      <div
+                        className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors ${
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : isSnackCategory(category.id)
+                              ? "bg-amber-50 text-amber-600"
+                              : isDrinkCategory(category.id)
+                                ? "bg-sky-50 text-sky-500"
+                                : "bg-white text-gray-600"
+                        }`}
+                      >
+                        {config.icon}
+                      </div>
+                      <span
+                        className={`text-[10px] font-bold leading-tight text-center ${
+                          isActive ? "text-primary" : "text-gray-700"
+                        }`}
+                      >
+                        {config.label}
+                      </span>
+                      <span
+                        className={`text-[9px] leading-tight text-center ${
+                          isActive ? "text-primary/70" : "text-gray-400"
+                        }`}
+                      >
+                        {config.helpText}
                       </span>
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Right: Menu Items */}
-            <div className="lg:col-span-3">
-              <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="text-sm text-gray-500">
-                    {filteredItems?.length || 0} món
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
-                  {filteredItems?.map((item) => (
-                    <FnbMenuItem
-                      key={item._id}
-                      item={item}
-                      cart={cart}
-                      onAddToCart={handleAddToCart}
-                      onUpdateQuantity={handleUpdateQuantity}
-                      onRemoveFromCart={handleRemoveFromCart}
-                      onOpenCart={() => setIsCartModalOpen(true)}
-                      isSubmitting={isSubmitting}
-                    />
-                  ))}
-                </div>
+            {/* Menu Items Grid */}
+            <div className="pl-[5.5rem] pr-3 pt-3">
+              <div className="grid grid-cols-3 gap-2.5 items-stretch">
+                {filteredItems?.map((item) => (
+                  <FnbMenuItem
+                    key={item._id}
+                    item={item}
+                    cart={cart}
+                    compact
+                    onAddToCart={handleAddToCart}
+                    onUpdateQuantity={handleUpdateQuantity}
+                    onRemoveFromCart={handleRemoveFromCart}
+                    onOpenCart={() => setIsCartModalOpen(true)}
+                    isSubmitting={isSubmitting}
+                  />
+                ))}
               </div>
             </div>
           </div>
         ) : activeTab === "orders" ? (
-          /* Orders Tab */
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-hover via-primary to-primary-deeper bg-clip-text text-transparent">
+          <div className="px-4 pt-3">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-gray-800">
                 Đơn hàng đã đặt
               </h2>
               <button
                 onClick={() => refetchOrders()}
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-gradient-to-r from-primary to-primary-deep text-primary-foreground rounded-xl hover:from-primary-hover hover:to-primary-deeper transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-brand-soft"
+                className="p-2 text-primary hover:bg-brand-50 rounded-lg transition-colors disabled:opacity-50"
+                title="Làm mới"
               >
                 <svg
-                  className="w-4 h-4"
+                  className="w-5 h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -461,7 +602,6 @@ const FnbOrder: React.FC = () => {
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
-                <span>Làm mới</span>
               </button>
             </div>
             <OrderList orders={orders || []} isLoading={ordersLoading} />

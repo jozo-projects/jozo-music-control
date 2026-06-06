@@ -57,8 +57,8 @@ const Home: React.FC = () => {
 
       {/* Selected Category Videos Section */}
       {backgroundId && (
-        <section key={backgroundId}>
-          <div className="flex items-center justify-between mb-4">
+        <section key={backgroundId} className="!mt-2">
+          <div className="flex items-center justify-between mb-2">
             <h2 className="text-2xl font-bold">{selectedCategoryName}</h2>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">

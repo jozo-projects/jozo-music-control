@@ -32,7 +32,7 @@ export function ImageBackgroundProvider({
   children,
 }: ImageBackgroundProviderProps) {
   const [backgroundId, setBackgroundId] = useState<string>(
-    CategoriesId.HOT_SONGS
+    CategoriesId.ANH_TRAI_SAY_HI
   );
 
   return (

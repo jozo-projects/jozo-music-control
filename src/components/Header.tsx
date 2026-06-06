@@ -5,6 +5,7 @@ import { logo } from "@/assets/images";
 import useRoom from "@/hooks/useRoom";
 import { useSongName } from "@/hooks/useSongName";
 import { setBoundRoomId } from "@/utils/boundRoomId";
+import { getRoomDisplayNumber } from "@/utils/roomDisplayNumber";
 import { useQueryClient } from "@tanstack/react-query";
 import BillSummary from "./BillSummary";
 import debounce from "lodash/debounce";
@@ -66,6 +67,7 @@ const Header: React.FC = () => {
 
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
+  const roomDisplayNumber = roomId ? getRoomDisplayNumber(roomId) : null;
   const [isRoomScreenOpen, setIsRoomScreenOpen] = useState(!roomId);
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
   const touchStartXRef = useRef<number | null>(null);
@@ -355,6 +357,7 @@ const Header: React.FC = () => {
         className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-95"
         aria-hidden
       />
+
       {/* Logo */}
       <img
         src={logo}
@@ -545,6 +548,18 @@ const Header: React.FC = () => {
             <span>Hỗ trợ</span>
           </div>
         </button>
+
+        {roomDisplayNumber && (
+          <div
+            className="flex flex-col items-center gap-0.5 rounded-lg border border-primary/40 bg-primary/20 px-2 py-0.5"
+            aria-label={`Phòng ${roomDisplayNumber}`}
+          >
+            <span className="text-[10px] leading-tight text-white/70">Phòng</span>
+            <span className="text-sm font-bold leading-none tracking-wider text-primary-foreground sm:text-base">
+              {roomDisplayNumber}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Confirm Support Modal */}

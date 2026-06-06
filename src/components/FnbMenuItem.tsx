@@ -3,6 +3,7 @@ import React, { useState } from "react";
 interface FnbMenuItemProps {
   item: FnbItem;
   cart?: OrderItem[];
+  compact?: boolean;
   onAddToCart?: (
     item: FnbItem,
     variant?: FnbVariant,
@@ -21,6 +22,7 @@ interface FnbMenuItemProps {
 const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
   item,
   cart = [],
+  compact = false,
   onAddToCart,
   onUpdateQuantity,
   onRemoveFromCart,
@@ -128,9 +130,17 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
   if (item.hasVariant && variants.length > 0) {
     return (
       <>
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 flex flex-col h-full hover:shadow-xl transition-all duration-300">
+        <div
+          className={`bg-white overflow-hidden border border-gray-100 flex flex-col h-full hover:shadow-md transition-all duration-300 ${
+            compact ? "rounded-xl shadow-sm" : "rounded-2xl shadow-lg hover:shadow-xl"
+          }`}
+        >
           {/* Item Image */}
-          <div className="h-48 overflow-hidden relative flex-shrink-0">
+          <div
+            className={`overflow-hidden relative flex-shrink-0 ${
+              compact ? "h-28" : "h-48"
+            }`}
+          >
             <img
               src={item.image || item.existingImage || defaultImage}
               alt={item.name}
@@ -142,34 +152,52 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
           </div>
 
           {/* Item Info */}
-          <div className="p-5 flex-1 flex flex-col justify-between">
+          <div
+            className={`flex-1 flex flex-col justify-between ${
+              compact ? "p-2.5" : "p-5"
+            }`}
+          >
             <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
+              <h3
+                className={`font-bold text-gray-800 line-clamp-2 ${
+                  compact ? "text-sm mb-1" : "text-lg mb-2"
+                }`}
+              >
                 {item.name}
               </h3>
-              {item.description && (
+              {!compact && item.description && (
                 <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                   {item.description}
                 </p>
               )}
 
-              <div className="mb-4">
-                <div className="text-xl font-bold text-brand-600 mb-1">
+              <div className={compact ? "mb-2" : "mb-4"}>
+                <div
+                  className={`font-bold text-brand-600 ${
+                    compact ? "text-sm" : "text-xl mb-1"
+                  }`}
+                >
                   Từ{" "}
                   {Math.min(...variants.map((v) => v.price)).toLocaleString(
                     "vi-VN",
                   )}
                   đ
                 </div>
-                <span className="text-xs text-gray-500">
-                  {variants.length} loại khác nhau
-                </span>
+                {!compact && (
+                  <span className="text-xs text-gray-500">
+                    {variants.length} loại khác nhau
+                  </span>
+                )}
               </div>
             </div>
 
             {/* Choose Variant Button */}
             <button
-              className="w-full py-3 rounded-xl font-semibold transition-all duration-200 bg-gradient-to-r from-primary to-primary-deep text-primary-foreground hover:from-primary-hover hover:to-primary-deeper hover:shadow-brand-soft transform hover:-translate-y-0.5"
+              className={`w-full rounded-lg font-semibold transition-all duration-200 bg-gradient-to-r from-primary to-primary-deep text-primary-foreground hover:from-primary-hover hover:to-primary-deeper ${
+                compact
+                  ? "py-1.5 text-xs"
+                  : "py-3 rounded-xl hover:shadow-brand-soft transform hover:-translate-y-0.5"
+              }`}
               onClick={() => setShowVariantsModal(true)}
             >
               Chọn loại
@@ -389,21 +417,31 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
   // Regular item without variants
   return (
     <div
-      className={`relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 flex flex-col h-full ${
-        !isAvailable ? "opacity-75" : "hover:scale-105"
-      }`}
+      className={`relative bg-white overflow-hidden border border-gray-100 transition-all duration-300 flex flex-col h-full ${
+        compact
+          ? "rounded-xl shadow-sm hover:shadow-md"
+          : "rounded-2xl shadow-lg hover:shadow-xl"
+      } ${!isAvailable ? "opacity-75" : compact ? "" : "hover:scale-105"}`}
     >
       {/* Out of Stock Badge */}
       {!isAvailable && (
-        <div className="absolute top-3 right-3 z-10">
-          <div className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-            HẾT HÀNG
+        <div className={`absolute z-10 ${compact ? "top-1.5 right-1.5" : "top-3 right-3"}`}>
+          <div
+            className={`bg-red-500 text-white font-bold rounded-full shadow-lg ${
+              compact ? "text-[10px] px-2 py-0.5" : "text-xs px-3 py-1.5"
+            }`}
+          >
+            HẾT
           </div>
         </div>
       )}
 
       {/* Item Image */}
-      <div className="h-48 overflow-hidden relative flex-shrink-0">
+      <div
+        className={`overflow-hidden relative flex-shrink-0 ${
+          compact ? "h-28" : "h-48"
+        }`}
+      >
         <img
           src={item.image || item.existingImage || defaultImage}
           alt={item.name}
@@ -412,26 +450,37 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
             (e.target as HTMLImageElement).src = defaultImage;
           }}
         />
-        {/* Image overlay for out of stock */}
         {!isAvailable && (
           <div className="absolute inset-0 bg-black bg-opacity-30"></div>
         )}
       </div>
 
       {/* Item Info */}
-      <div className="p-5 flex-1 flex flex-col justify-between">
+      <div
+        className={`flex-1 flex flex-col justify-between ${
+          compact ? "p-2.5" : "p-5"
+        }`}
+      >
         <div>
-          <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
+          <h3
+            className={`font-bold text-gray-800 line-clamp-2 ${
+              compact ? "text-sm mb-1" : "text-lg mb-2"
+            }`}
+          >
             {item.name}
           </h3>
-          {item.description && (
+          {!compact && item.description && (
             <p className="text-sm text-gray-600 mb-3 line-clamp-2">
               {item.description}
             </p>
           )}
 
-          <div className="mb-4">
-            <div className="text-xl font-bold text-brand-600 mb-1">
+          <div className={compact ? "mb-2" : "mb-4"}>
+            <div
+              className={`font-bold text-brand-600 ${
+                compact ? "text-sm" : "text-xl mb-1"
+              }`}
+            >
               {item.price.toLocaleString("vi-VN")}đ
             </div>
           </div>
@@ -440,18 +489,24 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
         {/* Quantity Controls */}
         {isAvailable ? (
           <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-500">
-              Còn {getRemainingQuantity(item._id)}
-            </span>
+            {!compact && (
+              <span className="text-xs text-gray-500">
+                Còn {getRemainingQuantity(item._id)}
+              </span>
+            )}
 
-            <div className="flex items-center space-x-2">
+            <div
+              className={`flex items-center ${compact ? "w-full justify-center space-x-1.5" : "space-x-2"}`}
+            >
               <button
-                className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary-deeper transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary-deeper transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  compact ? "w-6 h-6" : "w-8 h-8"
+                }`}
                 disabled={isSubmitting}
                 onClick={() => handleItemQuantityChange(-1)}
               >
                 <svg
-                  className="w-4 h-4"
+                  className={compact ? "w-3 h-3" : "w-4 h-4"}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -465,17 +520,23 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                 </svg>
               </button>
 
-              <span className="text-sm font-bold text-brand-600 min-w-[2rem] text-center">
+              <span
+                className={`font-bold text-brand-600 text-center ${
+                  compact ? "text-xs min-w-[1.25rem]" : "text-sm min-w-[2rem]"
+                }`}
+              >
                 {getItemQuantityInCart(item._id)}
               </span>
 
               <button
-                className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary-deeper transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary-deeper transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  compact ? "w-6 h-6" : "w-8 h-8"
+                }`}
                 disabled={isSubmitting}
                 onClick={(e) => handleItemQuantityChange(1, e.currentTarget)}
               >
                 <svg
-                  className="w-4 h-4"
+                  className={compact ? "w-3 h-3" : "w-4 h-4"}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -492,7 +553,13 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
           </div>
         ) : (
           <div className="text-center">
-            <span className="text-sm text-red-500 font-medium">Hết hàng</span>
+            <span
+              className={`text-red-500 font-medium ${
+                compact ? "text-xs" : "text-sm"
+              }`}
+            >
+              Hết hàng
+            </span>
           </div>
         )}
       </div>
