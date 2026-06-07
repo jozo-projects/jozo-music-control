@@ -1,7 +1,10 @@
+import { useRoomAccessEnabled } from "@/hooks/useRoomAccessEnabled";
 import http from "@/utils/http";
 import { useQuery } from "@tanstack/react-query";
 
 export const useFnbMenuQuery = () => {
+  const isRoomAccessEnabled = useRoomAccessEnabled();
+
   return useQuery({
     queryKey: ["fnbMenu"],
     queryFn: async () => {
@@ -20,5 +23,6 @@ export const useFnbMenuQuery = () => {
 
       return menu;
     },
+    enabled: isRoomAccessEnabled,
   });
 };

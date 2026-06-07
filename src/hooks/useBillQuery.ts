@@ -1,3 +1,4 @@
+import { useRoomAccessEnabled } from "@/hooks/useRoomAccessEnabled";
 import http from "@/utils/http";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
@@ -9,6 +10,7 @@ type UseBillQueryOptions = {
 export const useBillQuery = (options?: UseBillQueryOptions) => {
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
+  const isRoomAccessEnabled = useRoomAccessEnabled();
   const isEnabled = options?.enabled ?? true;
 
   return useQuery<IBill | null>({
@@ -25,7 +27,7 @@ export const useBillQuery = (options?: UseBillQueryOptions) => {
       if (response.status === 404) return null;
       return response.data.result ?? null;
     },
-    enabled: !!roomId && isEnabled,
+    enabled: isRoomAccessEnabled && isEnabled,
     refetchInterval: 60000, // Cập nhật mỗi phút để đồng bộ thời gian sử dụng và đơn FnB
   });
 };

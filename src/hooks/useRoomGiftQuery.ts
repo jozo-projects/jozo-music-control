@@ -1,3 +1,4 @@
+import { useRoomAccessEnabled } from "@/hooks/useRoomAccessEnabled";
 import http from "@/utils/http";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
@@ -5,6 +6,7 @@ import { useSearchParams } from "react-router-dom";
 export const useRoomGiftQuery = () => {
   const [searchParams] = useSearchParams();
   const roomIndex = searchParams.get("roomId") || "";
+  const isRoomAccessEnabled = useRoomAccessEnabled();
 
   return useQuery({
     queryKey: ["room-gift", roomIndex],
@@ -14,7 +16,7 @@ export const useRoomGiftQuery = () => {
       );
       return response.data.result;
     },
-    enabled: !!roomIndex,
+    enabled: isRoomAccessEnabled,
     refetchInterval: 300000, // Refetch mỗi 5 phút để check trạng thái mới nhất
   });
 };

@@ -2,6 +2,7 @@ import BellAlertIcon from "@/assets/icons/BellAlertIcon";
 import HomeIcon from "@/assets/icons/HomeIcon";
 import ListIcon from "@/assets/icons/ListIcon";
 import { logo } from "@/assets/images";
+import { useRoomPin } from "@/contexts/RoomPinContext";
 import useRoom from "@/hooks/useRoom";
 import { useSongName } from "@/hooks/useSongName";
 import { setBoundRoomId } from "@/utils/boundRoomId";
@@ -77,6 +78,7 @@ const Header: React.FC = () => {
 
   const queryClient = useQueryClient();
   const { mutate: sendNotification } = useRoom();
+  const { isPinVerified } = useRoomPin();
 
   // Tính toán các biến thường dùng
   const isSearchPage = location.pathname.includes("/search");
@@ -85,6 +87,9 @@ const Header: React.FC = () => {
   const ensureRoomSelected = () => {
     if (!roomId) {
       setIsRoomScreenOpen(true);
+      return false;
+    }
+    if (!isPinVerified) {
       return false;
     }
     return true;
@@ -416,7 +421,9 @@ const Header: React.FC = () => {
           songNameSuggestions.length > 0 && (
             <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-primary/25 bg-brand-950/92 shadow-xl backdrop-blur-md">
               <div className="flex items-center justify-between border-b border-primary/20 bg-primary/10">
-                <div className="p-1.5 text-xs font-medium text-white">Gợi ý</div>
+                <div className="p-1.5 text-xs font-medium text-white">
+                  Gợi ý
+                </div>
                 <button
                   className="p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                   onClick={() =>
@@ -455,22 +462,24 @@ const Header: React.FC = () => {
           )}
 
         <div className="flex items-center gap-x-1.5 rounded-full border border-white/10 bg-black/20 px-2 py-1 backdrop-blur-sm">
-          <span className="whitespace-nowrap text-xs text-white/85">Lời nhạc</span>
+          <span className="whitespace-nowrap text-xs text-white/85">
+            Lời nhạc
+          </span>
           <div className="origin-right scale-90">
-          <Switch
-            isChecked={isKaraoke}
-            onChange={() => {
-              if (!ensureRoomSelected()) return;
-              setIsKaraoke(!isKaraoke);
-              if (isSearchPage) {
-                navigate(
-                  `/search?query=${encodeURIComponent(
-                    searchState.term,
-                  )}&karaoke=${!isKaraoke}&roomId=${roomId}`,
-                );
-              }
-            }}
-          />
+            <Switch
+              isChecked={isKaraoke}
+              onChange={() => {
+                if (!ensureRoomSelected()) return;
+                setIsKaraoke(!isKaraoke);
+                if (isSearchPage) {
+                  navigate(
+                    `/search?query=${encodeURIComponent(
+                      searchState.term,
+                    )}&karaoke=${!isKaraoke}&roomId=${roomId}`,
+                  );
+                }
+              }}
+            />
           </div>
         </div>
       </div>
@@ -554,7 +563,9 @@ const Header: React.FC = () => {
             className="flex flex-col items-center gap-0.5 rounded-lg border border-primary/40 bg-primary/20 px-2 py-0.5"
             aria-label={`Phòng ${roomDisplayNumber}`}
           >
-            <span className="text-[10px] leading-tight text-white/70">Phòng</span>
+            <span className="text-[10px] leading-tight text-white/70">
+              Phòng
+            </span>
             <span className="text-sm font-bold leading-none tracking-wider text-primary-foreground sm:text-base">
               {roomDisplayNumber}
             </span>
@@ -700,10 +711,6 @@ const Header: React.FC = () => {
           </div>
 
           <div className="p-4 space-y-4">
-            <p className="text-sm text-white/70">
-              Chạm logo 3 lần trong vòng 5 giây để mở màn chọn phòng (hoặc vuốt
-              phải từ mép trái thanh tiêu đề). Chỉ staff biết thao tác này.
-            </p>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
               {ROOM_OPTIONS.map((room) => (
                 <button

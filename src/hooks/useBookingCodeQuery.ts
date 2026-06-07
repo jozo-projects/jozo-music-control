@@ -1,7 +1,9 @@
+import { useRoomAccessEnabled } from "@/hooks/useRoomAccessEnabled";
 import http from "@/utils/http";
 import { useQuery } from "@tanstack/react-query";
 
 export const useBookingCodeQuery = (bookingCode: string) => {
+  const isRoomAccessEnabled = useRoomAccessEnabled();
   return useQuery({
     queryKey: ["bookingCode", bookingCode],
     queryFn: async () => {
@@ -19,6 +21,6 @@ export const useBookingCodeQuery = (bookingCode: string) => {
       >(`/bookings/${bookingCode}/videos`);
       return response.data;
     },
-    enabled: !!bookingCode && bookingCode.length === 4,
+    enabled: isRoomAccessEnabled && !!bookingCode && bookingCode.length === 4,
   });
 };

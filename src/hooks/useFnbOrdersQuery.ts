@@ -1,7 +1,9 @@
+import { useRoomAccessEnabled } from "@/hooks/useRoomAccessEnabled";
 import http from "@/utils/http";
 import { useQuery } from "@tanstack/react-query";
 
 export const useFnbOrdersQuery = (roomId: string) => {
+  const isRoomAccessEnabled = useRoomAccessEnabled();
   return useQuery({
     queryKey: ["fnb-orders", roomId],
     queryFn: async () => {
@@ -16,6 +18,6 @@ export const useFnbOrdersQuery = (roomId: string) => {
       if (!order) return [];
       return [order];
     },
-    enabled: !!roomId, // Chỉ fetch khi có roomId
+    enabled: isRoomAccessEnabled,
   });
 };

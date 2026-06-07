@@ -1,3 +1,4 @@
+import { useRoomAccessEnabled } from "@/hooks/useRoomAccessEnabled";
 import { useQuery } from "@tanstack/react-query";
 import http from "@/utils/http";
 import { useSearchParams } from "react-router-dom";
@@ -10,6 +11,7 @@ export const useSongName = (query: string, options?: UseSongNameOptions) => {
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId");
   const karaoke = searchParams.get("karaoke") === "true";
+  const isRoomAccessEnabled = useRoomAccessEnabled();
 
   return useQuery({
     queryKey: ["songName", query.trim(), karaoke, roomId], // Thêm roomId và trim query để cache tốt hơn
@@ -26,7 +28,10 @@ export const useSongName = (query: string, options?: UseSongNameOptions) => {
       return response.data;
     },
     select: (data) => data.result,
-    enabled: options?.enabled && query.trim().length >= 2, // Trim để kiểm tra độ dài chính xác
+    enabled:
+      isRoomAccessEnabled &&
+      !!options?.enabled &&
+      query.trim().length >= 2,
     staleTime: 1000 * 60 * 5, // Tăng cache time lên 5 phút
     gcTime: 1000 * 60 * 10, // Giữ cache trong 10 phút
     refetchOnWindowFocus: false, // Không gọi lại khi focus window

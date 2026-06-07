@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import RoutesWrapper from "@/routes/RoutesWrapper";
+import { RoomPinProvider } from "@/contexts/RoomPinContext";
 import { TimerProvider } from "@/contexts/TimerContext";
 import { SocketProvider } from "@/contexts/SocketContext";
 import { GiftProvider } from "@/contexts/GiftContext";
@@ -24,15 +25,17 @@ const App: React.FC = () => {
       <ReactQueryDevtools initialIsOpen={false} />
       <ToastContainer />
       <BrowserRouter>
-        <SocketProvider>
-          <GiftProvider>
-            <TimerProvider>
-              <ImageBackgroundProvider>
-                <RoutesWrapper />
-              </ImageBackgroundProvider>
-            </TimerProvider>
-          </GiftProvider>
-        </SocketProvider>
+        <RoomPinProvider>
+          <SocketProvider>
+            <GiftProvider>
+              <TimerProvider>
+                <ImageBackgroundProvider>
+                  <RoutesWrapper />
+                </ImageBackgroundProvider>
+              </TimerProvider>
+            </GiftProvider>
+          </SocketProvider>
+        </RoomPinProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

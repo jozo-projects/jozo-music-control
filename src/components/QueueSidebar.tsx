@@ -22,8 +22,7 @@ import ReactDOM from "react-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface QueueSidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
 }
 
 interface Song {
@@ -242,10 +241,7 @@ const SortableQueueItem = ({
   );
 };
 
-const QueueSidebar: React.FC<QueueSidebarProps> = ({
-  isOpen = true,
-  onClose,
-}) => {
+const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true }) => {
   const { data: queueData } = useQueueQuery();
 
   const { mutate: removeSongFromQueue } = useRemoveSongFromQueue();
@@ -298,12 +294,8 @@ const QueueSidebar: React.FC<QueueSidebarProps> = ({
       }`}
     >
       <div className="flex flex-col h-[100vh]">
-        {/* Close Button */}
-        <div className="p-4 flex justify-between items-center border-b border-gray-700">
+        <div className="p-4 border-b border-gray-700">
           <h2 className="text-lg font-bold">Danh sách</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
-            ✖
-          </button>
         </div>
 
         {/* Now Playing */}

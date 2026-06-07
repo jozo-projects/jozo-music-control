@@ -1,4 +1,5 @@
 import SongCard from "@/components/SongCard";
+import { useRoomAccessEnabled } from "@/hooks/useRoomAccessEnabled";
 import { searchLocalSongs, searchRemoteSongs } from "@/services/searchService";
 import { useQueries } from "@tanstack/react-query";
 import React, { useEffect, useState, useMemo, useRef } from "react";
@@ -37,6 +38,7 @@ const SearchPage: React.FC = () => {
   const query = searchParams.get("query") || "";
   const karaoke = searchParams.get("karaoke") === "true";
   const location = useLocation();
+  const isRoomAccessEnabled = useRoomAccessEnabled();
 
   // State để kiểm soát khi nào thực hiện tìm kiếm
   const [shouldSearch, setShouldSearch] = useState(false);
@@ -123,14 +125,16 @@ const SearchPage: React.FC = () => {
       {
         queryKey: ["searchLocal", searchQuery.toLowerCase().trim()],
         queryFn: () => searchLocalSongs(searchQuery),
-        enabled: shouldSearch && processedQuery.length >= 2,
+        enabled:
+          isRoomAccessEnabled && shouldSearch && processedQuery.length >= 2,
         staleTime: 1000 * 60 * 5, // Cache 5 phút
         retry: 2, // Retry 2 lần nếu fail
       },
       {
         queryKey: ["searchRemote", searchQuery.toLowerCase().trim()],
         queryFn: () => searchRemoteSongs(searchQuery),
-        enabled: shouldSearch && processedQuery.length >= 2,
+        enabled:
+          isRoomAccessEnabled && shouldSearch && processedQuery.length >= 2,
         staleTime: 1000 * 60 * 5, // Cache 5 phút (Redis cache ở backend)
         retry: 2, // Retry 2 lần nếu fail
       },
