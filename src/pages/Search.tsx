@@ -3,7 +3,7 @@ import { useRoomAccessEnabled } from "@/hooks/useRoomAccessEnabled";
 import { searchLocalSongs, searchRemoteSongs } from "@/services/searchService";
 import { useQueries } from "@tanstack/react-query";
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import debounce from "lodash/debounce";
 
 // Helper function to detect mobile/tablet devices
@@ -37,7 +37,6 @@ const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
   const karaoke = searchParams.get("karaoke") === "true";
-  const location = useLocation();
   const isRoomAccessEnabled = useRoomAccessEnabled();
 
   // State để kiểm soát khi nào thực hiện tìm kiếm
@@ -65,16 +64,19 @@ const SearchPage: React.FC = () => {
       setShouldSearch(false);
     }
 
-    // Enhanced keyboard handling for mobile devices
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [query]);
+
+  // Xử lý bàn phím mobile — mount một lần, không gắn lại mỗi lần query đổi
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" && isMobileOrTablet()) {
         e.preventDefault();
-        // Blur any focused input element
         if (document.activeElement instanceof HTMLElement) {
           document.activeElement.blur();
         }
-        // For iOS devices, we can try to force the keyboard to close
-        // by temporarily making the input readonly
         const activeInput = document.activeElement as HTMLInputElement;
         if (activeInput?.tagName === "INPUT") {
           activeInput.setAttribute("readonly", "readonly");
@@ -85,7 +87,6 @@ const SearchPage: React.FC = () => {
       }
     };
 
-    // Handle form submission on mobile
     const handleFormSubmit = (e: Event) => {
       if (isMobileOrTablet()) {
         e.preventDefault();
@@ -101,9 +102,8 @@ const SearchPage: React.FC = () => {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("submit", handleFormSubmit);
-      debouncedSearch.cancel();
     };
-  }, [location.search, query]);
+  }, []);
 
   // Tạo search query với keywords phù hợp
   const searchQuery = useMemo(() => {

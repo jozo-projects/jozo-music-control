@@ -173,7 +173,7 @@ const Header: React.FC = () => {
         } else if (!isHomePage) {
           navigate(baseUrl);
         }
-      }, 5000),
+      }, 600),
     [roomId, isKaraoke, isSearchPage, isHomePage, navigate],
   );
 
@@ -195,19 +195,19 @@ const Header: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Effect to trigger navigation when isKaraoke changes
+  const searchTermRef = useRef(searchState.term);
+  searchTermRef.current = searchState.term;
+
+  // Chỉ cập nhật URL khi toggle karaoke — không navigate mỗi lần gõ phím
   useEffect(() => {
-    if (!roomId) return;
-    if (isSearchPage && searchState.term) {
-      const baseUrl = `/search?roomId=${roomId}`;
-      // Giữ lại khoảng trắng ở cuối bằng cách dùng trực tiếp searchState.term mà không trim()
-      navigate(
-        `${baseUrl}&query=${encodeURIComponent(
-          searchState.term,
-        )}&karaoke=${isKaraoke}`,
-      );
-    }
-  }, [isKaraoke, roomId, isSearchPage, searchState.term, navigate]);
+    if (!roomId || !isSearchPage || !searchTermRef.current) return;
+    const baseUrl = `/search?roomId=${roomId}`;
+    navigate(
+      `${baseUrl}&query=${encodeURIComponent(
+        searchTermRef.current,
+      )}&karaoke=${isKaraoke}`,
+    );
+  }, [isKaraoke, roomId, isSearchPage, navigate]);
 
   // Handle input change với cách tiếp cận tối ưu hơn
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -381,7 +381,7 @@ const Header: React.FC = () => {
             ref={inputRef}
             type="text"
             placeholder="Tìm kiếm bài hát hoặc nghệ sĩ..."
-            value={inputValueRef.current}
+            value={searchState.term}
             onChange={handleInputChange}
             onFocus={() => {
               if (!ensureRoomSelected()) return;
@@ -419,7 +419,7 @@ const Header: React.FC = () => {
         {searchState.showSuggestions &&
           songNameSuggestions &&
           songNameSuggestions.length > 0 && (
-            <div className="absolute left-0 top-full z-50 mt-1 w-full overflow-hidden rounded-lg border border-primary/25 bg-brand-950/92 shadow-xl backdrop-blur-md">
+            <div className="absolute left-0 top-full z-50 mt-1 max-h-[min(50vh,320px)] w-full overflow-y-auto rounded-lg border border-primary/25 bg-brand-950/92 shadow-xl backdrop-blur-md">
               <div className="flex items-center justify-between border-b border-primary/20 bg-primary/10">
                 <div className="p-1.5 text-xs font-medium text-white">
                   Gợi ý
@@ -675,12 +675,23 @@ const Header: React.FC = () => {
       )}
 
       <div
-        className={`fixed inset-0 z-[120] pointer-events-none transition-transform duration-300 ${
-          isRoomScreenOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed inset-0 z-[120] transition-transform duration-300 ${
+          isRoomScreenOpen
+            ? "translate-x-0"
+            : "-translate-x-full pointer-events-none"
         }`}
+        aria-hidden={!isRoomScreenOpen}
       >
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto" />
-        <div className="absolute inset-y-0 left-0 w-full max-w-xl bg-gray-900 text-white shadow-2xl pointer-events-auto">
+        <div
+          className={`absolute inset-0 bg-black/60 backdrop-blur-sm ${
+            isRoomScreenOpen ? "pointer-events-auto" : "pointer-events-none"
+          }`}
+        />
+        <div
+          className={`absolute inset-y-0 left-0 w-full max-w-xl bg-gray-900 text-white shadow-2xl ${
+            isRoomScreenOpen ? "pointer-events-auto" : "pointer-events-none"
+          }`}
+        >
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
             <div>
               <p className="text-xs uppercase tracking-wide text-white/70">

@@ -85,6 +85,8 @@ export const searchRemoteSongs = async (
         q: query,
         limit,
       },
+      timeout: 15000,
+      skipErrorToast: true,
     });
 
     const payload = response?.data?.result;
