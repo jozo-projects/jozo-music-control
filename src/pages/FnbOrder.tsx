@@ -480,8 +480,8 @@ const FnbOrder: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-white via-brand-50/90 to-neutral-50">
       {/* Compact Header */}
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-lg font-bold text-gray-800">Đặt món</h1>
+        <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-2.5">
+          <h1 className="text-base md:text-lg font-bold text-gray-800">Đặt món</h1>
           <div className="bg-gray-100 rounded-xl p-0.5 flex">
             <button
               onClick={() => setActiveTab("menu")}
@@ -510,10 +510,10 @@ const FnbOrder: React.FC = () => {
       <div className="pb-8">
         {activeTab === "menu" ? (
           <div className="relative">
-            {/* macOS-style Category Dock */}
-            <div className="fixed left-2 top-1/2 -translate-y-1/2 z-20">
-              <div className="flex flex-col items-center gap-2 p-2.5 rounded-2xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
-                <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wide px-1 text-center leading-tight">
+            {/* macOS-style Category Dock — gọn cho tablet 10" */}
+            <div className="fixed left-1.5 md:left-2 top-1/2 -translate-y-1/2 z-20">
+              <div className="flex flex-col items-center gap-1.5 p-2 md:p-2 rounded-xl md:rounded-2xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+                <p className="text-[8px] md:text-[9px] font-semibold text-gray-400 uppercase tracking-wide px-0.5 text-center leading-tight">
                   Chọn
                   <br />
                   danh mục
@@ -525,7 +525,7 @@ const FnbOrder: React.FC = () => {
                   return (
                     <button
                       key={category.id}
-                      className={`group flex flex-col items-center gap-1 w-[4.5rem] py-2 px-1 rounded-xl transition-all duration-200 ${
+                      className={`group flex flex-col items-center gap-0.5 w-[3.75rem] md:w-[4rem] py-1.5 px-0.5 rounded-lg md:rounded-xl transition-all duration-200 ${
                         isActive
                           ? "bg-primary/10 ring-2 ring-primary shadow-brand-soft scale-105"
                           : "hover:bg-white hover:shadow-md hover:scale-105"
@@ -533,7 +533,7 @@ const FnbOrder: React.FC = () => {
                       onClick={() => setSelectedCategory(category.id)}
                     >
                       <div
-                        className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors ${
+                        className={`flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-lg md:rounded-xl transition-colors ${
                           isActive
                             ? "bg-primary text-primary-foreground"
                             : isSnackCategory(category.id)
@@ -546,14 +546,14 @@ const FnbOrder: React.FC = () => {
                         {config.icon}
                       </div>
                       <span
-                        className={`text-[10px] font-bold leading-tight text-center ${
+                        className={`text-[9px] md:text-[10px] font-bold leading-tight text-center ${
                           isActive ? "text-primary" : "text-gray-700"
                         }`}
                       >
                         {config.label}
                       </span>
                       <span
-                        className={`text-[9px] leading-tight text-center ${
+                        className={`text-[8px] md:text-[9px] leading-tight text-center ${
                           isActive ? "text-primary/70" : "text-gray-400"
                         }`}
                       >
@@ -565,9 +565,9 @@ const FnbOrder: React.FC = () => {
               </div>
             </div>
 
-            {/* Menu Items Grid */}
-            <div className="pl-[5.5rem] pr-3 pt-3">
-              <div className="grid grid-cols-3 gap-2.5 items-stretch">
+            {/* Menu Items Grid — full width, 3 cột tablet dọc / 4 cột ngang */}
+            <div className="pl-[4.5rem] md:pl-[4.75rem] pr-2 md:pr-3 pt-2 md:pt-3">
+              <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 items-stretch">
                 {filteredItems?.map((item) => (
                   <FnbMenuItem
                     key={item._id}
@@ -711,18 +711,11 @@ const FnbOrder: React.FC = () => {
                       >
                         {/* Item Image */}
                         <div className="flex-shrink-0">
-                          <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-200">
+                          <div className="w-24 aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
                             <img
-                              src={
-                                itemImage ||
-                                "https://via.placeholder.com/56?text=No+Image"
-                              }
+                              src={itemImage || ""}
                               alt={itemName}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src =
-                                  "https://via.placeholder.com/56?text=No+Image";
-                              }}
+                              className="w-full h-full object-contain"
                             />
                           </div>
                         </div>
@@ -893,10 +886,6 @@ const FnbOrder: React.FC = () => {
               src={flyingItem.image}
               alt="Flying item"
               className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  "https://via.placeholder.com/40?text=No+Image";
-              }}
             />
           </div>
         </div>

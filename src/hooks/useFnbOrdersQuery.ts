@@ -9,8 +9,15 @@ export const useFnbOrdersQuery = (roomId: string) => {
     queryFn: async () => {
       // API mới trả về một object FnbOrder thay vì mảng
       const response = await http.get<ApiResponse<FnbOrder>>(
-        `/client/fnb/orders/room/${roomId}`
+        `/client/fnb/orders/room/${roomId}`,
+        {
+          validateStatus: (status) =>
+            (status >= 200 && status < 300) || status === 404,
+          skipErrorToast: true,
+        }
       );
+      if (response.status === 404) return [];
+
       const order = response.data.result;
 
       // Convert object thành mảng để giữ compatibility với component hiện tại
@@ -19,5 +26,8 @@ export const useFnbOrdersQuery = (roomId: string) => {
       return [order];
     },
     enabled: isRoomAccessEnabled,
+    retry: false,
+    retryOnMount: false,
+    refetchOnReconnect: false,
   });
 };

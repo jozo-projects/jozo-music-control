@@ -31,7 +31,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
 }) => {
   const [showVariantsModal, setShowVariantsModal] = useState(false);
 
-  const defaultImage = "https://via.placeholder.com/150?text=No+Image";
+  const defaultImage = "";
 
   // Helper function to parse variants (handle both array and JSON string)
   const parseVariants = (
@@ -135,7 +135,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
       <>
         <div
           className={`relative bg-white overflow-hidden border border-gray-100 flex flex-col h-full transition-all duration-300 ${
-            compact ? "rounded-xl shadow-sm" : "rounded-2xl shadow-lg"
+            compact ? "rounded-lg shadow-sm" : "rounded-2xl shadow-lg"
           } ${hasAvailableVariant ? "hover:shadow-md" : "opacity-75"}`}
         >
           {!hasAvailableVariant && (
@@ -154,14 +154,14 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
 
           {/* Item Image */}
           <div
-            className={`overflow-hidden relative flex-shrink-0 ${
-              compact ? "h-28" : "h-48"
+            className={`overflow-hidden relative flex-shrink-0 bg-gray-100 flex items-center justify-center ${
+              compact ? "aspect-[4/3]" : "aspect-video"
             }`}
           >
             <img
               src={item.image || item.existingImage || defaultImage}
               alt={item.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = defaultImage;
               }}
@@ -174,13 +174,13 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
           {/* Item Info */}
           <div
             className={`flex-1 flex flex-col justify-between ${
-              compact ? "p-2.5" : "p-5"
+              compact ? "p-2" : "p-5"
             }`}
           >
             <div>
               <h3
                 className={`font-bold text-gray-800 line-clamp-2 ${
-                  compact ? "text-sm mb-1" : "text-lg mb-2"
+                  compact ? "text-xs leading-snug mb-1" : "text-lg mb-2"
                 }`}
               >
                 {item.name}
@@ -191,10 +191,10 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                 </p>
               )}
 
-              <div className={compact ? "mb-2" : "mb-4"}>
+              <div className={compact ? "mb-1.5" : "mb-4"}>
                 <div
                   className={`font-bold text-brand-600 ${
-                    compact ? "text-sm" : "text-xl mb-1"
+                    compact ? "text-xs" : "text-xl mb-1"
                   }`}
                 >
                   Từ{" "}
@@ -309,8 +309,8 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
               </div>
 
               {/* Variants List */}
-              <div className="p-4 overflow-y-auto max-h-[60vh]">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pb-4">
+              <div className="p-3 md:p-4 overflow-y-auto max-h-[60vh]">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 pb-4">
                   {variants.map((variant) => {
                     const remainingQuantity = getRemainingQuantity(
                       item._id,
@@ -339,8 +339,8 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                           </div>
                         )}
 
-                        {/* Variant Image - Small square */}
-                        <div className="aspect-square overflow-hidden relative">
+                        {/* Variant Image */}
+                        <div className="aspect-[4/3] overflow-hidden relative bg-gray-100 flex items-center justify-center">
                           <img
                             src={
                               variant.image ||
@@ -349,7 +349,7 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                               defaultImage
                             }
                             alt={variant.name}
-                            className="w-full h-full object-cover rounded-t-xl"
+                            className="w-full h-full object-contain rounded-t-xl"
                             onLoad={() => {}}
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = defaultImage;
@@ -362,11 +362,11 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                         </div>
 
                         {/* Variant Info - Compact */}
-                        <div className="p-2">
-                          <h4 className="font-semibold text-gray-800 text-sm mb-1 line-clamp-1">
+                        <div className="p-1.5">
+                          <h4 className="font-semibold text-gray-800 text-xs mb-0.5 line-clamp-1">
                             {variant.name}
                           </h4>
-                          <div className="text-sm font-bold text-brand-600 mb-2">
+                          <div className="text-xs font-bold text-brand-600 mb-1.5">
                             {variant.price.toLocaleString("vi-VN")}đ
                           </div>
 
@@ -451,13 +451,15 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
     <div
       className={`relative bg-white overflow-hidden border border-gray-100 transition-all duration-300 flex flex-col h-full ${
         compact
-          ? "rounded-xl shadow-sm hover:shadow-md"
+          ? "rounded-lg shadow-sm hover:shadow-md"
           : "rounded-2xl shadow-lg hover:shadow-xl"
       } ${!isAvailable ? "opacity-75" : compact ? "" : "hover:scale-105"}`}
     >
       {/* Out of Stock Badge */}
       {!isAvailable && (
-        <div className={`absolute z-10 ${compact ? "top-1.5 right-1.5" : "top-3 right-3"}`}>
+        <div
+          className={`absolute z-10 ${compact ? "top-1.5 right-1.5" : "top-3 right-3"}`}
+        >
           <div
             className={`bg-red-500 text-white font-bold rounded-full shadow-lg ${
               compact ? "text-[10px] px-2 py-0.5" : "text-xs px-3 py-1.5"
@@ -470,14 +472,14 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
 
       {/* Item Image */}
       <div
-        className={`overflow-hidden relative flex-shrink-0 ${
-          compact ? "h-28" : "h-48"
+        className={`overflow-hidden relative flex-shrink-0 bg-gray-100 flex items-center justify-center ${
+          compact ? "aspect-[4/3]" : "aspect-video"
         }`}
       >
         <img
           src={item.image || item.existingImage || defaultImage}
           alt={item.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           onError={(e) => {
             (e.target as HTMLImageElement).src = defaultImage;
           }}
@@ -490,13 +492,13 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
       {/* Item Info */}
       <div
         className={`flex-1 flex flex-col justify-between ${
-          compact ? "p-2.5" : "p-5"
+          compact ? "p-2" : "p-5"
         }`}
       >
         <div>
           <h3
             className={`font-bold text-gray-800 line-clamp-2 ${
-              compact ? "text-sm mb-1" : "text-lg mb-2"
+              compact ? "text-xs leading-snug mb-1" : "text-lg mb-2"
             }`}
           >
             {item.name}
@@ -507,10 +509,10 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
             </p>
           )}
 
-          <div className={compact ? "mb-2" : "mb-4"}>
+          <div className={compact ? "mb-1.5" : "mb-4"}>
             <div
               className={`font-bold text-brand-600 ${
-                compact ? "text-sm" : "text-xl mb-1"
+                compact ? "text-xs" : "text-xl mb-1"
               }`}
             >
               {item.price.toLocaleString("vi-VN")}đ
