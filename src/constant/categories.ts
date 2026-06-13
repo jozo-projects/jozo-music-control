@@ -698,15 +698,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Moonlight 2",
       },
       {
-        video_id: "0qTp5VlLCZw",
-        title:
-          "[Karaoke Beat] ĐỀU LÀ CỦA EM - ANH TÚ, ATUS, SONG LUÂN, DƯƠNG DOMIC, QUANG TRUNG (Beat Chuẩn Có Bè)",
-        duration: 239,
-        url: "https://youtube.com/watch?v=0qTp5VlLCZw",
-        thumbnail: "https://i.ytimg.com/vi/0qTp5VlLCZw/hq720.jpg",
-        author: "Hoàng Anh Potatoes",
-      },
-      {
         video_id: "9vbdBhlfvD8",
         title:
           "KARAOKE LOVE SAND   HIEUTHUHAI, Jsol, Ali Hoàng Dương, Vũ Thịnh so hot   Anh Trai Say Hi",
@@ -1192,15 +1183,6 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         url: "https://youtube.com/watch?v=s6m4D0pyLh4",
         thumbnail: "https://i.ytimg.com/vi/s6m4D0pyLh4/hq720.jpg",
         author: "ZKN Music",
-      },
-      {
-        video_id: "woBak43AtJk",
-        title:
-          "Karaoke Westside Squad (Beat Gốc) tụi mày chỉ biết hút không chịu đi khám phá",
-        duration: 181,
-        url: "https://youtube.com/watch?v=woBak43AtJk",
-        thumbnail: "https://i.ytimg.com/vi/woBak43AtJk/hq720.jpg",
-        author: "G5R Karaoke",
       },
       {
         video_id: "TWKuHcEwIfE",
@@ -1728,29 +1710,12 @@ export const SHOW_CATEGORIES: CategoryData[] = [
         author: "Internity",
       },
       {
-        video_id: "IpSeS7bdOa4",
-        title:
-          "[KARAOKE SONG CA] - NƠI TÌNH YÊU BẮT ĐẦU - Bằng Kiều ft Lam Anh",
-        duration: 282,
-        url: "https://youtube.com/watch?v=IpSeS7bdOa4",
-        thumbnail: "https://i.ytimg.com/vi/IpSeS7bdOa4/hq720.jpg",
-        author: "Yêu Ca Hát",
-      },
-      {
         video_id: "SsLiKrTTcwo",
         title: "Karaoke Yêu Một Người Có Lẽ   Miu Lê ft  Lou Hoàng Beat",
         duration: 251,
         url: "https://youtube.com/watch?v=SsLiKrTTcwo",
         thumbnail: "https://i.ytimg.com/vi/SsLiKrTTcwo/hq720.jpg",
         author: "thuong hieu vuive channel",
-      },
-      {
-        video_id: "qNbXYIVhqoo",
-        title: "[KARAOKE] KHI EM LỚN _Orange x Hoàng Dũng - Beat chuẩn (maN)",
-        duration: 228,
-        url: "https://youtube.com/watch?v=qNbXYIVhqoo",
-        thumbnail: "https://i.ytimg.com/vi/qNbXYIVhqoo/hq720.jpg",
-        author: "Nguyễn Hà Nam",
       },
       {
         video_id: "oUUT0cPsJQc",

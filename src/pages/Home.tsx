@@ -62,8 +62,11 @@ const Home: React.FC = () => {
             <h2 className="text-2xl font-bold">{selectedCategoryName}</h2>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-            {selectedCategoryVideos.map((video: Video) => (
-              <SongCard key={`${backgroundId}-${video.video_id}`} {...video} />
+            {selectedCategoryVideos.map((video: Video, index) => (
+              <SongCard
+                key={`${backgroundId}-${video.video_id}-${index}`}
+                {...video}
+              />
             ))}
           </div>
         </section>

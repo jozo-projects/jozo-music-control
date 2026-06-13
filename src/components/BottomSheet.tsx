@@ -33,8 +33,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         }
       }, 10);
     } else {
-      // Restore body scroll
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
 
       // Remove animation classes
       if (sheetRef.current) {
@@ -45,9 +44,8 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
       }
     }
 
-    // Cleanup on unmount
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
     };
   }, [isOpen]);
 

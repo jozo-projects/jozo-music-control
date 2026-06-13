@@ -1,9 +1,15 @@
-import { isValidRoomPin } from "@/utils/roomPin";
+import {
+  clearStoredPinVerification,
+  getStoredPinVerification,
+  isValidRoomPin,
+  setStoredPinVerification,
+} from "@/utils/roomPin";
 import React, {
   createContext,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
@@ -32,29 +38,43 @@ interface RoomPinProviderProps {
 export const RoomPinProvider: React.FC<RoomPinProviderProps> = ({ children }) => {
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
-  const [isPinVerified, setIsPinVerified] = useState(false);
+  const [isPinVerified, setIsPinVerified] = useState(() =>
+    roomId ? getStoredPinVerification(roomId) : false,
+  );
 
   useEffect(() => {
-    setIsPinVerified(false);
+    if (!roomId) {
+      setIsPinVerified(false);
+      return;
+    }
+    setIsPinVerified(getStoredPinVerification(roomId));
   }, [roomId]);
 
-  const verifyPin = useCallback((code: string): boolean => {
-    if (isValidRoomPin(code)) {
-      setIsPinVerified(true);
-      return true;
-    }
-    return false;
-  }, []);
+  const verifyPin = useCallback(
+    (code: string): boolean => {
+      if (isValidRoomPin(code)) {
+        setIsPinVerified(true);
+        if (roomId) {
+          setStoredPinVerification(roomId);
+        }
+        return true;
+      }
+      return false;
+    },
+    [roomId],
+  );
 
   const resetPinVerification = useCallback(() => {
     setIsPinVerified(false);
+    clearStoredPinVerification();
   }, []);
 
+  const value = useMemo(
+    () => ({ isPinVerified, verifyPin, resetPinVerification }),
+    [isPinVerified, verifyPin, resetPinVerification],
+  );
+
   return (
-    <RoomPinContext.Provider
-      value={{ isPinVerified, verifyPin, resetPinVerification }}
-    >
-      {children}
-    </RoomPinContext.Provider>
+    <RoomPinContext.Provider value={value}>{children}</RoomPinContext.Provider>
   );
 };

@@ -109,7 +109,7 @@ const PlayNowModal = ({
         </button>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 
@@ -174,7 +174,7 @@ const SortableQueueItem = ({
             queryKey: ["queue", roomId],
           });
         },
-      }
+      },
     );
     setShowPlayPopup(false);
   };
@@ -270,10 +270,10 @@ const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true }) => {
 
     if (active.id !== over.id) {
       const oldIndex = items.findIndex(
-        (item, idx) => `${idx}-${item.title}` === active.id
+        (item, idx) => `${idx}-${item.title}` === active.id,
       );
       const newIndex = items.findIndex(
-        (item, idx) => `${idx}-${item.title}` === over.id
+        (item, idx) => `${idx}-${item.title}` === over.id,
       );
 
       if (oldIndex !== -1 && newIndex !== -1) {
@@ -294,10 +294,6 @@ const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true }) => {
       }`}
     >
       <div className="flex flex-col h-[100vh]">
-        <div className="p-4 border-b border-gray-700">
-          <h2 className="text-lg font-bold">Danh sách</h2>
-        </div>
-
         {/* Now Playing */}
         {queueData?.result?.nowPlaying && (
           <div className="p-4 border-b border-gray-700">
@@ -330,7 +326,7 @@ const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true }) => {
             style={{
               paddingBottom: `${Math.max(
                 100,
-                (queueData?.result?.queue?.length || 0) * 10
+                (queueData?.result?.queue?.length || 0) * 10,
               )}px`,
             }}
           >

@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import RoutesWrapper from "@/routes/RoutesWrapper";
 import { RoomPinProvider } from "@/contexts/RoomPinContext";
-import { TimerProvider } from "@/contexts/TimerContext";
 import { SocketProvider } from "@/contexts/SocketContext";
 import { GiftProvider } from "@/contexts/GiftContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -28,11 +27,9 @@ const App: React.FC = () => {
         <RoomPinProvider>
           <SocketProvider>
             <GiftProvider>
-              <TimerProvider>
-                <ImageBackgroundProvider>
-                  <RoutesWrapper />
-                </ImageBackgroundProvider>
-              </TimerProvider>
+              <ImageBackgroundProvider>
+                <RoutesWrapper />
+              </ImageBackgroundProvider>
             </GiftProvider>
           </SocketProvider>
         </RoomPinProvider>
