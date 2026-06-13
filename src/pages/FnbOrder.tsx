@@ -148,7 +148,7 @@ const FnbOrder: React.FC = () => {
     isLoading,
     isError,
     refetch: refetchMenu,
-  } = useFnbMenuQuery();
+  } = useFnbMenuQuery({ refetchInterval: 30_000 });
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [categories, setCategories] = useState<FnbCategory[]>([]);
@@ -172,6 +172,13 @@ const FnbOrder: React.FC = () => {
     isLoading: ordersLoading,
     refetch: refetchOrders,
   } = useFnbOrdersQuery(roomId);
+
+  // Refetch menu khi quay lại tab Menu để đồng bộ tồn kho mới nhất
+  useEffect(() => {
+    if (activeTab === "menu") {
+      refetchMenu();
+    }
+  }, [activeTab, refetchMenu]);
 
   // Tạo danh sách categories từ items
   useEffect(() => {

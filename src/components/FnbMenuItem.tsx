@@ -81,6 +81,9 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
 
   // Check if item/variant is available
   const isAvailable = getRemainingQuantity(item._id) > 0;
+  const hasAvailableVariant = variants.some(
+    (v) => getRemainingQuantity(item._id, v._id) > 0,
+  );
 
   const handleVariantQuantityChange = (variantId: string, change: number) => {
     const currentQuantity = getItemQuantityInCart(item._id, variantId);
@@ -131,10 +134,24 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
     return (
       <>
         <div
-          className={`bg-white overflow-hidden border border-gray-100 flex flex-col h-full hover:shadow-md transition-all duration-300 ${
-            compact ? "rounded-xl shadow-sm" : "rounded-2xl shadow-lg hover:shadow-xl"
-          }`}
+          className={`relative bg-white overflow-hidden border border-gray-100 flex flex-col h-full transition-all duration-300 ${
+            compact ? "rounded-xl shadow-sm" : "rounded-2xl shadow-lg"
+          } ${hasAvailableVariant ? "hover:shadow-md" : "opacity-75"}`}
         >
+          {!hasAvailableVariant && (
+            <div
+              className={`absolute z-10 ${compact ? "top-1.5 right-1.5" : "top-3 right-3"}`}
+            >
+              <div
+                className={`bg-red-500 text-white font-bold rounded-full shadow-lg ${
+                  compact ? "text-[10px] px-2 py-0.5" : "text-xs px-3 py-1.5"
+                }`}
+              >
+                HẾT
+              </div>
+            </div>
+          )}
+
           {/* Item Image */}
           <div
             className={`overflow-hidden relative flex-shrink-0 ${
@@ -149,6 +166,9 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                 (e.target as HTMLImageElement).src = defaultImage;
               }}
             />
+            {!hasAvailableVariant && (
+              <div className="absolute inset-0 bg-black bg-opacity-30" />
+            )}
           </div>
 
           {/* Item Info */}
@@ -192,16 +212,28 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
             </div>
 
             {/* Choose Variant Button */}
-            <button
-              className={`w-full rounded-lg font-semibold transition-all duration-200 bg-gradient-to-r from-primary to-primary-deep text-primary-foreground hover:from-primary-hover hover:to-primary-deeper ${
-                compact
-                  ? "py-1.5 text-xs"
-                  : "py-3 rounded-xl hover:shadow-brand-soft transform hover:-translate-y-0.5"
-              }`}
-              onClick={() => setShowVariantsModal(true)}
-            >
-              Chọn loại
-            </button>
+            {hasAvailableVariant ? (
+              <button
+                className={`w-full rounded-lg font-semibold transition-all duration-200 bg-gradient-to-r from-primary to-primary-deep text-primary-foreground hover:from-primary-hover hover:to-primary-deeper ${
+                  compact
+                    ? "py-1.5 text-xs"
+                    : "py-3 rounded-xl hover:shadow-brand-soft transform hover:-translate-y-0.5"
+                }`}
+                onClick={() => setShowVariantsModal(true)}
+              >
+                Chọn loại
+              </button>
+            ) : (
+              <div className="text-center">
+                <span
+                  className={`text-red-500 font-medium ${
+                    compact ? "text-xs" : "text-sm"
+                  }`}
+                >
+                  Hết hàng
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
