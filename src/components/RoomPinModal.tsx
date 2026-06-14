@@ -66,8 +66,21 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
     inputRefs.current[0]?.focus();
   }, []);
 
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="room-pin-title"
+    >
       <div className="relative w-full max-w-md rounded-2xl bg-gray-900 p-6 text-white shadow-2xl mx-4">
         <button
           type="button"
@@ -95,7 +108,7 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
           <p className="text-xs uppercase tracking-wide text-white/60">
             Xác thực phòng
           </p>
-          <h2 className="mt-1 text-xl font-bold">
+          <h2 id="room-pin-title" className="mt-1 text-xl font-bold">
             Nhập mã PIN — Phòng {roomDisplayNumber}
           </h2>
           <p className="mt-2 text-sm text-white/70">

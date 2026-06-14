@@ -16,24 +16,20 @@ const GiftFloatButton: React.FC = () => {
     navigate(`/gift${query ? `?${query}` : ""}`);
   };
 
-  // Hình lì xì — nằm giữa màn hình (thay ChucMungNamMoi bằng li-xi.png)
+  // Hình lì xì — nằm giữa màn hình, không dùng wrapper full-screen
   const centerButton = (
-    <div className="fixed inset-0 z-30 flex items-center justify-center pointer-events-none">
-      <div className="pointer-events-auto">
-        <button
-          onClick={goToGift}
-          className="bg-transparent text-white p-2 rounded-full shadow-2xl transition-all duration-200 flex items-center justify-center"
-          title="Mở quà"
-        >
-          <div className="relative">
-            <img
-              src={liXiImg}
-              alt="Bấm vào để nhận lì xì"
-              className="w-72 h-72 object-contain"
-            />
-          </div>
-        </button>
-      </div>
+    <div className="fixed left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2">
+      <button
+        onClick={goToGift}
+        className="bg-transparent text-white p-2 rounded-full shadow-2xl transition-all duration-200 flex items-center justify-center"
+        title="Mở quà"
+      >
+        <img
+          src={liXiImg}
+          alt="Bấm vào để nhận lì xì"
+          className="w-72 h-72 object-contain"
+        />
+      </button>
     </div>
   );
 

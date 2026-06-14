@@ -11,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import BillSummary from "./BillSummary";
 import debounce from "lodash/debounce";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import ReactDOM from "react-dom";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Switch from "./Switch";
 import { toast } from "./ToastContainer";
@@ -98,6 +99,15 @@ const Header: React.FC = () => {
   useEffect(() => {
     setIsRoomScreenOpen(!roomId);
   }, [roomId]);
+
+  useEffect(() => {
+    if (!isRoomScreenOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isRoomScreenOpen]);
 
   const handleHeaderTouchStart = (e: React.TouchEvent<HTMLElement>) => {
     touchStartXRef.current = e.touches[0]?.clientX ?? null;
@@ -674,101 +684,100 @@ const Header: React.FC = () => {
         </div>
       )}
 
-      <div
-        className={`fixed inset-0 z-[120] transition-transform duration-300 ${
-          isRoomScreenOpen
-            ? "translate-x-0"
-            : "-translate-x-full pointer-events-none"
-        }`}
-        aria-hidden={!isRoomScreenOpen}
-      >
-        <div
-          className={`absolute inset-0 bg-black/60 backdrop-blur-sm ${
-            isRoomScreenOpen ? "pointer-events-auto" : "pointer-events-none"
-          }`}
-        />
-        <div
-          className={`absolute inset-y-0 left-0 w-full max-w-xl bg-gray-900 text-white shadow-2xl ${
-            isRoomScreenOpen ? "pointer-events-auto" : "pointer-events-none"
-          }`}
-        >
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-white/70">
-                Room selection
-              </p>
-              <h2 className="text-lg font-bold">Chọn phòng để tiếp tục</h2>
-            </div>
-            <button
+      {isRoomScreenOpen &&
+        typeof document !== "undefined" &&
+        ReactDOM.createPortal(
+          <div
+            className="fixed inset-0 z-[120]"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Chọn phòng"
+          >
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               onClick={() => setIsRoomScreenOpen(false)}
-              className="p-2 rounded-full hover:bg-white/10"
-              aria-label="Đóng chọn phòng"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18 18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <div className="p-4 space-y-4">
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-              {ROOM_OPTIONS.map((room) => (
+              aria-hidden
+            />
+            <div className="absolute inset-y-0 left-0 w-full max-w-xl bg-gray-900 text-white shadow-2xl">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-white/70">
+                    Room selection
+                  </p>
+                  <h2 className="text-lg font-bold">Chọn phòng để tiếp tục</h2>
+                </div>
                 <button
-                  key={room}
-                  onClick={() => {
-                    setBoundRoomId(room);
-                    const nextParams = new URLSearchParams(searchParams);
-                    nextParams.set("roomId", room);
-                    const qs = nextParams.toString();
-                    const path = `${location.pathname}${qs ? `?${qs}` : ""}${location.hash}`;
-                    window.location.replace(path);
-                  }}
-                  className={`py-3 rounded-xl border transition-colors font-semibold ${
-                    roomId === room
-                      ? "bg-primary-hover text-primary-foreground border-primary"
-                      : "border-white/10 bg-white/5 hover:bg-white/10"
-                  }`}
+                  onClick={() => setIsRoomScreenOpen(false)}
+                  className="p-2 rounded-full hover:bg-white/10"
+                  aria-label="Đóng chọn phòng"
                 >
-                  Phòng {room}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18 18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
-              ))}
-            </div>
+              </div>
 
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 w-full py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors font-semibold flex items-center justify-center gap-2"
-              aria-label="Tải lại trang"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M2.985 19.644l3.181-3.183m0 0 3.182 3.183m-3.182-3.183v-4.991"
-                />
-              </svg>
-              Tải lại trang
-            </button>
-          </div>
-        </div>
-      </div>
+              <div className="p-4 space-y-4">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                  {ROOM_OPTIONS.map((room) => (
+                    <button
+                      key={room}
+                      onClick={() => {
+                        setBoundRoomId(room);
+                        const nextParams = new URLSearchParams(searchParams);
+                        nextParams.set("roomId", room);
+                        const qs = nextParams.toString();
+                        const path = `${location.pathname}${qs ? `?${qs}` : ""}${location.hash}`;
+                        window.location.replace(path);
+                      }}
+                      className={`py-3 rounded-xl border transition-colors font-semibold ${
+                        roomId === room
+                          ? "bg-primary-hover text-primary-foreground border-primary"
+                          : "border-white/10 bg-white/5 hover:bg-white/10"
+                      }`}
+                    >
+                      Phòng {room}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => window.location.reload()}
+                  className="mt-4 w-full py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors font-semibold flex items-center justify-center gap-2"
+                  aria-label="Tải lại trang"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M2.985 19.644l3.181-3.183m0 0 3.182 3.183m-3.182-3.183v-4.991"
+                    />
+                  </svg>
+                  Tải lại trang
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </header>
   );
 };
