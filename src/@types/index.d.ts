@@ -116,16 +116,30 @@ interface OrderItem {
   notes?: string;
 }
 
+interface FnbOrderLine {
+  lineId: string;
+  itemId: string;
+  category: string;
+  quantity: number;
+  variantId?: string;
+  notes?: string;
+}
+
 interface FnbOrder {
-  id: string;
-  roomId: string;
+  id?: string;
+  roomScheduleId?: string;
+  roomId?: string;
   order: {
-    drinks: Record<string, number>;
-    snacks: Record<string, number>;
+    lines?: FnbOrderLine[];
+    drinks?: Record<string, number>;
+    snacks?: Record<string, number>;
   };
-  status: "pending" | "processing" | "completed" | "cancelled";
+  status?: "pending" | "processing" | "completed" | "cancelled";
   createdAt: string;
   updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  history?: unknown[];
 }
 
 interface CreateFnbOrderPayload {

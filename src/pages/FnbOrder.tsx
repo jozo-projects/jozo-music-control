@@ -5,7 +5,7 @@ import { toast } from "@/components/ToastContainer";
 import { useFnbMenuQuery } from "@/hooks/useFnbMenuQuery";
 import { useFnbMutations } from "@/hooks/useFnbMutations";
 import { useFnbOrdersQuery } from "@/hooks/useFnbOrdersQuery";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 const SnackIcon = ({ className = "w-7 h-7" }: { className?: string }) => (
@@ -142,6 +142,9 @@ const getCategoryConfig = (id: string) =>
     ),
   };
 
+const CART_HINT_DELAY_MS = 3500;
+const CART_HINT_VISIBLE_MS = 2000;
+
 const FnbOrder: React.FC = () => {
   const {
     data: fnbMenu,
@@ -165,6 +168,11 @@ const FnbOrder: React.FC = () => {
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
   const [activeTab, setActiveTab] = useState<"menu" | "orders">("menu");
+  const [showCartHint, setShowCartHint] = useState(false);
+  const cartHintTimersRef = useRef<{
+    show?: ReturnType<typeof setTimeout>;
+    hide?: ReturnType<typeof setTimeout>;
+  }>({});
   const { submitCart } = useFnbMutations();
   const isSubmitting = submitCart.isPending;
   const {
@@ -173,12 +181,54 @@ const FnbOrder: React.FC = () => {
     refetch: refetchOrders,
   } = useFnbOrdersQuery(roomId);
 
+  const clearCartHintTimers = () => {
+    const timers = cartHintTimersRef.current;
+    if (timers.show) clearTimeout(timers.show);
+    if (timers.hide) clearTimeout(timers.hide);
+    timers.show = undefined;
+    timers.hide = undefined;
+  };
+
+  const scheduleCartHint = () => {
+    clearCartHintTimers();
+    setShowCartHint(false);
+
+    const timers = cartHintTimersRef.current;
+    timers.show = setTimeout(() => {
+      setShowCartHint(true);
+      timers.hide = setTimeout(() => {
+        setShowCartHint(false);
+      }, CART_HINT_VISIBLE_MS);
+    }, CART_HINT_DELAY_MS);
+  };
+
   // Refetch menu khi quay lại tab Menu để đồng bộ tồn kho mới nhất
   useEffect(() => {
     if (activeTab === "menu") {
       refetchMenu();
     }
   }, [activeTab, refetchMenu]);
+
+  useEffect(() => {
+    const timers = cartHintTimersRef.current;
+    return () => {
+      if (timers.show) clearTimeout(timers.show);
+      if (timers.hide) clearTimeout(timers.hide);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isCartModalOpen) {
+      setShowCartHint(false);
+    }
+  }, [isCartModalOpen]);
+
+  useEffect(() => {
+    if (cart.length === 0) {
+      setShowCartHint(false);
+      clearCartHintTimers();
+    }
+  }, [cart.length]);
 
   // Tạo danh sách categories từ items
   useEffect(() => {
@@ -306,6 +356,7 @@ const FnbOrder: React.FC = () => {
 
       const itemName = variant ? `${item.name} - ${variant.name}` : item.name;
       toast.success(`Đã thêm ${itemName} vào giỏ hàng`);
+      scheduleCartHint();
     } catch (error) {
       console.error("Add to cart error:", error);
       toast.error("Không thể thêm vào giỏ hàng. Vui lòng thử lại!");
@@ -476,33 +527,97 @@ const FnbOrder: React.FC = () => {
     (item) => item.category === selectedCategory && !item.parentId,
   );
 
+  const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-brand-50/90 to-neutral-50">
       {/* Compact Header */}
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-2.5">
-          <h1 className="text-base md:text-lg font-bold text-gray-800">Đặt món</h1>
-          <div className="bg-gray-100 rounded-xl p-0.5 flex">
-            <button
-              onClick={() => setActiveTab("menu")}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                activeTab === "menu"
-                  ? "bg-white text-primary shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Menu
-            </button>
-            <button
-              onClick={() => setActiveTab("orders")}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                activeTab === "orders"
-                  ? "bg-white text-primary shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Đơn đã đặt ({orders?.length || 0})
-            </button>
+        <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5">
+          <h1 className="text-base md:text-lg font-bold text-gray-800 shrink-0">
+            Đặt món
+          </h1>
+
+          <div className="flex-1 flex items-center justify-end gap-2 min-w-0">
+            <div className="bg-gray-100 rounded-xl p-0.5 flex min-w-0">
+              <button
+                onClick={() => setActiveTab("menu")}
+                className={`px-3 md:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                  activeTab === "menu"
+                    ? "bg-white text-primary shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Menu
+              </button>
+              <button
+                onClick={() => setActiveTab("orders")}
+                className={`px-3 md:px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap ${
+                  activeTab === "orders"
+                    ? "bg-white text-primary shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                Đơn đã đặt
+                {(orders?.length || 0) > 0 && (
+                  <span className="ml-1 text-xs opacity-80">
+                    ({orders?.length})
+                  </span>
+                )}
+              </button>
+            </div>
+
+            <div className="relative shrink-0">
+              {showCartHint && cartItemCount > 0 && (
+                <div
+                  className="absolute right-0 top-[calc(100%+6px)] z-20 whitespace-nowrap rounded-lg bg-gray-900 text-white text-xs font-medium px-2.5 py-1.5 shadow-lg pointer-events-none transition-opacity duration-300"
+                  role="status"
+                >
+                  Ấn vào để đặt
+                  <span className="absolute -top-1 right-4 h-2 w-2 rotate-45 bg-gray-900" />
+                </div>
+              )}
+              <button
+                onClick={() => {
+                  setShowCartHint(false);
+                  clearCartHintTimers();
+                  setIsCartModalOpen(true);
+                }}
+                disabled={isSubmitting}
+                className={`floating-cart-button relative flex items-center gap-1.5 shrink-0 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                  cartItemCount > 0
+                    ? "bg-gradient-to-br from-primary to-primary-deeper text-primary-foreground px-2.5 md:px-3 py-1.5 shadow-brand-soft hover:shadow-brand-glow"
+                    : "w-10 h-10 justify-center bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+                title="Giỏ hàng"
+                aria-label={`Giỏ hàng${cartItemCount > 0 ? `, ${cartItemCount} món` : ""}`}
+              >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-5 shrink-0"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                />
+              </svg>
+              {cartItemCount > 0 && (
+                <>
+                  <span className="text-sm font-bold tabular-nums">
+                    {cartItemCount}
+                  </span>
+                  <span className="hidden sm:inline text-xs font-semibold opacity-90">
+                    {calculateTotal().toLocaleString("vi-VN")}đ
+                  </span>
+                </>
+              )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -586,18 +701,15 @@ const FnbOrder: React.FC = () => {
           </div>
         ) : activeTab === "orders" ? (
           <div className="px-4 pt-3">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-bold text-gray-800">
-                Đơn hàng đã đặt
-              </h2>
+            <div className="flex items-center justify-end mb-4">
               <button
                 onClick={() => refetchOrders()}
-                disabled={isSubmitting}
-                className="p-2 text-primary hover:bg-brand-50 rounded-lg transition-colors disabled:opacity-50"
+                disabled={ordersLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary hover:bg-brand-50 rounded-lg transition-colors disabled:opacity-50"
                 title="Làm mới"
               >
                 <svg
-                  className="w-5 h-5"
+                  className={`w-4 h-4 ${ordersLoading ? "animate-spin" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -609,45 +721,13 @@ const FnbOrder: React.FC = () => {
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
+                Làm mới
               </button>
             </div>
             <OrderList orders={orders || []} isLoading={ordersLoading} />
           </div>
         ) : null}
       </div>
-
-      {/* Floating Cart Button - Chỉ hiển thị khi ở tab menu */}
-      {activeTab === "menu" && (
-        <div className="fixed bottom-20 right-6 z-30">
-          <button
-            onClick={() => setIsCartModalOpen(true)}
-            disabled={isSubmitting}
-            className="floating-cart-button bg-gradient-to-br from-primary to-primary-deeper text-primary-foreground p-3 rounded-full shadow-brand-glow hover:shadow-2xl transform hover:scale-110 transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none ring-2 ring-white/90"
-          >
-            <div className="relative">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="size-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                />
-              </svg>
-              {cart.length > 0 && (
-                <div className="absolute -top-2 -right-2 bg-primary-hover text-primary-foreground text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold border-2 border-white">
-                  {cart.reduce((sum, item) => sum + item.quantity, 0)}
-                </div>
-              )}
-            </div>
-          </button>
-        </div>
-      )}
 
       {/* Cart Bottom Sheet */}
       <BottomSheet

@@ -6,10 +6,51 @@ interface OrderListProps {
   isLoading?: boolean;
 }
 
+const isSnackCategory = (id: string) => id === "snack" || id === "snacks";
+const isDrinkCategory = (id: string) => id === "drink" || id === "drinks";
+
+const getOrderLines = (order: FnbOrder): FnbOrderLine[] => {
+  if (order.order?.lines?.length) {
+    return order.order.lines;
+  }
+
+  const lines: FnbOrderLine[] = [];
+  Object.entries(order.order?.drinks || {}).forEach(([itemId, quantity]) => {
+    lines.push({
+      lineId: itemId,
+      itemId,
+      category: "drink",
+      quantity,
+    });
+  });
+  Object.entries(order.order?.snacks || {}).forEach(([itemId, quantity]) => {
+    lines.push({
+      lineId: itemId,
+      itemId,
+      category: "snack",
+      quantity,
+    });
+  });
+  return lines;
+};
+
+const mergeOrderLines = (lines: FnbOrderLine[]): FnbOrderLine[] => {
+  const merged = new Map<string, FnbOrderLine>();
+
+  for (const line of lines) {
+    const existing = merged.get(line.itemId);
+    if (existing) {
+      existing.quantity += line.quantity;
+    } else {
+      merged.set(line.itemId, { ...line });
+    }
+  }
+
+  return Array.from(merged.values());
+};
+
 const OrderList: React.FC<OrderListProps> = ({ orders, isLoading }) => {
   const { data: fnbMenu } = useFnbMenuQuery();
-
-  console.log("orders", orders);
 
   // Helper function to parse variants (handle both array and JSON string)
   const parseVariants = (
@@ -99,87 +140,84 @@ const OrderList: React.FC<OrderListProps> = ({ orders, isLoading }) => {
     );
   }
 
+  const renderLineGroup = (
+    title: string,
+    lines: FnbOrderLine[],
+  ) => {
+    if (lines.length === 0) return null;
+
+    return (
+      <div>
+        <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+          {title}
+        </h4>
+        <div className="space-y-2">
+          {lines.map((line) => (
+            <div
+              key={line.itemId}
+              className="flex items-center justify-between bg-gray-50 rounded-lg p-3"
+            >
+              <span className="text-gray-800 font-medium">
+                {getItemName(line.itemId)}
+              </span>
+              <span className="text-brand-600 font-bold">x{line.quantity}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4">
-      {orders.map((order) => (
-        <div
-          key={order.id}
-          className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-sm text-gray-500">
-                {order.createdAt ? formatDate(order.createdAt) : "N/A"}
-              </p>
+      {orders.map((order) => {
+        const lines = mergeOrderLines(getOrderLines(order));
+        const drinkLines = lines.filter((line) =>
+          isDrinkCategory(line.category),
+        );
+        const snackLines = lines.filter((line) =>
+          isSnackCategory(line.category),
+        );
+        const otherLines = lines.filter(
+          (line) =>
+            !isDrinkCategory(line.category) && !isSnackCategory(line.category),
+        );
+
+        return (
+          <div
+            key={order.id || order.roomScheduleId || order.createdAt}
+            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-sm text-gray-500">
+                  {order.createdAt ? formatDate(order.createdAt) : "N/A"}
+                </p>
+              </div>
+              {order.status && (
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    STATUS_STYLES[order.status as keyof typeof STATUS_STYLES]
+                      ?.color || "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {STATUS_STYLES[order.status as keyof typeof STATUS_STYLES]
+                    ?.text || order.status}
+                </span>
+              )}
             </div>
-            <span
-              className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                STATUS_STYLES[order.status as keyof typeof STATUS_STYLES]
-                  ?.color || "bg-gray-100 text-gray-800"
-              }`}
-            >
-              {STATUS_STYLES[order.status as keyof typeof STATUS_STYLES]
-                ?.text || order.status}
-            </span>
-          </div>
 
-          {/* Order Items */}
-          <div className="space-y-3">
-            {/* Drinks */}
-            {Object.keys(order?.order?.drinks || {}).length > 0 && (
-              <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  Drinks
-                </h4>
-                <div className="space-y-2">
-                  {Object.entries(order?.order?.drinks || {}).map(
-                    ([itemId, quantity]) => (
-                      <div
-                        key={itemId}
-                        className="flex items-center justify-between bg-gray-50 rounded-lg p-3"
-                      >
-                        <span className="text-gray-800 font-medium">
-                          {getItemName(itemId)}
-                        </span>
-                        <span className="text-brand-600 font-bold">
-                          x{quantity}
-                        </span>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Snacks */}
-            {Object.keys(order?.order?.snacks || {}).length > 0 && (
-              <div>
-                <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  Snacks
-                </h4>
-                <div className="space-y-2">
-                  {Object.entries(order?.order?.snacks || {}).map(
-                    ([itemId, quantity]) => (
-                      <div
-                        key={itemId}
-                        className="flex items-center justify-between bg-gray-50 rounded-lg p-3"
-                      >
-                        <span className="text-gray-800 font-medium">
-                          {getItemName(itemId)}
-                        </span>
-                        <span className="text-brand-600 font-bold">
-                          x{quantity}
-                        </span>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            )}
+            {/* Order Items */}
+            <div className="space-y-3">
+              {renderLineGroup("Drinks", drinkLines)}
+              {renderLineGroup("Snacks", snackLines)}
+              {otherLines.length > 0 &&
+                renderLineGroup("Khác", otherLines)}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
