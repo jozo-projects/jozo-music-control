@@ -10,7 +10,7 @@ import { getRoomDisplayNumber } from "@/utils/roomDisplayNumber";
 import { useQueryClient } from "@tanstack/react-query";
 import BillSummary from "./BillSummary";
 import debounce from "lodash/debounce";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Switch from "./Switch";
@@ -66,6 +66,7 @@ const Header: React.FC = () => {
   const location = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const blurCloseTimeoutRef = useRef<number | null>(null);
 
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
@@ -175,9 +176,9 @@ const Header: React.FC = () => {
         const baseUrl = `/search?roomId=${roomId}&karaoke=${isKaraoke}`;
 
         if (query.trim().length > 0) {
-          // Chỉ kiểm tra nếu query có ký tự khác khoảng trắng
           // Giữ lại khoảng trắng ở cuối bằng cách dùng trực tiếp query mà không trim()
           navigate(`${baseUrl}&query=${encodeURIComponent(query)}`);
+          setSearchState((prev) => ({ ...prev, showSuggestions: false }));
         } else if (isSearchPage) {
           navigate(baseUrl);
         } else if (!isHomePage) {
@@ -187,23 +188,48 @@ const Header: React.FC = () => {
     [roomId, isKaraoke, isSearchPage, isHomePage, navigate],
   );
 
-  // Click outside để đóng suggestions
+  const closeSuggestions = useCallback(() => {
+    if (blurCloseTimeoutRef.current !== null) {
+      window.clearTimeout(blurCloseTimeoutRef.current);
+      blurCloseTimeoutRef.current = null;
+    }
+    setSearchState((prev) =>
+      prev.showSuggestions ? { ...prev, showSuggestions: false } : prev,
+    );
+  }, []);
+
+  // Click/touch outside để đóng suggestions (touchstart cho tablet)
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handlePointerOutside = (event: Event) => {
       if (
         searchContainerRef.current &&
         !searchContainerRef.current.contains(event.target as Node)
       ) {
-        setSearchState((prev) => ({
-          ...prev,
-          showSuggestions: false,
-        }));
+        closeSuggestions();
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener("mousedown", handlePointerOutside);
+    document.addEventListener("touchstart", handlePointerOutside, {
+      passive: true,
+    });
+    return () => {
+      document.removeEventListener("mousedown", handlePointerOutside);
+      document.removeEventListener("touchstart", handlePointerOutside);
+    };
+  }, [closeSuggestions]);
+
+  // Đóng gợi ý khi cuộn (user hay giữ focus input rồi scroll kết quả)
+  useEffect(() => {
+    const handleScroll = () => closeSuggestions();
+    document.addEventListener("scroll", handleScroll, true);
+    return () => document.removeEventListener("scroll", handleScroll, true);
+  }, [closeSuggestions]);
+
+  // Đóng gợi ý khi chuyển trang
+  useEffect(() => {
+    closeSuggestions();
+  }, [location.pathname, closeSuggestions]);
 
   const searchTermRef = useRef(searchState.term);
   searchTermRef.current = searchState.term;
@@ -343,6 +369,9 @@ const Header: React.FC = () => {
     return () => {
       debouncedNavigate.cancel();
       debouncedSetTerm.cancel();
+      if (blurCloseTimeoutRef.current !== null) {
+        window.clearTimeout(blurCloseTimeoutRef.current);
+      }
       // Hủy các query đang pending để tránh memory leak
       queryClient.cancelQueries({ queryKey: ["songName"] });
     };
@@ -394,11 +423,22 @@ const Header: React.FC = () => {
             value={searchState.term}
             onChange={handleInputChange}
             onFocus={() => {
+              if (blurCloseTimeoutRef.current !== null) {
+                window.clearTimeout(blurCloseTimeoutRef.current);
+                blurCloseTimeoutRef.current = null;
+              }
               if (!ensureRoomSelected()) return;
               setSearchState((prev) => ({ ...prev, showSuggestions: true }));
               if (!isSearchPage) {
                 navigate(`/search?roomId=${roomId}&karaoke=${isKaraoke}`);
               }
+            }}
+            onBlur={() => {
+              // Delay nhỏ để tap chọn gợi ý kịp fire trước khi đóng
+              blurCloseTimeoutRef.current = window.setTimeout(() => {
+                blurCloseTimeoutRef.current = null;
+                closeSuggestions();
+              }, 150);
             }}
             className="w-full rounded-lg border border-white/10 bg-black/25 py-2 pl-2.5 pr-8 text-sm text-white shadow-inner backdrop-blur-sm placeholder:text-white/45 focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow]"
           />
@@ -435,13 +475,9 @@ const Header: React.FC = () => {
                   Gợi ý
                 </div>
                 <button
+                  type="button"
                   className="p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-                  onClick={() =>
-                    setSearchState((prev) => ({
-                      ...prev,
-                      showSuggestions: false,
-                    }))
-                  }
+                  onClick={closeSuggestions}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -463,6 +499,7 @@ const Header: React.FC = () => {
                 <div
                   key={index}
                   className="cursor-pointer border-b border-white/5 p-2 text-xs text-white/90 last:border-b-0 hover:bg-primary/15 hover:text-white"
+                  onMouseDown={(e) => e.preventDefault()}
                   onClick={() => handleSelectSuggestion(suggestion)}
                 >
                   {suggestion}

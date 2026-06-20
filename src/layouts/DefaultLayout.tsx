@@ -1,7 +1,6 @@
 import { categoryImages } from "@/assets/images/categories";
 import ControlBar from "@/components/ControlBar";
 import Footer from "@/components/Footer";
-import GiftFloatButton from "@/components/GiftFloatButton";
 import GiftModal from "@/components/GiftModal";
 import Header from "@/components/Header";
 import RoomPinGate from "@/components/RoomPinGate";
@@ -61,9 +60,6 @@ const Layout: React.FC = () => {
       <Footer>
         <ControlBar />
       </Footer>
-
-      {/* Gift Float Button */}
-      <GiftFloatButton />
 
       {/* Gift Modal */}
       <GiftModal />
