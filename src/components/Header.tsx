@@ -784,7 +784,7 @@ const Header: React.FC = () => {
                           : "border-white/10 bg-white/5 hover:bg-white/10"
                       }`}
                     >
-                      Phòng {room}
+                      Phòng {getRoomDisplayNumber(room) ?? room}
                     </button>
                   ))}
                 </div>
