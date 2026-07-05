@@ -1,5 +1,8 @@
 export const DEFAULT_ROOM_PIN = import.meta.env.VITE_ROOM_PIN ?? "8888";
 
+/** Tạm tắt modal PIN để kiểm tra — đặt `true` để bật lại. */
+export const ROOM_PIN_ENABLED = false;
+
 const PIN_VERIFIED_STORAGE_KEY = "jozo:roomPinVerified";
 
 export const isValidRoomPin = (code: string): boolean =>

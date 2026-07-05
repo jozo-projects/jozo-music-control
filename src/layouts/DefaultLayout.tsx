@@ -41,11 +41,12 @@ const Layout: React.FC = () => {
         {/* Outlet Content */}
         <div className="relative z-20 h-full grid grid-cols-12">
           <div
-            className={`${
+            className={`relative ${
               canShowQueue ? "col-span-8" : "col-span-12"
             } h-[calc(100vh-9.5rem)] overflow-y-auto`}
           >
             <Outlet />
+            <RoomPinGate />
           </div>
 
           {/* Queue Sidebar */}
@@ -63,8 +64,6 @@ const Layout: React.FC = () => {
 
       {/* Gift Modal */}
       <GiftModal />
-
-      <RoomPinGate />
     </div>
   );
 };

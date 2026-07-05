@@ -1,9 +1,6 @@
 import { useRoomPin } from "@/contexts/RoomPinContext";
-import { clearBoundRoomId } from "@/utils/boundRoomId";
 import { getRoomDisplayNumber } from "@/utils/roomDisplayNumber";
 import React, { useEffect, useRef, useState } from "react";
-import ReactDOM from "react-dom";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 interface RoomPinModalProps {
   roomId: string;
@@ -14,9 +11,6 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
   const [pin, setPin] = useState(["", "", "", ""]);
   const [pinError, setPinError] = useState("");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
   const roomDisplayNumber = getRoomDisplayNumber(roomId);
   const isComplete = pin.every((digit) => digit !== "");
 
@@ -42,15 +36,6 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
     }
   };
 
-  const handleClose = () => {
-    clearBoundRoomId();
-    const nextParams = new URLSearchParams(searchParams);
-    nextParams.delete("roomId");
-    const qs = nextParams.toString();
-    const path = `${location.pathname}${qs ? `?${qs}` : ""}${location.hash}`;
-    navigate(path, { replace: true });
-  };
-
   const handleSubmit = () => {
     if (!isComplete) return;
 
@@ -66,44 +51,17 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
     inputRefs.current[0]?.focus();
   }, []);
 
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, []);
-
-  return ReactDOM.createPortal(
+  return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      className="absolute inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm touch-none"
       role="dialog"
       aria-modal="true"
       aria-labelledby="room-pin-title"
     >
-      <div className="relative w-full max-w-md rounded-2xl bg-gray-900 p-6 text-white shadow-2xl mx-4">
-        <button
-          type="button"
-          onClick={handleClose}
-          className="absolute right-4 top-4 rounded-full p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-          aria-label="Đóng"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="h-5 w-5"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18 18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-
+      <div
+        className="relative mx-4 w-full max-w-md touch-auto rounded-2xl bg-gray-900 p-6 text-white shadow-2xl"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
         <div className="mb-6 text-center">
           <p className="text-xs uppercase tracking-wide text-white/60">
             Xác thực phòng
@@ -112,7 +70,7 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
             Nhập mã PIN — Phòng {roomDisplayNumber}
           </h2>
           <p className="mt-2 text-sm text-white/70">
-            Nhập mã PIN để tiếp tục sử dụng hệ thống
+            Nhập mã PIN nhân viên để sử dụng hệ thống
           </p>
         </div>
 
@@ -123,6 +81,7 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
               ref={(el) => (inputRefs.current[index] = el)}
               type="password"
               inputMode="numeric"
+              autoComplete="off"
               maxLength={1}
               value={digit}
               onChange={(e) => handleInputChange(index, e.target.value)}
@@ -155,17 +114,8 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
         >
           Xác nhận
         </button>
-
-        <button
-          type="button"
-          onClick={handleClose}
-          className="mt-3 w-full rounded-xl border border-white/10 bg-white/5 py-3 font-semibold transition-colors hover:bg-white/10"
-        >
-          Đóng
-        </button>
       </div>
-    </div>,
-    document.body,
+    </div>
   );
 };
 

@@ -363,9 +363,14 @@ const Gift: React.FC = () => {
     claimGift({ scheduleId, giftId });
   };
 
+  const goBackFromGift = () => {
+    const qs = searchParams.toString();
+    navigate(qs ? `/?${qs}` : "/", { replace: true });
+  };
+
   const handleBack = () => {
     if (!isPending) {
-      navigate(-1);
+      goBackFromGift();
     }
   };
 
@@ -442,7 +447,7 @@ const Gift: React.FC = () => {
             <button
               onClick={() => {
                 setShowCongratsModal(false);
-                navigate(-1);
+                goBackFromGift();
               }}
               className="w-full rounded-full bg-gradient-to-r from-primary to-primary-deep hover:from-primary-hover hover:to-primary-deeper text-primary-foreground font-semibold py-2 text-sm transition-all shadow-brand-soft"
             >

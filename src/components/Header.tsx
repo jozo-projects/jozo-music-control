@@ -7,10 +7,17 @@ import useRoom from "@/hooks/useRoom";
 import { useSongName } from "@/hooks/useSongName";
 import { setBoundRoomId } from "@/utils/boundRoomId";
 import { getRoomDisplayNumber } from "@/utils/roomDisplayNumber";
+import { ROOM_PIN_ENABLED } from "@/utils/roomPin";
 import { useQueryClient } from "@tanstack/react-query";
 import BillSummary from "./BillSummary";
 import debounce from "lodash/debounce";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ReactDOM from "react-dom";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Switch from "./Switch";
@@ -91,7 +98,7 @@ const Header: React.FC = () => {
       setIsRoomScreenOpen(true);
       return false;
     }
-    if (!isPinVerified) {
+    if (ROOM_PIN_ENABLED && !isPinVerified) {
       return false;
     }
     return true;
@@ -573,7 +580,7 @@ const Header: React.FC = () => {
         <button
           onClick={() => setIsBillModalOpen(true)}
           className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
-          title="Phiên sử dụng"
+          title="Thông tin"
         >
           <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
             <svg
@@ -590,7 +597,7 @@ const Header: React.FC = () => {
                 d="M9 7.5h6M9 12h6m-6 4.5h3M7.5 3.75h9A1.5 1.5 0 0118 5.25v13.5a1.5 1.5 0 01-1.5 1.5h-9a1.5 1.5 0 01-1.5-1.5V5.25a1.5 1.5 0 011.5-1.5z"
               />
             </svg>
-            <span>Phiên</span>
+            <span>Thông tin</span>
           </div>
         </button>
 
@@ -693,7 +700,7 @@ const Header: React.FC = () => {
           <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 w-[90%] max-w-xl shadow-2xl border border-gray-700 relative">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white">
-                Phiên sử dụng phòng {roomId || "?"}
+                Thông tin phòng {roomId || "?"}
               </h2>
               <button
                 onClick={() => setIsBillModalOpen(false)}

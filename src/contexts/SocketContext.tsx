@@ -1,5 +1,4 @@
 import { toast } from "@/components/ToastContainer";
-import { useRoomPin } from "@/contexts/RoomPinContext";
 import React, {
   createContext,
   useContext,
@@ -39,7 +38,6 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [isConnected, setIsConnected] = React.useState(false);
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
-  const { isPinVerified } = useRoomPin();
 
   const showConnectToastOnce = () => {
     if (hasShownConnectToastRef.current) return;
@@ -57,7 +55,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!roomId || !isPinVerified) {
+    if (!roomId) {
       disconnectSocket();
       return;
     }
@@ -121,7 +119,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     return () => {
       disconnectSocket();
     };
-  }, [roomId, isPinVerified]);
+  }, [roomId]);
 
   const value = {
     socket: socketRef.current,

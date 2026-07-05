@@ -6,9 +6,6 @@ import { useRequestEndSessionMutation } from "@/hooks/useRequestEndSessionMutati
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "@/components/ToastContainer";
-import { useRoomPin } from "@/contexts/RoomPinContext";
-import { clearBoundRoomId } from "@/utils/boundRoomId";
-
 const END_REQUEST_COOLDOWN_MS = 30_000;
 
 const formatNowTimeVi = (d: Date) =>
@@ -48,7 +45,6 @@ const BillSummary: React.FC<BillSummaryProps> = ({
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
   const navigate = useNavigate();
-  const { resetPinVerification } = useRoomPin();
   const endSessionMutation = useRequestEndSessionMutation(roomId);
   const isEndingSession = endSessionMutation.isPending;
   const [elapsedText, setElapsedText] = useState<string>("--");
@@ -159,8 +155,6 @@ const BillSummary: React.FC<BillSummaryProps> = ({
     if (!roomId || !bill || isEndingSession) return;
     endSessionMutation.mutate(undefined, {
       onSuccess: () => {
-        clearBoundRoomId();
-        resetPinVerification();
         setIsEndConfirmOpen(false);
         setIsEndSuccessOpen(true);
         setEndRequestCooldownMs(END_REQUEST_COOLDOWN_MS);
