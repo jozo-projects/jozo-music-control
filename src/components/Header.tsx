@@ -80,6 +80,7 @@ const Header: React.FC = () => {
   const roomDisplayNumber = roomId ? getRoomDisplayNumber(roomId) : null;
   const [isRoomScreenOpen, setIsRoomScreenOpen] = useState(!roomId);
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const touchStartXRef = useRef<number | null>(null);
 
   /** 3 lần chạm logo trong 5s (cửa sổ trượt) mở drawer chọn phòng */
@@ -116,6 +117,51 @@ const Header: React.FC = () => {
       document.body.style.overflow = previousOverflow;
     };
   }, [isRoomScreenOpen]);
+
+  useEffect(() => {
+    const syncFullscreen = () => {
+      const doc = document as Document & {
+        webkitFullscreenElement?: Element | null;
+      };
+      setIsFullscreen(
+        Boolean(doc.fullscreenElement ?? doc.webkitFullscreenElement),
+      );
+    };
+
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    document.addEventListener("webkitfullscreenchange", syncFullscreen);
+    syncFullscreen();
+
+    return () => {
+      document.removeEventListener("fullscreenchange", syncFullscreen);
+      document.removeEventListener("webkitfullscreenchange", syncFullscreen);
+    };
+  }, []);
+
+  const toggleFullscreen = async () => {
+    const doc = document as Document & {
+      webkitExitFullscreen?: () => Promise<void>;
+    };
+    const el = document.documentElement as HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void>;
+    };
+
+    try {
+      if (isFullscreen) {
+        if (doc.exitFullscreen) {
+          await doc.exitFullscreen();
+        } else {
+          await doc.webkitExitFullscreen?.();
+        }
+      } else if (el.requestFullscreen) {
+        await el.requestFullscreen();
+      } else {
+        await el.webkitRequestFullscreen?.();
+      }
+    } catch {
+      toast.error("Không thể bật chế độ toàn màn hình");
+    }
+  };
 
   const handleHeaderTouchStart = (e: React.TouchEvent<HTMLElement>) => {
     touchStartXRef.current = e.touches[0]?.clientX ?? null;
@@ -797,8 +843,40 @@ const Header: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={() => window.location.reload()}
+                  onClick={() => void toggleFullscreen()}
                   className="mt-4 w-full py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors font-semibold flex items-center justify-center gap-2"
+                  aria-label={
+                    isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"
+                  }
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    {isFullscreen ? (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M15 9h4.5M15 9V4.5M15 9l5.25-5.25M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+                      />
+                    ) : (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+                      />
+                    )}
+                  </svg>
+                  {isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
+                </button>
+
+                <button
+                  onClick={() => window.location.reload()}
+                  className="w-full py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors font-semibold flex items-center justify-center gap-2"
                   aria-label="Tải lại trang"
                 >
                   <svg
