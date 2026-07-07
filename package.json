@@ -1,8 +1,25 @@
 {
-  "name": "jozo-music-control",
+  "name": "Jozo control panel",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "display":"fullscreen",
+  "orientation":"landscape",
+  "fullScreen":true,
+  "icons": [
+    {
+      "src": "src/assets/images/logo-jozo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display_override": ["window-controls-overlay", "fullscreen"],
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "short_name": "Jozo control panel",
+  "description": "Jozo control panel",
+  "lang": "en-US",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
