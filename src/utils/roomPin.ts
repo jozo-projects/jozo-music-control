@@ -1,6 +1,6 @@
 export const DEFAULT_ROOM_PIN = import.meta.env.VITE_ROOM_PIN ?? "8888";
 
-export const ROOM_PIN_ENABLED = true;
+export const ROOM_PIN_ENABLED = false;
 
 const PIN_VERIFIED_STORAGE_KEY = "jozo:roomPinVerified";
 
