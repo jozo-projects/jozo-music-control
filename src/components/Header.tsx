@@ -331,6 +331,11 @@ const Header: React.FC = () => {
     navigate(`/?roomId=${roomId}&karaoke=${isKaraoke}`);
   };
 
+  /** Logo: chỉ về home, không mở PIN / chọn phòng */
+  const handleLogoClick = () => {
+    navigate(`/?roomId=${roomId}&karaoke=${isKaraoke}`);
+  };
+
   const handleFnbNavigation = () => {
     if (!ensureRoomSelected()) return;
     navigate(`/fnb?roomId=${roomId}`);
@@ -399,7 +404,7 @@ const Header: React.FC = () => {
         src={logo}
         alt="Jozo"
         className="h-9 w-20 shrink-0 cursor-pointer object-cover animate-breathing sm:h-10 sm:w-24"
-        onClick={handleHomeNavigation}
+        onClick={handleLogoClick}
       />
 
       {/* Search Input */}
