@@ -58,6 +58,12 @@ const Header: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const blurCloseTimeoutRef = useRef<number | null>(null);
+  const inputFocusedAtRef = useRef(0);
+
+  /** Tablet: tap control trong vùng search không được blur input (tránh bàn phím giật). */
+  const keepSearchInputFocus = (e: React.PointerEvent) => {
+    e.preventDefault();
+  };
 
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
@@ -187,6 +193,11 @@ const Header: React.FC = () => {
     }
   }, []);
 
+  const dismissSearchKeyboard = useCallback(() => {
+    closeSuggestions();
+    blurSearchInput();
+  }, [blurSearchInput, closeSuggestions]);
+
   // Click/touch outside: đóng gợi ý + blur input (tablet hay giữ focus khiến tap không ăn)
   useEffect(() => {
     const handlePointerOutside = (event: Event) => {
@@ -194,8 +205,7 @@ const Header: React.FC = () => {
         searchContainerRef.current &&
         !searchContainerRef.current.contains(event.target as Node)
       ) {
-        blurSearchInput();
-        closeSuggestions();
+        dismissSearchKeyboard();
       }
     };
 
@@ -208,27 +218,31 @@ const Header: React.FC = () => {
       document.removeEventListener("mousedown", handlePointerOutside, true);
       document.removeEventListener("touchstart", handlePointerOutside, true);
     };
-  }, [blurSearchInput, closeSuggestions]);
+  }, [dismissSearchKeyboard]);
 
-  // Đóng gợi ý + blur input khi cuộn kết quả (user hay giữ focus input rồi scroll)
+  // Chỉ ẩn bàn phím khi cuộn danh sách kết quả — không blur khi cuộn gợi ý / layout shift lúc mở keyboard
   useEffect(() => {
+    const mainScrollEl = document.querySelector("[data-main-scroll]");
+    if (!mainScrollEl) return;
+
     let scrollCloseTimer: number | null = null;
     const handleScroll = () => {
+      if (Date.now() - inputFocusedAtRef.current < 400) return;
       if (scrollCloseTimer !== null) return;
       scrollCloseTimer = window.setTimeout(() => {
         scrollCloseTimer = null;
-        blurSearchInput();
-        closeSuggestions();
+        dismissSearchKeyboard();
       }, 80);
     };
-    document.addEventListener("scroll", handleScroll, true);
+
+    mainScrollEl.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      document.removeEventListener("scroll", handleScroll, true);
+      mainScrollEl.removeEventListener("scroll", handleScroll);
       if (scrollCloseTimer !== null) {
         window.clearTimeout(scrollCloseTimer);
       }
     };
-  }, [blurSearchInput, closeSuggestions]);
+  }, [dismissSearchKeyboard]);
 
   // Đóng gợi ý khi chuyển trang
   useEffect(() => {
@@ -275,6 +289,27 @@ const Header: React.FC = () => {
       searchState.debouncedTerm.length >= 2,
   });
 
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!ensureRoomSelected()) return;
+
+    debouncedNavigate.cancel();
+    const query = inputValueRef.current;
+
+    setSearchState((prev) => ({
+      ...prev,
+      debouncedTerm: query,
+      showSuggestions: false,
+    }));
+
+    const baseUrl = `/search?roomId=${roomId}&karaoke=${isKaraoke}`;
+    if (query.trim().length > 0) {
+      navigate(`${baseUrl}&query=${encodeURIComponent(query)}`);
+    }
+
+    dismissSearchKeyboard();
+  };
+
   const handleSelectSuggestion = (suggestion: string) => {
     if (!ensureRoomSelected()) return;
     debouncedNavigate.cancel();
@@ -295,6 +330,8 @@ const Header: React.FC = () => {
         suggestion,
       )}&karaoke=${isKaraoke}`,
     );
+
+    dismissSearchKeyboard();
   };
 
   const handleClearSearch = () => {
@@ -402,14 +439,16 @@ const Header: React.FC = () => {
         className="relative flex w-1/2 min-w-0 items-center gap-x-2"
         ref={searchContainerRef}
       >
-        <div className="relative w-full">
+        <form className="relative w-full" onSubmit={handleSearchSubmit}>
           <input
             ref={inputRef}
             type="text"
+            enterKeyHint="search"
             placeholder="Tìm kiếm bài hát hoặc nghệ sĩ..."
             value={searchState.term}
             onChange={handleInputChange}
             onFocus={() => {
+              inputFocusedAtRef.current = Date.now();
               if (blurCloseTimeoutRef.current !== null) {
                 window.clearTimeout(blurCloseTimeoutRef.current);
                 blurCloseTimeoutRef.current = null;
@@ -436,7 +475,7 @@ const Header: React.FC = () => {
             <button
               type="button"
               onClick={handleClearSearch}
-              onPointerDown={(e) => e.preventDefault()}
+              onPointerDown={keepSearchInputFocus}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
               aria-label="Xóa tìm kiếm"
             >
@@ -456,7 +495,7 @@ const Header: React.FC = () => {
               </svg>
             </button>
           )}
-        </div>
+        </form>
 
         {/* Auto Complete Suggestions */}
         {searchState.showSuggestions &&
@@ -471,6 +510,7 @@ const Header: React.FC = () => {
                   type="button"
                   className="p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                   onClick={closeSuggestions}
+                  onPointerDown={keepSearchInputFocus}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -492,7 +532,7 @@ const Header: React.FC = () => {
                 <div
                   key={index}
                   className="cursor-pointer border-b border-white/5 p-2 text-xs text-white/90 last:border-b-0 hover:bg-primary/15 hover:text-white"
-                  onMouseDown={(e) => e.preventDefault()}
+                  onPointerDown={keepSearchInputFocus}
                   onClick={() => handleSelectSuggestion(suggestion)}
                 >
                   {suggestion}
@@ -501,7 +541,10 @@ const Header: React.FC = () => {
             </div>
           )}
 
-        <div className="flex items-center gap-x-1.5 rounded-full border border-white/10 bg-black/20 px-2 py-1 backdrop-blur-sm">
+        <div
+          className="flex items-center gap-x-1.5 rounded-full border border-white/10 bg-black/20 px-2 py-1 backdrop-blur-sm"
+          onPointerDown={keepSearchInputFocus}
+        >
           <span className="whitespace-nowrap text-xs text-white/85">
             Lời nhạc
           </span>

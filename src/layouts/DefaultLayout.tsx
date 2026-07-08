@@ -45,6 +45,7 @@ const Layout: React.FC = () => {
             className={`relative z-10 min-h-0 ${
               canShowQueue ? "col-span-8" : "col-span-12"
             } h-[calc(100vh-9.5rem)] overflow-y-auto overscroll-contain`}
+            data-main-scroll
           >
             <Outlet />
           </div>
