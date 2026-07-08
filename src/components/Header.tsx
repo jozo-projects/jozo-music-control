@@ -68,9 +68,6 @@ const Header: React.FC = () => {
   const [isRoomSelectModalOpen, setIsRoomSelectModalOpen] = useState(false);
   const touchStartXRef = useRef<number | null>(null);
 
-  /** 3 lần chạm logo trong 5s (cửa sổ trượt) mở trang chọn phòng */
-  const logoTapTimesRef = useRef<number[]>([]);
-
   const queryClient = useQueryClient();
   const { mutate: sendNotification } = useRoom();
   const { isPinVerified } = useRoomPin();
@@ -386,24 +383,6 @@ const Header: React.FC = () => {
     };
   }, [debouncedNavigate, queryClient]);
 
-  const handleLogoClick = () => {
-    const now = Date.now();
-    const windowMs = 5000;
-    const times = logoTapTimesRef.current.filter((t) => now - t < windowMs);
-    times.push(now);
-    logoTapTimesRef.current = times;
-    if (times.length >= 3) {
-      logoTapTimesRef.current = [];
-      if (ROOM_PIN_ENABLED) {
-        openPinModal();
-      } else {
-        openRoomSelectModal();
-      }
-      return;
-    }
-    handleHomeNavigation();
-  };
-
   return (
     <header
       className="relative z-50 flex items-center justify-between border-b border-primary/35 bg-gradient-to-r from-brand-950 via-brand-900 to-brand-950 px-3 py-2 text-white shadow-[0_3px_18px_-4px_rgba(0,0,0,0.4)]"
@@ -420,7 +399,7 @@ const Header: React.FC = () => {
         src={logo}
         alt="Jozo"
         className="h-9 w-20 shrink-0 cursor-pointer object-cover animate-breathing sm:h-10 sm:w-24"
-        onClick={handleLogoClick}
+        onClick={handleHomeNavigation}
       />
 
       {/* Search Input */}
