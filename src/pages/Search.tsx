@@ -6,15 +6,6 @@ import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import debounce from "lodash/debounce";
 
-// Helper function to detect mobile/tablet devices
-const isMobileOrTablet = () => {
-  const userAgent = navigator.userAgent.toLowerCase();
-  const isMobile = /iphone|ipad|ipod|android|blackberry|windows phone/g.test(
-    userAgent,
-  );
-  return isMobile;
-};
-
 // Skeleton Card Component
 const SkeletonCard: React.FC = () => (
   <div className="shadow-md rounded-lg overflow-hidden animate-pulse">
@@ -69,42 +60,6 @@ const SearchPage: React.FC = () => {
     };
   }, [query]);
 
-  // Xử lý bàn phím mobile — mount một lần, không gắn lại mỗi lần query đổi
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && isMobileOrTablet()) {
-        e.preventDefault();
-        if (document.activeElement instanceof HTMLElement) {
-          document.activeElement.blur();
-        }
-        const activeInput = document.activeElement as HTMLInputElement;
-        if (activeInput?.tagName === "INPUT") {
-          activeInput.setAttribute("readonly", "readonly");
-          setTimeout(() => {
-            activeInput.removeAttribute("readonly");
-          }, 100);
-        }
-      }
-    };
-
-    const handleFormSubmit = (e: Event) => {
-      if (isMobileOrTablet()) {
-        e.preventDefault();
-        if (document.activeElement instanceof HTMLElement) {
-          document.activeElement.blur();
-        }
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("submit", handleFormSubmit);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("submit", handleFormSubmit);
-    };
-  }, []);
-
   // Tạo search query với keywords phù hợp
   const searchQuery = useMemo(() => {
     if (!processedQuery) return "";
@@ -119,7 +74,7 @@ const SearchPage: React.FC = () => {
         }`;
   }, [processedQuery, karaoke]);
 
-  // Parallel queries sử dụng useQueries - chạy song song cả 2 API
+  // Parallel queries — giữ placeholderData để tránh nhấp nháy khi đổi query
   const queries = useQueries({
     queries: [
       {
@@ -127,16 +82,18 @@ const SearchPage: React.FC = () => {
         queryFn: () => searchLocalSongs(searchQuery),
         enabled:
           isRoomAccessEnabled && shouldSearch && processedQuery.length >= 2,
-        staleTime: 1000 * 60 * 5, // Cache 5 phút
-        retry: 2, // Retry 2 lần nếu fail
+        staleTime: 1000 * 60 * 5,
+        retry: 2,
+        placeholderData: (prev: Video[] | undefined) => prev,
       },
       {
         queryKey: ["searchRemote", searchQuery.toLowerCase().trim()],
         queryFn: () => searchRemoteSongs(searchQuery),
         enabled:
           isRoomAccessEnabled && shouldSearch && processedQuery.length >= 2,
-        staleTime: 1000 * 60 * 5, // Cache 5 phút (Redis cache ở backend)
-        retry: 2, // Retry 2 lần nếu fail
+        staleTime: 1000 * 60 * 5,
+        retry: 2,
+        placeholderData: (prev: Video[] | undefined) => prev,
       },
     ],
   });
@@ -179,7 +136,7 @@ const SearchPage: React.FC = () => {
   const isError = isLocalError && isRemoteError;
 
   return (
-    <div className="p-4 space-y-6 relative">
+    <div className="pointer-events-auto relative p-4 space-y-6">
       <h2 className="text-xl font-bold">Kết quả tìm kiếm</h2>
 
       {/* Loading State - Skeleton Cards */}
@@ -199,7 +156,7 @@ const SearchPage: React.FC = () => {
       {/* Search Results - Hiển thị ngay khi có local results, không cần đợi remote */}
       {/* Skeleton cards nối tiếp với results trong cùng grid khi remote đang loading */}
       {!isLocalLoading && combinedResults.length > 0 && (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4 touch-manipulation lg:grid-cols-3">
           {/* Results từ local/remote */}
           {combinedResults?.map((result: Video) => (
             <SongCard key={result.video_id} {...result} />

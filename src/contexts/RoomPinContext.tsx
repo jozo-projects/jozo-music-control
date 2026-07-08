@@ -39,24 +39,18 @@ export const RoomPinProvider: React.FC<RoomPinProviderProps> = ({ children }) =>
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
   const [isPinVerified, setIsPinVerified] = useState(() =>
-    roomId ? getStoredPinVerification(roomId) : false,
+    getStoredPinVerification(roomId || undefined),
   );
 
   useEffect(() => {
-    if (!roomId) {
-      setIsPinVerified(false);
-      return;
-    }
-    setIsPinVerified(getStoredPinVerification(roomId));
+    setIsPinVerified(getStoredPinVerification(roomId || undefined));
   }, [roomId]);
 
   const verifyPin = useCallback(
     (code: string): boolean => {
       if (isValidRoomPin(code)) {
         setIsPinVerified(true);
-        if (roomId) {
-          setStoredPinVerification(roomId);
-        }
+        setStoredPinVerification(roomId || undefined);
         return true;
       }
       return false;

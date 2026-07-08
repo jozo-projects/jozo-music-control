@@ -1,17 +1,26 @@
 import { useRoomPin } from "@/contexts/RoomPinContext";
 import { getRoomDisplayNumber } from "@/utils/roomDisplayNumber";
 import React, { useEffect, useRef, useState } from "react";
+import ReactDOM from "react-dom";
 
 interface RoomPinModalProps {
-  roomId: string;
+  roomId?: string;
+  fixed?: boolean;
+  onClose?: () => void;
+  onVerified?: () => void;
 }
 
-const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
+const RoomPinModal: React.FC<RoomPinModalProps> = ({
+  roomId,
+  fixed = false,
+  onClose,
+  onVerified,
+}) => {
   const { verifyPin } = useRoomPin();
   const [pin, setPin] = useState(["", "", "", ""]);
   const [pinError, setPinError] = useState("");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const roomDisplayNumber = getRoomDisplayNumber(roomId);
+  const roomDisplayNumber = roomId ? getRoomDisplayNumber(roomId) : null;
   const isComplete = pin.every((digit) => digit !== "");
 
   const handleInputChange = (index: number, value: string) => {
@@ -44,30 +53,69 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
       setPinError("Mã PIN không đúng. Vui lòng thử lại.");
       setPin(["", "", "", ""]);
       inputRefs.current[0]?.focus();
+      return;
     }
+    onVerified?.();
   };
 
   useEffect(() => {
     inputRefs.current[0]?.focus();
   }, []);
 
-  return (
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
+  if (typeof document === "undefined") return null;
+
+  return ReactDOM.createPortal(
     <div
-      className="absolute inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm touch-none"
+      className={`${fixed ? "fixed" : "absolute"} inset-0 z-[130] flex items-center justify-center bg-black/70 backdrop-blur-sm`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="room-pin-title"
+      onClick={onClose}
     >
       <div
-        className="relative mx-4 w-full max-w-md touch-auto rounded-2xl bg-gray-900 p-6 text-white shadow-2xl"
+        className="relative mx-4 w-full max-w-md rounded-2xl bg-gray-900 p-6 text-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
       >
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-4 top-4 rounded-full p-1.5 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+            aria-label="Đóng"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="h-5 w-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        )}
         <div className="mb-6 text-center">
           <p className="text-xs uppercase tracking-wide text-white/60">
             Xác thực phòng
           </p>
           <h2 id="room-pin-title" className="mt-1 text-xl font-bold">
-            Nhập mã PIN — Phòng {roomDisplayNumber}
+            {roomDisplayNumber
+              ? `Nhập mã PIN — Phòng ${roomDisplayNumber}`
+              : "Nhập mã PIN"}
           </h2>
           <p className="mt-2 text-sm text-white/70">
             Nhập mã PIN nhân viên để sử dụng hệ thống
@@ -115,7 +163,8 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({ roomId }) => {
           Xác nhận
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

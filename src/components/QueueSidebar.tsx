@@ -289,11 +289,11 @@ const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true }) => {
 
   return (
     <div
-      className={`w-full bg-transparent text-white transition-all duration-200 z-40 shadow-md ${
+      className={`flex h-full min-h-0 w-full flex-col bg-transparent text-white shadow-md ${
         isOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-100"
       }`}
     >
-      <div className="flex flex-col h-[100vh]">
+      <div className="flex min-h-0 flex-1 flex-col">
         {/* Now Playing */}
         {queueData?.result?.nowPlaying && (
           <div className="p-4 border-b border-gray-700">

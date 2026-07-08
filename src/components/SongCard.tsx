@@ -1,6 +1,6 @@
 import Modal from "@/components/Modal";
-import { useQueueMutations } from "@/hooks/useQueueMutations"; // Đường dẫn file hook
-import React, { useState } from "react";
+import { useQueueAdd } from "@/contexts/QueueAddContext";
+import React, { useCallback, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 interface SongCardProps {
@@ -14,9 +14,26 @@ interface SongCardProps {
 const SongCard: React.FC<SongCardProps> = React.memo(
   ({ video_id, title, thumbnail, author, duration }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { addSongToQueue } = useQueueMutations();
+    const { addSongToQueue } = useQueueAdd();
     const [searchParams] = useSearchParams();
     const roomId = searchParams.get("roomId") || "";
+    const openedAtRef = useRef(0);
+
+    const openModal = useCallback(() => {
+      const now = Date.now();
+      if (now - openedAtRef.current < 300) return;
+      openedAtRef.current = now;
+      setIsModalOpen(true);
+    }, []);
+
+    /** Tablet: input search đang focus thì tap card thường không fire click — xử lý trực tiếp */
+    const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+      const active = document.activeElement;
+      if (!(active instanceof HTMLInputElement)) return;
+      e.preventDefault();
+      active.blur();
+      openModal();
+    };
 
     const handleAddToTop = () => {
       addSongToQueue.mutate(
@@ -56,20 +73,21 @@ const SongCard: React.FC<SongCardProps> = React.memo(
     return (
       <>
         <div
-          className="shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer user-select-none"
-          onClick={() => setIsModalOpen(true)}
+          className="shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer touch-manipulation select-none"
+          onTouchStart={handleTouchStart}
+          onClick={openModal}
         >
           <img
             src={thumbnail}
             alt={title}
             loading="lazy"
-            className="w-full h-40 object-cover user-select-none"
+            className="pointer-events-none h-40 w-full object-cover select-none"
           />
           <div className="p-4 bg-brand-950/90 border-t-2 border-primary/40">
-            <h3 className="text-sm font-semibold mb-1 line-clamp-2 min-h-10 user-select-none">
+            <h3 className="mb-1 line-clamp-2 min-h-10 text-sm font-semibold select-none">
               {title}
             </h3>
-            <p className="text-xs text-gray-500 truncate user-select-none">
+            <p className="truncate text-xs text-gray-500 select-none">
               {author}
             </p>
           </div>

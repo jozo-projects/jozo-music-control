@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 
 interface ModalProps {
   isOpen: boolean;
@@ -48,7 +49,9 @@ const Modal: React.FC<ModalProps> = ({
 
   const isBusy = addQueuePending !== null;
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return ReactDOM.createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white w-full md:w-3/4 lg:w-1/2 xl:w-1/3 rounded-lg shadow-lg p-6">
         <h2 className="text-lg font-bold text-gray-900 mb-4">Chọn hành động</h2>
@@ -132,7 +135,8 @@ const Modal: React.FC<ModalProps> = ({
           Hủy
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

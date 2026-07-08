@@ -625,9 +625,9 @@ const FnbOrder: React.FC = () => {
       <div className="pb-8">
         {activeTab === "menu" ? (
           <div className="relative">
-            {/* macOS-style Category Dock — gọn cho tablet 10" */}
-            <div className="fixed left-1.5 md:left-2 top-1/2 -translate-y-1/2 z-20">
-              <div className="flex flex-col items-center gap-1.5 p-2 md:p-2 rounded-xl md:rounded-2xl bg-white/70 backdrop-blur-xl border border-white/60 shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+            {/* macOS-style Category Dock — glass, item cuộn phía sau */}
+            <div className="fixed left-1.5 md:left-2 top-1/2 z-20 -translate-y-1/2 pointer-events-none">
+              <div className="pointer-events-auto isolate flex flex-col items-center gap-1.5 rounded-xl border border-white/35 bg-white/15 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-2xl backdrop-saturate-150 md:rounded-2xl md:p-2">
                 <p className="text-[8px] md:text-[9px] font-semibold text-gray-400 uppercase tracking-wide px-0.5 text-center leading-tight">
                   Chọn
                   <br />
@@ -642,8 +642,8 @@ const FnbOrder: React.FC = () => {
                       key={category.id}
                       className={`group flex flex-col items-center gap-0.5 w-[3.75rem] md:w-[4rem] py-1.5 px-0.5 rounded-lg md:rounded-xl transition-all duration-200 ${
                         isActive
-                          ? "bg-primary/10 ring-2 ring-primary shadow-brand-soft scale-105"
-                          : "hover:bg-white hover:shadow-md hover:scale-105"
+                          ? "bg-primary/15 ring-2 ring-primary shadow-brand-soft scale-105 backdrop-blur-sm"
+                          : "hover:bg-white/40 hover:shadow-md hover:scale-105"
                       }`}
                       onClick={() => setSelectedCategory(category.id)}
                     >
@@ -652,10 +652,10 @@ const FnbOrder: React.FC = () => {
                           isActive
                             ? "bg-primary text-primary-foreground"
                             : isSnackCategory(category.id)
-                              ? "bg-amber-50 text-amber-600"
+                              ? "bg-amber-50/70 text-amber-600 backdrop-blur-sm"
                               : isDrinkCategory(category.id)
-                                ? "bg-sky-50 text-sky-500"
-                                : "bg-white text-gray-600"
+                                ? "bg-sky-50/70 text-sky-500 backdrop-blur-sm"
+                                : "bg-white/50 text-gray-600 backdrop-blur-sm"
                         }`}
                       >
                         {config.icon}
@@ -680,9 +680,9 @@ const FnbOrder: React.FC = () => {
               </div>
             </div>
 
-            {/* Menu Items Grid — full width, 3 cột tablet dọc / 4 cột ngang */}
-            <div className="pl-[4.5rem] md:pl-[4.75rem] pr-2 md:pr-3 pt-2 md:pt-3">
-              <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 items-stretch">
+            {/* Menu Items Grid — full width, item cuộn dưới dock glass */}
+            <div className="px-2 pt-2 md:px-3 md:pt-3">
+              <div className="grid grid-cols-3 items-stretch gap-2 lg:grid-cols-4">
                 {filteredItems?.map((item) => (
                   <FnbMenuItem
                     key={item._id}

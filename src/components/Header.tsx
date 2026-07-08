@@ -5,11 +5,12 @@ import { logo } from "@/assets/images";
 import { useRoomPin } from "@/contexts/RoomPinContext";
 import useRoom from "@/hooks/useRoom";
 import { useSongName } from "@/hooks/useSongName";
-import { setBoundRoomId } from "@/utils/boundRoomId";
 import { getRoomDisplayNumber } from "@/utils/roomDisplayNumber";
 import { ROOM_PIN_ENABLED } from "@/utils/roomPin";
 import { useQueryClient } from "@tanstack/react-query";
 import BillSummary from "./BillSummary";
+import RoomPinModal from "./RoomPinModal";
+import RoomSelectModal from "./RoomSelectModal";
 import debounce from "lodash/debounce";
 import React, {
   useCallback,
@@ -18,7 +19,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import ReactDOM from "react-dom";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Switch from "./Switch";
 import { toast } from "./ToastContainer";
@@ -42,21 +42,6 @@ const FoodIcon: React.FC = () => (
   </svg>
 );
 
-const ROOM_OPTIONS = [
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-];
-
 const Header: React.FC = () => {
   // Gộp trạng thái tìm kiếm vào một object
   const [searchState, setSearchState] = useState({
@@ -78,12 +63,12 @@ const Header: React.FC = () => {
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
   const roomDisplayNumber = roomId ? getRoomDisplayNumber(roomId) : null;
-  const [isRoomScreenOpen, setIsRoomScreenOpen] = useState(!roomId);
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  const [isRoomSelectModalOpen, setIsRoomSelectModalOpen] = useState(false);
   const touchStartXRef = useRef<number | null>(null);
 
-  /** 3 lần chạm logo trong 5s (cửa sổ trượt) mở drawer chọn phòng */
+  /** 3 lần chạm logo trong 5s (cửa sổ trượt) mở trang chọn phòng */
   const logoTapTimesRef = useRef<number[]>([]);
 
   const queryClient = useQueryClient();
@@ -94,73 +79,41 @@ const Header: React.FC = () => {
   const isSearchPage = location.pathname.includes("/search");
   const isHomePage = location.pathname === "/" || location.pathname === "";
 
+  const openRoomSelectModal = () => {
+    if (ROOM_PIN_ENABLED && !isPinVerified) {
+      openPinModal();
+      return;
+    }
+    setIsRoomSelectModalOpen(true);
+  };
+
+  const openPinModal = () => {
+    setIsPinModalOpen(true);
+  };
+
+  const handleRoomButtonClick = () => {
+    if (ROOM_PIN_ENABLED) {
+      openPinModal();
+      return;
+    }
+    openRoomSelectModal();
+  };
+
+  const handlePinVerified = () => {
+    setIsPinModalOpen(false);
+    setIsRoomSelectModalOpen(true);
+  };
+
   const ensureRoomSelected = () => {
-    if (!roomId) {
-      setIsRoomScreenOpen(true);
+    if (ROOM_PIN_ENABLED && !isPinVerified) {
+      openPinModal();
       return false;
     }
-    if (ROOM_PIN_ENABLED && !isPinVerified) {
+    if (!roomId) {
+      openRoomSelectModal();
       return false;
     }
     return true;
-  };
-
-  useEffect(() => {
-    setIsRoomScreenOpen(!roomId);
-  }, [roomId]);
-
-  useEffect(() => {
-    if (!isRoomScreenOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isRoomScreenOpen]);
-
-  useEffect(() => {
-    const syncFullscreen = () => {
-      const doc = document as Document & {
-        webkitFullscreenElement?: Element | null;
-      };
-      setIsFullscreen(
-        Boolean(doc.fullscreenElement ?? doc.webkitFullscreenElement),
-      );
-    };
-
-    document.addEventListener("fullscreenchange", syncFullscreen);
-    document.addEventListener("webkitfullscreenchange", syncFullscreen);
-    syncFullscreen();
-
-    return () => {
-      document.removeEventListener("fullscreenchange", syncFullscreen);
-      document.removeEventListener("webkitfullscreenchange", syncFullscreen);
-    };
-  }, []);
-
-  const toggleFullscreen = async () => {
-    const doc = document as Document & {
-      webkitExitFullscreen?: () => Promise<void>;
-    };
-    const el = document.documentElement as HTMLElement & {
-      webkitRequestFullscreen?: () => Promise<void>;
-    };
-
-    try {
-      if (isFullscreen) {
-        if (doc.exitFullscreen) {
-          await doc.exitFullscreen();
-        } else {
-          await doc.webkitExitFullscreen?.();
-        }
-      } else if (el.requestFullscreen) {
-        await el.requestFullscreen();
-      } else {
-        await el.webkitRequestFullscreen?.();
-      }
-    } catch {
-      toast.error("Không thể bật chế độ toàn màn hình");
-    }
   };
 
   const handleHeaderTouchStart = (e: React.TouchEvent<HTMLElement>) => {
@@ -179,7 +132,11 @@ const Header: React.FC = () => {
     const isRightSwipe = deltaX > 80;
 
     if (startedAtEdge && isRightSwipe) {
-      setIsRoomScreenOpen(true);
+      if (ROOM_PIN_ENABLED) {
+        openPinModal();
+      } else {
+        openRoomSelectModal();
+      }
     }
   };
 
@@ -203,41 +160,26 @@ const Header: React.FC = () => {
     setIsKaraoke(karaoke === "true");
   }, [location.search]); // Sử dụng inputValueRef.current thay vì searchState.term
 
-  // Xử lý debounce cho việc cập nhật debouncedTerm
-  const debouncedSetTerm = useMemo(
-    () =>
-      debounce((term: string) => {
-        setSearchState((prev) => ({
-          ...prev,
-          debouncedTerm: term,
-        }));
-      }, 800),
-    [],
-  );
-
-  // Cập nhật debounced term khi term thay đổi
-  useEffect(() => {
-    debouncedSetTerm(searchState.term);
-    return () => debouncedSetTerm.cancel();
-  }, [searchState.term, debouncedSetTerm]);
-
-  // Tối ưu hóa hàm debounce navigation
+  // Một debounce cho URL navigate + gợi ý autocomplete (tránh 2 timer 600ms/800ms chạy song song)
   const debouncedNavigate = useMemo(
     () =>
       debounce((query: string) => {
-        // KHÔNG sử dụng trim() để giữ lại khoảng trắng ở cuối
+        setSearchState((prev) =>
+          prev.debouncedTerm === query
+            ? prev
+            : { ...prev, debouncedTerm: query },
+        );
+
         const baseUrl = `/search?roomId=${roomId}&karaoke=${isKaraoke}`;
 
         if (query.trim().length > 0) {
-          // Giữ lại khoảng trắng ở cuối bằng cách dùng trực tiếp query mà không trim()
           navigate(`${baseUrl}&query=${encodeURIComponent(query)}`);
-          setSearchState((prev) => ({ ...prev, showSuggestions: false }));
         } else if (isSearchPage) {
           navigate(baseUrl);
         } else if (!isHomePage) {
           navigate(baseUrl);
         }
-      }, 600),
+      }, 500),
     [roomId, isKaraoke, isSearchPage, isHomePage, navigate],
   );
 
@@ -251,33 +193,55 @@ const Header: React.FC = () => {
     );
   }, []);
 
-  // Click/touch outside để đóng suggestions (touchstart cho tablet)
+  const blurSearchInput = useCallback(() => {
+    const input = inputRef.current;
+    if (input && input === document.activeElement) {
+      input.blur();
+    }
+  }, []);
+
+  // Click/touch outside: đóng gợi ý + blur input (tablet hay giữ focus khiến tap không ăn)
   useEffect(() => {
     const handlePointerOutside = (event: Event) => {
       if (
         searchContainerRef.current &&
         !searchContainerRef.current.contains(event.target as Node)
       ) {
+        blurSearchInput();
         closeSuggestions();
       }
     };
 
-    document.addEventListener("mousedown", handlePointerOutside);
+    document.addEventListener("mousedown", handlePointerOutside, true);
     document.addEventListener("touchstart", handlePointerOutside, {
+      capture: true,
       passive: true,
     });
     return () => {
-      document.removeEventListener("mousedown", handlePointerOutside);
-      document.removeEventListener("touchstart", handlePointerOutside);
+      document.removeEventListener("mousedown", handlePointerOutside, true);
+      document.removeEventListener("touchstart", handlePointerOutside, true);
     };
-  }, [closeSuggestions]);
+  }, [blurSearchInput, closeSuggestions]);
 
-  // Đóng gợi ý khi cuộn (user hay giữ focus input rồi scroll kết quả)
+  // Đóng gợi ý + blur input khi cuộn kết quả (user hay giữ focus input rồi scroll)
   useEffect(() => {
-    const handleScroll = () => closeSuggestions();
+    let scrollCloseTimer: number | null = null;
+    const handleScroll = () => {
+      if (scrollCloseTimer !== null) return;
+      scrollCloseTimer = window.setTimeout(() => {
+        scrollCloseTimer = null;
+        blurSearchInput();
+        closeSuggestions();
+      }, 80);
+    };
     document.addEventListener("scroll", handleScroll, true);
-    return () => document.removeEventListener("scroll", handleScroll, true);
-  }, [closeSuggestions]);
+    return () => {
+      document.removeEventListener("scroll", handleScroll, true);
+      if (scrollCloseTimer !== null) {
+        window.clearTimeout(scrollCloseTimer);
+      }
+    };
+  }, [blurSearchInput, closeSuggestions]);
 
   // Đóng gợi ý khi chuyển trang
   useEffect(() => {
@@ -300,7 +264,6 @@ const Header: React.FC = () => {
 
   // Handle input change với cách tiếp cận tối ưu hơn
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!ensureRoomSelected()) return;
     // Lấy giá trị trực tiếp từ input để đảm bảo khoảng trắng được giữ nguyên
     const value = e.target.value;
 
@@ -348,6 +311,8 @@ const Header: React.FC = () => {
   };
 
   const handleClearSearch = () => {
+    debouncedNavigate.cancel();
+
     setSearchState({
       term: "",
       debouncedTerm: "",
@@ -362,13 +327,6 @@ const Header: React.FC = () => {
     if (isSearchPage && roomId) {
       navigate(`/search?roomId=${roomId}&karaoke=${isKaraoke}`);
     }
-
-    // Focus vào input để hiển thị bàn phím trên tablet
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 0);
   };
 
   const handleHomeNavigation = () => {
@@ -421,14 +379,12 @@ const Header: React.FC = () => {
   useEffect(() => {
     return () => {
       debouncedNavigate.cancel();
-      debouncedSetTerm.cancel();
       if (blurCloseTimeoutRef.current !== null) {
         window.clearTimeout(blurCloseTimeoutRef.current);
       }
-      // Hủy các query đang pending để tránh memory leak
       queryClient.cancelQueries({ queryKey: ["songName"] });
     };
-  }, [debouncedNavigate, debouncedSetTerm, queryClient]);
+  }, [debouncedNavigate, queryClient]);
 
   const handleLogoClick = () => {
     const now = Date.now();
@@ -438,7 +394,11 @@ const Header: React.FC = () => {
     logoTapTimesRef.current = times;
     if (times.length >= 3) {
       logoTapTimesRef.current = [];
-      setIsRoomScreenOpen(true);
+      if (ROOM_PIN_ENABLED) {
+        openPinModal();
+      } else {
+        openRoomSelectModal();
+      }
       return;
     }
     handleHomeNavigation();
@@ -480,7 +440,10 @@ const Header: React.FC = () => {
                 window.clearTimeout(blurCloseTimeoutRef.current);
                 blurCloseTimeoutRef.current = null;
               }
-              if (!ensureRoomSelected()) return;
+              if (!roomId) {
+                openRoomSelectModal();
+                return;
+              }
               setSearchState((prev) => ({ ...prev, showSuggestions: true }));
               if (!isSearchPage) {
                 navigate(`/search?roomId=${roomId}&karaoke=${isKaraoke}`);
@@ -497,8 +460,11 @@ const Header: React.FC = () => {
           />
           {searchState.term && (
             <button
+              type="button"
               onClick={handleClearSearch}
+              onPointerDown={(e) => e.preventDefault()}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              aria-label="Xóa tìm kiếm"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -658,19 +624,24 @@ const Header: React.FC = () => {
           </div>
         </button>
 
-        {roomDisplayNumber && (
-          <div
-            className="flex flex-col items-center gap-0.5 rounded-lg border border-primary/40 bg-primary/20 px-2 py-0.5"
-            aria-label={`Phòng ${roomDisplayNumber}`}
-          >
-            <span className="text-[10px] leading-tight text-white/70">
-              Phòng
-            </span>
-            <span className="text-sm font-bold leading-none tracking-wider text-primary-foreground sm:text-base">
-              {roomDisplayNumber}
-            </span>
-          </div>
-        )}
+        <button
+          type="button"
+          onClick={handleRoomButtonClick}
+          className={`flex flex-col items-center gap-0.5 rounded-lg border px-2 py-0.5 transition-colors ${
+            roomId
+              ? "border-primary/40 bg-primary/20 hover:bg-primary/30"
+              : "border-white/20 bg-white/5 hover:bg-white/10"
+          }`}
+          title={ROOM_PIN_ENABLED ? "Nhập mã PIN" : "Chọn phòng"}
+          aria-label={
+            roomId ? `Phòng ${roomDisplayNumber ?? roomId}` : "Chọn phòng"
+          }
+        >
+          <span className="text-[10px] leading-tight text-white/70">Phòng</span>
+          <span className="text-sm font-bold leading-none tracking-wider text-primary-foreground sm:text-base">
+            {roomDisplayNumber ?? "?"}
+          </span>
+        </button>
       </div>
 
       {/* Confirm Support Modal */}
@@ -746,7 +717,7 @@ const Header: React.FC = () => {
           <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 w-[90%] max-w-xl shadow-2xl border border-gray-700 relative">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white">
-                Thông tin phòng {roomId || "?"}
+                Thông tin phòng {roomDisplayNumber ?? "?"}
               </h2>
               <button
                 onClick={() => setIsBillModalOpen(false)}
@@ -774,132 +745,19 @@ const Header: React.FC = () => {
         </div>
       )}
 
-      {isRoomScreenOpen &&
-        typeof document !== "undefined" &&
-        ReactDOM.createPortal(
-          <div
-            className="fixed inset-0 z-[120]"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Chọn phòng"
-          >
-            <div
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setIsRoomScreenOpen(false)}
-              aria-hidden
-            />
-            <div className="absolute inset-y-0 left-0 w-full max-w-xl bg-gray-900 text-white shadow-2xl">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-white/70">
-                    Room selection
-                  </p>
-                  <h2 className="text-lg font-bold">Chọn phòng để tiếp tục</h2>
-                </div>
-                <button
-                  onClick={() => setIsRoomScreenOpen(false)}
-                  className="p-2 rounded-full hover:bg-white/10"
-                  aria-label="Đóng chọn phòng"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18 18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
+      {isPinModalOpen && (
+        <RoomPinModal
+          roomId={roomId || undefined}
+          fixed
+          onClose={() => setIsPinModalOpen(false)}
+          onVerified={handlePinVerified}
+        />
+      )}
 
-              <div className="p-4 space-y-4">
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {ROOM_OPTIONS.map((room) => (
-                    <button
-                      key={room}
-                      onClick={() => {
-                        setBoundRoomId(room);
-                        const nextParams = new URLSearchParams(searchParams);
-                        nextParams.set("roomId", room);
-                        const qs = nextParams.toString();
-                        const path = `${location.pathname}${qs ? `?${qs}` : ""}${location.hash}`;
-                        window.location.replace(path);
-                      }}
-                      className={`py-3 rounded-xl border transition-colors font-semibold ${
-                        roomId === room
-                          ? "bg-primary-hover text-primary-foreground border-primary"
-                          : "border-white/10 bg-white/5 hover:bg-white/10"
-                      }`}
-                    >
-                      Phòng {getRoomDisplayNumber(room) ?? room}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => void toggleFullscreen()}
-                  className="mt-4 w-full py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors font-semibold flex items-center justify-center gap-2"
-                  aria-label={
-                    isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"
-                  }
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    {isFullscreen ? (
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M15 9h4.5M15 9V4.5M15 9l5.25-5.25M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
-                      />
-                    ) : (
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
-                      />
-                    )}
-                  </svg>
-                  {isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}
-                </button>
-
-                <button
-                  onClick={() => window.location.reload()}
-                  className="w-full py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors font-semibold flex items-center justify-center gap-2"
-                  aria-label="Tải lại trang"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M2.985 19.644l3.181-3.183m0 0 3.182 3.183m-3.182-3.183v-4.991"
-                    />
-                  </svg>
-                  Tải lại trang
-                </button>
-              </div>
-            </div>
-          </div>,
-          document.body,
-        )}
+      <RoomSelectModal
+        isOpen={isRoomSelectModalOpen}
+        onClose={() => setIsRoomSelectModalOpen(false)}
+      />
     </header>
   );
 };
