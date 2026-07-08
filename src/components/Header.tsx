@@ -2,7 +2,6 @@ import BellAlertIcon from "@/assets/icons/BellAlertIcon";
 import HomeIcon from "@/assets/icons/HomeIcon";
 import ListIcon from "@/assets/icons/ListIcon";
 import { logo } from "@/assets/images";
-import { useRoomPin } from "@/contexts/RoomPinContext";
 import useRoom from "@/hooks/useRoom";
 import { useSongName } from "@/hooks/useSongName";
 import { getRoomDisplayNumber } from "@/utils/roomDisplayNumber";
@@ -70,17 +69,12 @@ const Header: React.FC = () => {
 
   const queryClient = useQueryClient();
   const { mutate: sendNotification } = useRoom();
-  const { isPinVerified } = useRoomPin();
 
   // Tính toán các biến thường dùng
   const isSearchPage = location.pathname.includes("/search");
   const isHomePage = location.pathname === "/" || location.pathname === "";
 
-  const openRoomSelectModal = () => {
-    if (ROOM_PIN_ENABLED && !isPinVerified) {
-      openPinModal();
-      return;
-    }
+  const showRoomSelectModal = () => {
     setIsRoomSelectModalOpen(true);
   };
 
@@ -93,21 +87,17 @@ const Header: React.FC = () => {
       openPinModal();
       return;
     }
-    openRoomSelectModal();
+    showRoomSelectModal();
   };
 
   const handlePinVerified = () => {
     setIsPinModalOpen(false);
-    setIsRoomSelectModalOpen(true);
+    showRoomSelectModal();
   };
 
   const ensureRoomSelected = () => {
-    if (ROOM_PIN_ENABLED && !isPinVerified) {
-      openPinModal();
-      return false;
-    }
     if (!roomId) {
-      openRoomSelectModal();
+      showRoomSelectModal();
       return false;
     }
     return true;
@@ -132,7 +122,7 @@ const Header: React.FC = () => {
       if (ROOM_PIN_ENABLED) {
         openPinModal();
       } else {
-        openRoomSelectModal();
+        showRoomSelectModal();
       }
     }
   };
@@ -425,7 +415,7 @@ const Header: React.FC = () => {
                 blurCloseTimeoutRef.current = null;
               }
               if (!roomId) {
-                openRoomSelectModal();
+                showRoomSelectModal();
                 return;
               }
               setSearchState((prev) => ({ ...prev, showSuggestions: true }));
