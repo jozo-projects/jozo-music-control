@@ -351,6 +351,11 @@ const Header: React.FC = () => {
     if (isSearchPage && roomId) {
       navigate(`/search?roomId=${roomId}&karaoke=${isKaraoke}`);
     }
+
+    const input = inputRef.current;
+    if (input && document.activeElement !== input) {
+      input.focus();
+    }
   };
 
   const handleHomeNavigation = () => {
