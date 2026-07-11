@@ -95,6 +95,10 @@ const ControlBar: React.FC = () => {
     const onTimeUpdated = (data: any) => {
       if (isDraggingRef.current) return;
 
+      if (typeof data.isPlaying === "boolean") {
+        setIsPlaying(data.isPlaying);
+      }
+
       const newTime = data.currentTime || 0;
       const currentCurrentTime = currentTimeRef.current;
       const currentIsPlaying = isPlayingRef.current;
@@ -133,6 +137,22 @@ const ControlBar: React.FC = () => {
         setCurrentTime(0);
         endOfSongHandledRef.current = false;
       }
+    };
+
+    // Đồng bộ play/pause + thời gian khi reload / join lại room
+    const onNowPlaying = (data: any) => {
+      if (!data) return;
+
+      if (typeof data.isPlaying === "boolean") {
+        setIsPlaying(data.isPlaying);
+      }
+
+      if (typeof data.currentTime === "number") {
+        setCurrentTime(data.currentTime);
+        lastTimeUpdateRef.current = data.currentTime;
+      }
+
+      endOfSongHandledRef.current = false;
     };
 
     const onNowPlayingCleared = () => {
@@ -174,14 +194,18 @@ const ControlBar: React.FC = () => {
     socket.on("time_updated", onTimeUpdated);
     socket.on("video_event", onVideoEvent);
     socket.on("play_song", onPlaySong);
+    socket.on("now_playing", onNowPlaying);
     socket.on("now_playing_cleared", onNowPlayingCleared);
     socket.on("song_ended", onSongEnded);
     socket.on("volumeChange", onVolumeChange);
+
+    socket.emit("get_now_playing", { roomId });
 
     return () => {
       socket.off("time_updated", onTimeUpdated);
       socket.off("video_event", onVideoEvent);
       socket.off("play_song", onPlaySong);
+      socket.off("now_playing", onNowPlaying);
       socket.off("now_playing_cleared", onNowPlayingCleared);
       socket.off("song_ended", onSongEnded);
       socket.off("volumeChange", onVolumeChange);
