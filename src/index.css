@@ -9,10 +9,18 @@ body {
   padding: 0;
   height: 100%;
   overflow: hidden;
+  /* Tránh lộ nền đen khi viewport resize (đóng bàn phím / fullscreen) */
+  background-color: #1a0808;
 }
 
 #root {
   height: 100%;
+  background-color: #1a0808;
+}
+
+html:fullscreen,
+html:-webkit-full-screen {
+  background-color: #1a0808;
 }
 
 /* Flying item animation */

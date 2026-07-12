@@ -41,6 +41,14 @@ const FoodIcon: React.FC = () => (
   </svg>
 );
 
+/** Fullscreen API — đóng bàn phím ảo lúc này hay flash đen (Chromium/WebKit). */
+const isDocumentFullscreen = () => {
+  const doc = document as Document & {
+    webkitFullscreenElement?: Element | null;
+  };
+  return Boolean(doc.fullscreenElement ?? doc.webkitFullscreenElement);
+};
+
 const Header: React.FC = () => {
   // Gộp trạng thái tìm kiếm vào một object
   const [searchState, setSearchState] = useState({
@@ -198,6 +206,17 @@ const Header: React.FC = () => {
     blurSearchInput();
   }, [blurSearchInput, closeSuggestions]);
 
+  /**
+   * Sau submit / chọn gợi ý: đóng gợi ý ngay.
+   * Ở fullscreen không blur đồng bộ — tránh flash đen khi bàn phím đóng cùng lúc navigate.
+   * Bàn phím sẽ ẩn khi user tap ngoài / cuộn kết quả (dismissSearchKeyboard).
+   */
+  const dismissSearchAfterCommit = useCallback(() => {
+    closeSuggestions();
+    if (isDocumentFullscreen()) return;
+    blurSearchInput();
+  }, [blurSearchInput, closeSuggestions]);
+
   // Click/touch outside: đóng gợi ý + blur input (tablet hay giữ focus khiến tap không ăn)
   useEffect(() => {
     const handlePointerOutside = (event: Event) => {
@@ -307,7 +326,7 @@ const Header: React.FC = () => {
       navigate(`${baseUrl}&query=${encodeURIComponent(query)}`);
     }
 
-    dismissSearchKeyboard();
+    dismissSearchAfterCommit();
   };
 
   const handleSelectSuggestion = (suggestion: string) => {
@@ -331,7 +350,7 @@ const Header: React.FC = () => {
       )}&karaoke=${isKaraoke}`,
     );
 
-    dismissSearchKeyboard();
+    dismissSearchAfterCommit();
   };
 
   const handleClearSearch = () => {
