@@ -206,14 +206,14 @@ const Header: React.FC = () => {
     blurSearchInput();
   }, [blurSearchInput, closeSuggestions]);
 
-  /**
-   * Sau submit / chọn gợi ý: đóng gợi ý ngay.
-   * Ở fullscreen không blur đồng bộ — tránh flash đen khi bàn phím đóng cùng lúc navigate.
-   * Bàn phím sẽ ẩn khi user tap ngoài / cuộn kết quả (dismissSearchKeyboard).
-   */
+  /** Sau submit / chọn gợi ý: đóng gợi ý + blur input để ẩn bàn phím. */
   const dismissSearchAfterCommit = useCallback(() => {
     closeSuggestions();
-    if (isDocumentFullscreen()) return;
+    // Fullscreen: blur sau paint để tránh flash đen khi bàn phím đóng cùng navigate.
+    if (isDocumentFullscreen()) {
+      window.setTimeout(() => blurSearchInput(), 0);
+      return;
+    }
     blurSearchInput();
   }, [blurSearchInput, closeSuggestions]);
 
