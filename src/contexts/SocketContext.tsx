@@ -1,4 +1,5 @@
 import { toast } from "@/components/ToastContainer";
+import { getDeviceId } from "@/utils/deviceId";
 import React, {
   createContext,
   useContext,
@@ -66,7 +67,11 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       console.log(`[Socket] Creating new connection for room: ${roomId}`);
 
       socketRef.current = io(import.meta.env.VITE_SOCKET_URL, {
-        query: { roomId },
+        query: {
+          roomId,
+          deviceId: getDeviceId(),
+          clientType: "control",
+        },
         transports: ["websocket"],
         reconnection: true,
         reconnectionDelay: 1000,
