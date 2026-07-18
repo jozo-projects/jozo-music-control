@@ -99,7 +99,6 @@ interface FnbItem {
   updatedAt?: string;
   updatedBy?: string;
   existingImage?: string;
-  quantity?: string;
   variants?: FnbVariant[] | string; // Array of FnbVariant objects or JSON string (for backward compatibility)
 }
 

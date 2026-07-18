@@ -268,10 +268,10 @@ const FnbOrder: React.FC = () => {
       return;
     }
 
-    // Kiểm tra số lượng còn lại
+    // Kiểm tra số lượng còn lại theo inventory.quantity
     const currentQuantity = variant
-      ? variant.inventory.quantity
-      : item.inventory?.quantity || parseInt(item.quantity || "0");
+      ? (variant.inventory?.quantity ?? 0)
+      : (item.inventory?.quantity ?? 0);
     if (currentQuantity <= 0) {
       toast.error("Sản phẩm đã hết hàng");
       return;
@@ -400,11 +400,10 @@ const FnbOrder: React.FC = () => {
       const variants: FnbVariant[] = parseVariants(item.variants);
       const variant = variants.find((v) => v._id === variantId);
       currentQuantity = variant
-        ? variant.inventory.quantity
-        : item.inventory?.quantity || parseInt(item.quantity || "0");
+        ? (variant.inventory?.quantity ?? 0)
+        : (item.inventory?.quantity ?? 0);
     } else {
-      currentQuantity =
-        item.inventory?.quantity || parseInt(item.quantity || "0");
+      currentQuantity = item.inventory?.quantity ?? 0;
     }
 
     if (quantity > currentQuantity) {

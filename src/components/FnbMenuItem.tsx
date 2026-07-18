@@ -66,14 +66,14 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
   };
 
   // Helper function to get remaining quantity for item
-  // Vì chỉ update local state (không gọi API ngay), nên cần trừ cart quantity
+  // Dùng inventory.quantity; trừ số đã có trong cart
   const getRemainingQuantity = (
     _itemId: string,
     variantId?: string,
   ): number => {
     const baseQuantity = variantId
-      ? variants.find((v) => v._id === variantId)?.inventory.quantity || 0
-      : item.inventory?.quantity || parseInt(item.quantity || "0");
+      ? (variants.find((v) => v._id === variantId)?.inventory?.quantity ?? 0)
+      : (item.inventory?.quantity ?? 0);
 
     const cartQuantity = getItemQuantityInCart(_itemId, variantId);
     return Math.max(0, baseQuantity - cartQuantity);
