@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { optimizeImageUrl } from "@/utils/optimizeImageUrl";
 
 interface FnbMenuItemProps {
   item: FnbItem;
@@ -166,8 +167,13 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
             }`}
           >
             <img
-              src={item.image || item.existingImage || defaultImage}
+              src={optimizeImageUrl(
+                item.image || item.existingImage || defaultImage,
+                "card",
+              )}
               alt={item.name}
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-contain"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = defaultImage;
@@ -349,15 +355,17 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
                         {/* Variant Image */}
                         <div className="aspect-[4/3] overflow-hidden relative bg-gray-100 flex items-center justify-center">
                           <img
-                            src={
+                            src={optimizeImageUrl(
                               variant.image ||
-                              item.image ||
-                              item.existingImage ||
-                              defaultImage
-                            }
+                                item.image ||
+                                item.existingImage ||
+                                defaultImage,
+                              "card",
+                            )}
                             alt={variant.name}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-contain rounded-t-xl"
-                            onLoad={() => {}}
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = defaultImage;
                             }}
@@ -484,8 +492,13 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
         }`}
       >
         <img
-          src={item.image || item.existingImage || defaultImage}
+          src={optimizeImageUrl(
+            item.image || item.existingImage || defaultImage,
+            "card",
+          )}
           alt={item.name}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-contain"
           onError={(e) => {
             (e.target as HTMLImageElement).src = defaultImage;

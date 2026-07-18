@@ -5,6 +5,7 @@ import { toast } from "@/components/ToastContainer";
 import { useFnbMenuQuery } from "@/hooks/useFnbMenuQuery";
 import { useFnbMutations } from "@/hooks/useFnbMutations";
 import { useFnbOrdersQuery } from "@/hooks/useFnbOrdersQuery";
+import { optimizeImageUrl } from "@/utils/optimizeImageUrl";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -161,8 +162,7 @@ const FnbOrder: React.FC = () => {
     data: fnbMenu,
     isLoading,
     isError,
-    refetch: refetchMenu,
-  } = useFnbMenuQuery({ refetchInterval: 30_000 });
+  } = useFnbMenuQuery();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [cart, setCart] = useState<OrderItem[]>([]);
   const [categories, setCategories] = useState<FnbCategory[]>([]);
@@ -212,13 +212,6 @@ const FnbOrder: React.FC = () => {
       }, CART_HINT_VISIBLE_MS);
     }, CART_HINT_DELAY_MS);
   };
-
-  // Refetch menu khi quay lại tab Menu để đồng bộ tồn kho mới nhất
-  useEffect(() => {
-    if (activeTab === "menu") {
-      refetchMenu();
-    }
-  }, [activeTab, refetchMenu]);
 
   useEffect(() => {
     const timers = cartHintTimersRef.current;
@@ -294,7 +287,10 @@ const FnbOrder: React.FC = () => {
     setIsAdding(true);
 
     // Get item image
-    const itemImage = variant?.image || item.image || item.existingImage || "";
+    const itemImage = optimizeImageUrl(
+      variant?.image || item.image || item.existingImage || "",
+      "thumb",
+    );
 
     // Calculate positions for animation
     if (buttonElement && itemImage) {
@@ -550,9 +546,8 @@ const FnbOrder: React.FC = () => {
       // Clear cart sau khi submit để user có thể tạo order mới
       setCart([]);
 
-      // Refetch orders và menu để cập nhật danh sách và số lượng
+      // Refetch orders — menu được invalidate trong submitCart mutation
       refetchOrders();
-      refetchMenu();
     } catch (error) {
       console.error("Submit order error:", error);
       toast.error(
@@ -859,8 +854,10 @@ const FnbOrder: React.FC = () => {
                         <div className="flex-shrink-0">
                           <div className="w-24 aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
                             <img
-                              src={itemImage || ""}
+                              src={optimizeImageUrl(itemImage, "cart")}
                               alt={itemName}
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-full object-contain"
                             />
                           </div>
@@ -1029,7 +1026,7 @@ const FnbOrder: React.FC = () => {
         >
           <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg">
             <img
-              src={flyingItem.image}
+              src={optimizeImageUrl(flyingItem.image, "thumb")}
               alt="Flying item"
               className="w-full h-full object-cover"
             />

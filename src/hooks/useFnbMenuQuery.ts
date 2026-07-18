@@ -2,12 +2,10 @@ import { useRoomAccessEnabled } from "@/hooks/useRoomAccessEnabled";
 import http from "@/utils/http";
 import { useQuery } from "@tanstack/react-query";
 
-type UseFnbMenuQueryOptions = {
-  /** Poll interval (ms) — dùng ở trang đặt món để cập nhật tồn kho realtime */
-  refetchInterval?: number | false;
-};
+/** Cache danh sách menu — không poll liên tục vì chủ yếu dùng để hiển thị list */
+const MENU_STALE_TIME_MS = 5 * 60_000;
 
-export const useFnbMenuQuery = (options?: UseFnbMenuQueryOptions) => {
+export const useFnbMenuQuery = () => {
   const isRoomAccessEnabled = useRoomAccessEnabled();
 
   return useQuery({
@@ -27,10 +25,8 @@ export const useFnbMenuQuery = (options?: UseFnbMenuQueryOptions) => {
       return menu;
     },
     enabled: isRoomAccessEnabled,
-    // Tồn kho thay đổi thường xuyên — không cache lâu
-    staleTime: 0,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: true,
-    refetchInterval: options?.refetchInterval,
+    staleTime: MENU_STALE_TIME_MS,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 };
