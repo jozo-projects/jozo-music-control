@@ -108,6 +108,7 @@ export const useFnbMutations = () => {
       const response = await http.post<ApiResponse<FnbOrder>>(
         `/client/fnb/orders/room/${roomId}/submit-cart`,
         payload,
+        { skipErrorToast: true },
       );
       return response.data.result;
     },

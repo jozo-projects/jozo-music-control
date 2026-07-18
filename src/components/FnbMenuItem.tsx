@@ -49,8 +49,10 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
     return [];
   };
 
-  // Parse variants from array
-  const variants: FnbVariant[] = parseVariants(item.variants);
+  // Parse variants from array — ẩn variant ngừng phục vụ
+  const variants: FnbVariant[] = parseVariants(item.variants).filter(
+    (v) => v.isActive !== false,
+  );
 
   // Helper function to get quantity in cart for item
   const getItemQuantityInCart = (
@@ -128,6 +130,11 @@ const FnbMenuItem: React.FC<FnbMenuItemProps> = ({
       }
     }
   };
+
+  // Ẩn món ngừng phục vụ
+  if (item.isActive === false) {
+    return null;
+  }
 
   // If item has variants, show parent item with "Chọn loại" button
   if (item.hasVariant && variants.length > 0) {

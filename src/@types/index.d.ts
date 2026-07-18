@@ -74,6 +74,7 @@ interface FnbVariant {
   name: string;
   price: number;
   image?: string;
+  isActive?: boolean;
   inventory: {
     quantity: number;
     minStock?: number;
@@ -90,6 +91,7 @@ interface FnbItem {
   description?: string;
   image?: string;
   category: string;
+  isActive?: boolean;
   inventory?: {
     quantity: number;
     lastUpdated: string;

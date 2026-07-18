@@ -5,8 +5,19 @@ import { toast } from "@/components/ToastContainer";
 import { useFnbMenuQuery } from "@/hooks/useFnbMenuQuery";
 import { useFnbMutations } from "@/hooks/useFnbMutations";
 import { useFnbOrdersQuery } from "@/hooks/useFnbOrdersQuery";
+import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+
+const getErrorMessageFromAxios = (error: unknown, fallback: string): string => {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as { message?: string } | undefined;
+    if (data?.message && typeof data.message === "string") {
+      return data.message;
+    }
+  }
+  return fallback;
+};
 
 const SnackIcon = ({ className = "w-7 h-7" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} fill="none">
@@ -230,15 +241,18 @@ const FnbOrder: React.FC = () => {
     }
   }, [cart.length]);
 
-  // Tạo danh sách categories từ items
+  // Tạo danh sách categories từ items đang phục vụ
   useEffect(() => {
     if (fnbMenu?.items) {
+      const activeItems = fnbMenu.items.filter(
+        (item) => item.isActive !== false && !item.parentId,
+      );
       const uniqueCategories = Array.from(
-        new Set(fnbMenu.items.map((item) => item.category)),
-      ).filter(Boolean) as string[]; // Đảm bảo các giá trị là string
+        new Set(activeItems.map((item) => item.category)),
+      ).filter(Boolean) as string[];
 
       const categoryList: FnbCategory[] = uniqueCategories.map((category) => ({
-        id: category, // category đã là string nên id chắc chắn là string
+        id: category,
         name:
           category === "snacks"
             ? "Snacks"
@@ -381,6 +395,49 @@ const FnbOrder: React.FC = () => {
     return [];
   };
 
+  // Lấy variant đang phục vụ: ưu tiên item con (parentId), fallback item.variants
+  const getActiveVariants = (item: FnbItem): FnbVariant[] => {
+    const children = (fnbMenu?.items || []).filter(
+      (child) => child.parentId === item._id && child.isActive !== false,
+    );
+    if (children.length > 0) {
+      return children.map((child) => ({
+        _id: child._id,
+        name: child.name,
+        price: child.price,
+        image: child.image || child.existingImage,
+        isActive: child.isActive,
+        inventory: {
+          quantity: child.inventory?.quantity ?? 0,
+        },
+      }));
+    }
+    return parseVariants(item.variants).filter((v) => v.isActive !== false);
+  };
+
+  // Resolve variant (kể cả ngừng phục vụ) để hiển thị trong giỏ
+  const findVariant = (
+    item: FnbItem,
+    variantId: string,
+  ): FnbVariant | undefined => {
+    const child = (fnbMenu?.items || []).find(
+      (c) => c._id === variantId && c.parentId === item._id,
+    );
+    if (child) {
+      return {
+        _id: child._id,
+        name: child.name,
+        price: child.price,
+        image: child.image || child.existingImage,
+        isActive: child.isActive,
+        inventory: {
+          quantity: child.inventory?.quantity ?? 0,
+        },
+      };
+    }
+    return parseVariants(item.variants).find((v) => v._id === variantId);
+  };
+
   const handleUpdateQuantity = async (
     itemId: string,
     quantity: number,
@@ -397,8 +454,7 @@ const FnbOrder: React.FC = () => {
 
     let currentQuantity: number;
     if (variantId) {
-      const variants: FnbVariant[] = parseVariants(item.variants);
-      const variant = variants.find((v) => v._id === variantId);
+      const variant = getActiveVariants(item).find((v) => v._id === variantId);
       currentQuantity = variant
         ? (variant.inventory?.quantity ?? 0)
         : (item.inventory?.quantity ?? 0);
@@ -447,8 +503,7 @@ const FnbOrder: React.FC = () => {
 
       if (cartItem.variantId) {
         // Get variant price
-        const variants: FnbVariant[] = parseVariants(item.variants);
-        const variant = variants.find((v) => v._id === cartItem.variantId);
+        const variant = findVariant(item, cartItem.variantId);
         itemPrice = variant ? variant.price : item.price;
       } else {
         // Use item price directly
@@ -500,7 +555,12 @@ const FnbOrder: React.FC = () => {
       refetchMenu();
     } catch (error) {
       console.error("Submit order error:", error);
-      toast.error("Đặt hàng thất bại. Vui lòng thử lại!");
+      toast.error(
+        getErrorMessageFromAxios(
+          error,
+          "Đặt hàng thất bại. Vui lòng thử lại!",
+        ),
+      );
     }
   };
 
@@ -522,9 +582,21 @@ const FnbOrder: React.FC = () => {
     );
   }
 
-  const filteredItems = fnbMenu?.items.filter(
-    (item) => item.category === selectedCategory && !item.parentId,
-  );
+  const filteredItems = fnbMenu?.items
+    .filter(
+      (item) =>
+        item.category === selectedCategory &&
+        !item.parentId &&
+        item.isActive !== false,
+    )
+    .map((item) => {
+      if (!item.hasVariant) return item;
+      return { ...item, variants: getActiveVariants(item) };
+    })
+    .filter((item) => {
+      if (!item.hasVariant) return true;
+      return parseVariants(item.variants).length > 0;
+    });
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -764,12 +836,7 @@ const FnbOrder: React.FC = () => {
                     let itemImage = item.image || item.existingImage;
 
                     if (cartItem.variantId) {
-                      const variants: FnbVariant[] = parseVariants(
-                        item.variants,
-                      );
-                      variant = variants.find(
-                        (v) => v._id === cartItem.variantId,
-                      );
+                      variant = findVariant(item, cartItem.variantId);
                       if (variant) {
                         itemName = `${item.name} - ${variant.name}`;
                         itemPrice = variant.price;
