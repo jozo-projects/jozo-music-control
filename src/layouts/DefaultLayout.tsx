@@ -1,4 +1,3 @@
-import { categoryImages } from "@/assets/images/categories";
 import ControlBar from "@/components/ControlBar";
 import Footer from "@/components/Footer";
 import GiftModal from "@/components/GiftModal";
@@ -8,14 +7,13 @@ import { useImageBackground } from "@/contexts/ImageBackgroundContext";
 import { QueueAddProvider } from "@/contexts/QueueAddContext";
 import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
-// import { categoryImages } from "@/assets/images/categories";
 // import { Socket } from "socket.io-client";
 
 const ROUTES_WITHOUT_QUEUE = ["/gift", "/fnb"];
 
 const Layout: React.FC = () => {
   const location = useLocation();
-  const { backgroundId } = useImageBackground();
+  const { selectedBackground } = useImageBackground();
   const canShowQueue = !ROUTES_WITHOUT_QUEUE.includes(location.pathname);
 
   return (
@@ -30,7 +28,9 @@ const Layout: React.FC = () => {
       <main
         className="flex-1 relative overflow-hidden rounded-3xl bg-secondary"
         style={{
-          backgroundImage: `url(${categoryImages[backgroundId]})`,
+          backgroundImage: selectedBackground
+            ? `url(${JSON.stringify(selectedBackground.imageUrl)})`
+            : undefined,
           backgroundSize: "cover",
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",

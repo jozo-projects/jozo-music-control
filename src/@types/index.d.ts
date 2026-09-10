@@ -16,6 +16,30 @@ interface Video {
   match_score?: number; // Điểm khớp từ tìm kiếm (cao hơn = khớp tốt hơn)
 }
 
+interface MusicCategory {
+  _id: string;
+  name: string;
+  slug: string;
+  imageUrl: string;
+  /** Thiếu field = đang active (BE có thể không trả) */
+  isActive?: boolean;
+  position: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface MusicCategorySongsResult {
+  songs: Video[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
 interface YouTubeSearchResponse {
   kind: string;
   etag: string;

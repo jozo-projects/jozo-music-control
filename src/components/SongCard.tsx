@@ -9,10 +9,11 @@ interface SongCardProps {
   thumbnail: string;
   author: string;
   duration: number;
+  url?: string;
 }
 
 const SongCard: React.FC<SongCardProps> = React.memo(
-  ({ video_id, title, thumbnail, author, duration }) => {
+  ({ video_id, title, thumbnail, author, duration, url }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { addSongToQueue } = useQueueAdd();
     const [searchParams] = useSearchParams();
@@ -38,7 +39,7 @@ const SongCard: React.FC<SongCardProps> = React.memo(
     const handleAddToTop = () => {
       addSongToQueue.mutate(
         {
-          song: { video_id, title, thumbnail, author, duration },
+          song: { video_id, title, thumbnail, author, duration, url },
           position: "top",
           roomId,
         },
@@ -53,7 +54,7 @@ const SongCard: React.FC<SongCardProps> = React.memo(
     const handleAddToEnd = () => {
       addSongToQueue.mutate(
         {
-          song: { video_id, title, thumbnail, author, duration },
+          song: { video_id, title, thumbnail, author, duration, url },
           position: "end",
           roomId,
         },

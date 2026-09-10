@@ -1,16 +1,18 @@
-import { CategoriesId } from "@/assets/images/categories";
-import { createContext, Dispatch, useContext, useState } from "react";
+import type { CategoryBackground } from "@/utils/categorySelection";
+import { createContext, type Dispatch, useContext, useState } from "react";
 
 interface ImageBackgroundContextType {
-  backgroundId: string;
-  setBackgroundId: Dispatch<React.SetStateAction<string>>;
+  selectedBackground: CategoryBackground | null;
+  setSelectedBackground: Dispatch<
+    React.SetStateAction<CategoryBackground | null>
+  >;
 }
 
 export const ImageBackgroundContext = createContext<ImageBackgroundContextType>(
   {
-    backgroundId: "",
-    setBackgroundId: () => null,
-  }
+    selectedBackground: null,
+    setSelectedBackground: () => null,
+  },
 );
 
 export const useImageBackground = () => {
@@ -18,7 +20,7 @@ export const useImageBackground = () => {
 
   if (!context) {
     throw new Error(
-      "useImageBackground must be used within a ImageBackgroundProvider"
+      "useImageBackground must be used within a ImageBackgroundProvider",
     );
   }
   return context;
@@ -31,12 +33,13 @@ interface ImageBackgroundProviderProps {
 export function ImageBackgroundProvider({
   children,
 }: ImageBackgroundProviderProps) {
-  const [backgroundId, setBackgroundId] = useState<string>(
-    CategoriesId.ANH_TRAI_SAY_HI
-  );
+  const [selectedBackground, setSelectedBackground] =
+    useState<CategoryBackground | null>(null);
 
   return (
-    <ImageBackgroundContext.Provider value={{ backgroundId, setBackgroundId }}>
+    <ImageBackgroundContext.Provider
+      value={{ selectedBackground, setSelectedBackground }}
+    >
       {children}
     </ImageBackgroundContext.Provider>
   );
