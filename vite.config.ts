@@ -7,6 +7,7 @@ export default defineConfig({
   preview: {
     host: true,
     port: 3000,
+    allowedHosts: ["control.jozo.com.vn"],
   },
   resolve: {
     alias: {
