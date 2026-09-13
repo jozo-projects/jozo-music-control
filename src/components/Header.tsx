@@ -5,6 +5,7 @@ import { logo } from "@/assets/images";
 import useRoom from "@/hooks/useRoom";
 import { useSongName } from "@/hooks/useSongName";
 import { getRoomDisplayNumber } from "@/utils/roomDisplayNumber";
+import { FNB_ORDER_ENABLED } from "@/utils/fnbOrder";
 import { ROOM_PIN_ENABLED } from "@/utils/roomPin";
 import { useQueryClient } from "@tanstack/react-query";
 import BillSummary from "./BillSummary";
@@ -619,16 +620,18 @@ const Header: React.FC = () => {
           </div>
         </button>
 
-        <button
-          onClick={handleFnbNavigation}
-          className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
-          title="Đặt đồ ăn & thức uống"
-        >
-          <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
-            <FoodIcon />
-            <span>Order</span>
-          </div>
-        </button>
+        {FNB_ORDER_ENABLED && (
+          <button
+            onClick={handleFnbNavigation}
+            className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
+            title="Đặt đồ ăn & thức uống"
+          >
+            <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
+              <FoodIcon />
+              <span>Order</span>
+            </div>
+          </button>
+        )}
 
         <button
           onClick={() => setIsBillModalOpen(true)}

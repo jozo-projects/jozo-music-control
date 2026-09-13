@@ -5,8 +5,23 @@ import QRCodeScreen from "@/pages/QRCode";
 import Search from "@/pages/Search";
 import FnbOrder from "@/pages/FnbOrder";
 import Gift from "@/pages/Gift";
-import { RouteObject } from "react-router-dom";
+import { FNB_ORDER_ENABLED } from "@/utils/fnbOrder";
+import { Navigate, RouteObject, useSearchParams } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
+
+const FnbOrderRoute = () => {
+  const [searchParams] = useSearchParams();
+  if (!FNB_ORDER_ENABLED) {
+    const roomId = searchParams.get("roomId");
+    return (
+      <Navigate
+        to={roomId ? `/?roomId=${encodeURIComponent(roomId)}` : "/"}
+        replace
+      />
+    );
+  }
+  return <FnbOrder />;
+};
 
 const routes: RouteObject[] = [
   {
@@ -17,7 +32,7 @@ const routes: RouteObject[] = [
         children: [
           { path: "/", element: <Home /> }, // Trang Home
           { path: "/search", element: <Search /> }, // Trang Search
-          { path: "/fnb", element: <FnbOrder /> }, // Trang FnB Order
+          { path: "/fnb", element: <FnbOrderRoute /> }, // Tạm ẩn khi FNB_ORDER_ENABLED = false
           { path: "/gift", element: <Gift /> }, // Trang Quà / Lì xì
         ],
       },

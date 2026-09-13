@@ -6,6 +6,7 @@ import { useRequestEndSessionMutation } from "@/hooks/useRequestEndSessionMutati
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "@/components/ToastContainer";
+import { FNB_ORDER_ENABLED } from "@/utils/fnbOrder";
 const END_REQUEST_COOLDOWN_MS = 30_000;
 
 const formatNowTimeVi = (d: Date) =>
@@ -455,15 +456,17 @@ const BillSummary: React.FC<BillSummaryProps> = ({
                 <p className="text-sm text-gray-400">
                   Chưa có đơn FnB nào được ghi nhận.
                 </p>
-                <button
-                  onClick={() => {
-                    onClose?.();
-                    navigate(`/fnb?roomId=${roomId}`);
-                  }}
-                  className="w-full px-4 py-3 bg-gradient-to-r from-primary to-primary-deep text-primary-foreground font-semibold rounded-xl hover:from-primary-hover hover:to-primary-deeper transition-all shadow-brand-soft"
-                >
-                  Đặt đồ ăn & thức uống
-                </button>
+                {FNB_ORDER_ENABLED && (
+                  <button
+                    onClick={() => {
+                      onClose?.();
+                      navigate(`/fnb?roomId=${roomId}`);
+                    }}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-primary to-primary-deep text-primary-foreground font-semibold rounded-xl hover:from-primary-hover hover:to-primary-deeper transition-all shadow-brand-soft"
+                  >
+                    Đặt đồ ăn & thức uống
+                  </button>
+                )}
               </div>
             )}
           </div>
