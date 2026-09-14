@@ -1,2 +1,2 @@
-/** Tạm ẩn trang Order vì bug BE. Bật lại khi BE ổn. */
-export const FNB_ORDER_ENABLED = false;
+/** Bật/tắt trang Order. Tắt khi BE có bug, bật lại khi đã fix. */
+export const FNB_ORDER_ENABLED = true;
