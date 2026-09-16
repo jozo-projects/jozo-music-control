@@ -95,9 +95,9 @@ const NowPlayingFullscreen: React.FC<NowPlayingFullscreenProps> = ({
         aria-hidden
       />
 
-      <div className="pointer-events-none relative z-10 flex h-full w-full items-center justify-center p-6">
-        <div className="now-playing-stage relative w-full max-w-5xl">
-          <div className="relative aspect-video max-h-[calc(100dvh-5.5rem)] overflow-hidden rounded-[2rem] bg-black/40 shadow-[0_40px_90px_rgba(0,0,0,0.55)] ring-1 ring-white/20">
+      <div className="pointer-events-none relative z-10 flex h-full w-full items-center justify-center px-16 py-14">
+        <div className="now-playing-stage relative w-full max-w-3xl">
+          <div className="relative aspect-video max-h-[min(58dvh,26rem)] overflow-hidden rounded-[2rem] bg-black/40 shadow-[0_40px_90px_rgba(0,0,0,0.55)] ring-1 ring-white/20">
             <img
               src={artwork}
               alt={song.title}
