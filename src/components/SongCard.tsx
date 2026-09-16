@@ -74,21 +74,27 @@ const SongCard: React.FC<SongCardProps> = React.memo(
     return (
       <>
         <div
-          className="shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer touch-manipulation select-none"
+          className="liquid-glass-card cursor-pointer overflow-hidden rounded-2xl transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-brand-glow active:scale-[0.99] touch-manipulation select-none"
           onTouchStart={handleTouchStart}
           onClick={openModal}
         >
-          <img
-            src={thumbnail}
-            alt={title}
-            loading="lazy"
-            className="pointer-events-none h-40 w-full object-cover select-none"
-          />
-          <div className="p-4 bg-brand-950/90 border-t-2 border-primary/40">
-            <h3 className="mb-1 line-clamp-2 min-h-10 text-sm font-semibold select-none">
+          <div className="relative">
+            <img
+              src={thumbnail}
+              alt={title}
+              loading="lazy"
+              className="pointer-events-none h-40 w-full object-cover select-none"
+            />
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/50 to-transparent"
+              aria-hidden
+            />
+          </div>
+          <div className="border-t border-primary/30 px-3 py-2.5">
+            <h3 className="mb-1 line-clamp-2 min-h-10 text-sm font-semibold text-white select-none">
               {title}
             </h3>
-            <p className="truncate text-xs text-gray-500 select-none">
+            <p className="truncate text-xs text-white/55 select-none">
               {author}
             </p>
           </div>

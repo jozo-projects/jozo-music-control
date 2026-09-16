@@ -8,18 +8,14 @@ import debounce from "lodash/debounce";
 
 // Skeleton Card Component
 const SkeletonCard: React.FC = () => (
-  <div className="shadow-md rounded-lg overflow-hidden animate-pulse">
-    {/* Image skeleton */}
-    <div className="w-full h-40 bg-gray-300 dark:bg-gray-700"></div>
-    {/* Content skeleton */}
-    <div className="p-4 bg-black/60">
-      {/* Title skeleton - 2 lines */}
+  <div className="liquid-glass-card animate-pulse overflow-hidden rounded-2xl">
+    <div className="h-40 w-full bg-white/10" />
+    <div className="border-t border-white/10 px-3 py-2.5">
       <div className="mb-2 space-y-2">
-        <div className="h-4 bg-gray-400 dark:bg-gray-600 rounded w-full"></div>
-        <div className="h-4 bg-gray-400 dark:bg-gray-600 rounded w-3/4"></div>
+        <div className="h-4 w-full rounded bg-white/15" />
+        <div className="h-4 w-3/4 rounded bg-white/10" />
       </div>
-      {/* Author skeleton */}
-      <div className="h-3 bg-gray-400 dark:bg-gray-600 rounded w-1/2"></div>
+      <div className="h-3 w-1/2 rounded bg-white/10" />
     </div>
   </div>
 );

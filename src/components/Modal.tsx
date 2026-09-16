@@ -14,7 +14,7 @@ interface ModalProps {
 function AddQueueSpinner() {
   return (
     <svg
-      className="size-6 animate-spin text-gray-900"
+      className="size-8 animate-spin text-white"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
@@ -37,6 +37,9 @@ function AddQueueSpinner() {
   );
 }
 
+const actionBtnClass =
+  "flex w-full flex-col items-center justify-center gap-y-2.5 rounded-2xl border border-primary/40 bg-primary/80 px-3 py-4 text-sm font-medium leading-none text-primary-foreground shadow-brand-soft transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-primary/80";
+
 const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -52,18 +55,18 @@ const Modal: React.FC<ModalProps> = ({
   if (typeof document === "undefined") return null;
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white w-full md:w-3/4 lg:w-1/2 xl:w-1/3 rounded-lg shadow-lg p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Chọn hành động</h2>
-        <p className="mb-6 text-gray-700">
-          Bài hát: <strong>{songTitle}</strong>
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md">
+      <div className="liquid-glass w-full max-w-xl rounded-3xl p-8 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
+        <h2 className="mb-2 text-xl font-bold text-white">Chọn hành động</h2>
+        <p className="mb-8 text-base text-white/70">
+          Bài hát: <strong className="font-semibold text-white">{songTitle}</strong>
         </p>
-        <div className="flex items-center justify-center space-x-4">
+        <div className="flex items-stretch justify-center gap-3">
           <button
             type="button"
             disabled={isBusy}
             onClick={onAddToEnd}
-            className="bg-primary text-primary-foreground w-full py-2 px-4 rounded-lg hover:bg-primary-hover transition-colors flex flex-col items-center gap-y-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-primary"
+            className={actionBtnClass}
           >
             {addQueuePending === "end" ? (
               <AddQueueSpinner />
@@ -74,7 +77,7 @@ const Modal: React.FC<ModalProps> = ({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-6"
+                className="size-8"
               >
                 <path
                   strokeLinecap="round"
@@ -83,14 +86,16 @@ const Modal: React.FC<ModalProps> = ({
                 />
               </svg>
             )}
-            {addQueuePending === "end" ? "Đang thêm…" : "Thêm vào cuối danh sách"}
+            <span className="whitespace-nowrap">
+              {addQueuePending === "end" ? "Đang thêm…" : "Thêm vào cuối danh sách"}
+            </span>
           </button>
 
           <button
             type="button"
             disabled={isBusy}
             onClick={onAddToTop}
-            className="bg-primary text-primary-foreground py-2 w-full px-4 rounded-lg hover:bg-primary-hover transition-colors flex flex-col items-center gap-y-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-primary"
+            className={actionBtnClass}
           >
             {addQueuePending === "top" ? (
               <AddQueueSpinner />
@@ -101,7 +106,7 @@ const Modal: React.FC<ModalProps> = ({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-6"
+                className="size-8"
               >
                 <path
                   strokeLinecap="round"
@@ -110,13 +115,16 @@ const Modal: React.FC<ModalProps> = ({
                 />
               </svg>
             )}
-            {addQueuePending === "top" ? "Đang thêm…" : "Thêm vào đầu danh sách"}
+            <span className="whitespace-nowrap">
+              {addQueuePending === "top" ? "Đang thêm…" : "Thêm vào đầu danh sách"}
+            </span>
           </button>
         </div>
 
         <button
+          type="button"
           onClick={onClose}
-          className="w-full mt-4 py-2 px-4 rounded-lg text-gray-900 hover:bg-primary/15 flex items-center gap-x-2 justify-center transition-colors"
+          className="liquid-glass-btn mt-5 flex w-full items-center justify-center gap-x-2 rounded-2xl py-3.5 text-base text-white/85"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +132,7 @@ const Modal: React.FC<ModalProps> = ({
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-6"
+            className="size-7"
           >
             <path
               strokeLinecap="round"

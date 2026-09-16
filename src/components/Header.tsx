@@ -19,6 +19,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import ReactDOM from "react-dom";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Switch from "./Switch";
 import { toast } from "./ToastContainer";
@@ -440,17 +441,15 @@ const Header: React.FC = () => {
     };
   }, [debouncedNavigate, queryClient]);
 
+  const headerActionClass =
+    "liquid-glass-btn rounded-xl px-1.5 py-0.5 text-white/85";
+
   return (
     <header
-      className="relative z-50 flex items-center justify-between border-b border-primary/35 bg-gradient-to-r from-brand-950 via-brand-900 to-brand-950 px-3 py-2 text-white shadow-[0_3px_18px_-4px_rgba(0,0,0,0.4)]"
+      className="liquid-glass relative z-50 mx-2 mt-1.5 flex items-center justify-between rounded-2xl px-3 py-2 text-white"
       onTouchStart={handleHeaderTouchStart}
       onTouchEnd={handleHeaderTouchEnd}
     >
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-95"
-        aria-hidden
-      />
-
       {/* Logo */}
       <img
         src={logo}
@@ -461,10 +460,10 @@ const Header: React.FC = () => {
 
       {/* Search Input */}
       <div
-        className="relative flex w-1/2 min-w-0 items-center gap-x-2"
+        className="relative flex w-1/2 min-w-0 items-center gap-x-2 px-2"
         ref={searchContainerRef}
       >
-        <form className="relative w-full" onSubmit={handleSearchSubmit}>
+        <form className="relative min-w-0 flex-1" onSubmit={handleSearchSubmit}>
           <input
             ref={inputRef}
             type="text"
@@ -494,7 +493,7 @@ const Header: React.FC = () => {
                 closeSuggestions();
               }, 150);
             }}
-            className="w-full rounded-lg border border-white/10 bg-black/25 py-2 pl-2.5 pr-8 text-sm text-white shadow-inner backdrop-blur-sm placeholder:text-white/45 focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-[border-color,box-shadow]"
+            className="liquid-glass-field w-full rounded-full py-2 pl-3.5 pr-8 text-sm text-white placeholder:text-white/45 focus:border-white/35 focus:outline-none focus:ring-2 focus:ring-white/15 transition-[border-color,box-shadow]"
           />
           {searchState.term && (
             <button
@@ -520,14 +519,12 @@ const Header: React.FC = () => {
               </svg>
             </button>
           )}
-        </form>
-
         {/* Auto Complete Suggestions */}
         {searchState.showSuggestions &&
           songNameSuggestions &&
           songNameSuggestions.length > 0 && (
-            <div className="absolute left-0 top-full z-50 mt-1 max-h-[min(50vh,320px)] w-full overflow-y-auto rounded-lg border border-primary/25 bg-brand-950/92 shadow-xl backdrop-blur-md">
-              <div className="flex items-center justify-between border-b border-primary/20 bg-primary/10">
+            <div className="liquid-glass absolute left-0 top-full z-50 mt-1.5 max-h-[min(50vh,320px)] w-full overflow-y-auto rounded-2xl">
+              <div className="flex items-center justify-between border-b border-white/10">
                 <div className="p-1.5 text-xs font-medium text-white">
                   Gợi ý
                 </div>
@@ -556,7 +553,7 @@ const Header: React.FC = () => {
               {songNameSuggestions?.map((suggestion, index) => (
                 <div
                   key={index}
-                  className="cursor-pointer border-b border-white/5 p-2 text-xs text-white/90 last:border-b-0 hover:bg-primary/15 hover:text-white"
+                  className="cursor-pointer border-b border-white/5 p-2 text-xs text-white/90 last:border-b-0 hover:bg-white/10 hover:text-white"
                   onPointerDown={keepSearchInputFocus}
                   onClick={() => handleSelectSuggestion(suggestion)}
                 >
@@ -565,9 +562,10 @@ const Header: React.FC = () => {
               ))}
             </div>
           )}
+        </form>
 
         <div
-          className="flex items-center gap-x-1.5 rounded-full border border-white/10 bg-black/20 px-2 py-1 backdrop-blur-sm"
+          className="liquid-glass-field flex items-center gap-x-1.5 rounded-full px-2.5 py-1"
           onPointerDown={keepSearchInputFocus}
         >
           <span className="whitespace-nowrap text-xs text-white/85">
@@ -595,11 +593,7 @@ const Header: React.FC = () => {
       {/* Right: Contact with server */}
       <div className="flex shrink-0 items-center gap-1 sm:gap-2 [&_svg]:size-5">
         <button
-          className={
-            !isHomePage
-              ? "opacity-100 rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
-              : "opacity-0"
-          }
+          className={!isHomePage ? headerActionClass : "hidden"}
           onClick={handleHomeNavigation}
           title="Trang chủ"
         >
@@ -611,7 +605,7 @@ const Header: React.FC = () => {
 
         <button
           onClick={() => setIsBookingCodeModalOpen(true)}
-          className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
+          className={headerActionClass}
           title="Nhập mã đặt box"
         >
           <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
@@ -623,7 +617,7 @@ const Header: React.FC = () => {
         {FNB_ORDER_ENABLED && (
           <button
             onClick={handleFnbNavigation}
-            className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
+            className={headerActionClass}
             title="Đặt đồ ăn & thức uống"
           >
             <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
@@ -635,7 +629,7 @@ const Header: React.FC = () => {
 
         <button
           onClick={() => setIsBillModalOpen(true)}
-          className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
+          className={headerActionClass}
           title="Thông tin"
         >
           <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
@@ -659,7 +653,7 @@ const Header: React.FC = () => {
 
         <button
           onClick={() => setIsConfirmSupportModalOpen(true)}
-          className="rounded-lg px-1.5 py-0.5 text-white/80 transition-colors hover:bg-primary/15 hover:text-brand-200"
+          className={headerActionClass}
           title="Gọi nhân viên hỗ trợ"
         >
           <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
@@ -671,10 +665,10 @@ const Header: React.FC = () => {
         <button
           type="button"
           onClick={handleRoomButtonClick}
-          className={`flex flex-col items-center gap-0.5 rounded-lg border px-2 py-0.5 transition-colors ${
+          className={`flex flex-col items-center gap-0.5 rounded-xl border px-2.5 py-0.5 transition-colors ${
             roomId
-              ? "border-primary/40 bg-primary/20 hover:bg-primary/30"
-              : "border-white/20 bg-white/5 hover:bg-white/10"
+              ? "border-primary/45 bg-primary/30 hover:bg-primary/45"
+              : "liquid-glass-btn"
           }`}
           title={ROOM_PIN_ENABLED ? "Nhập mã PIN" : "Chọn phòng"}
           aria-label={
@@ -688,64 +682,54 @@ const Header: React.FC = () => {
         </button>
       </div>
 
-      {/* Confirm Support Modal */}
-      {isConfirmSupportModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100]">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 w-[90%] max-w-md shadow-2xl border border-gray-700 animate-fade-in">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-primary/20 rounded-full">
-                  <BellAlertIcon />
-                </div>
-                <h2 className="text-xl font-bold text-white">Gọi nhân viên</h2>
+      {/* Confirm Support Modal — portal ra body vì header có backdrop-filter (fixed bị giam trong header) */}
+      {isConfirmSupportModalOpen &&
+        ReactDOM.createPortal(
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md">
+          <div className="liquid-glass w-full max-w-md rounded-3xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/30 text-white">
+                <BellAlertIcon />
               </div>
-              <button
-                onClick={() => setIsConfirmSupportModalOpen(false)}
-                className="p-2 hover:bg-gray-700 rounded-full transition-colors"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6 text-gray-400"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+              <h2 className="text-lg font-bold text-white">Gọi nhân viên</h2>
             </div>
-
-            {/* Content */}
-            <p className="text-gray-300 text-center mb-8">
+            <p className="mb-6 text-sm text-white/70">
               Bạn có muốn yêu cầu nhân viên hỗ trợ không?
             </p>
-
-            {/* Buttons */}
-            <div className="flex gap-4">
-              <button
-                onClick={() => setIsConfirmSupportModalOpen(false)}
-                className="flex-1 py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-xl transition-colors"
+            <button
+              type="button"
+              onClick={() => {
+                setIsConfirmSupportModalOpen(false);
+                handleNotification();
+              }}
+              className="flex w-full items-center justify-center rounded-2xl border border-primary/40 bg-primary/80 px-4 py-3 text-sm font-medium text-primary-foreground shadow-brand-soft transition-colors hover:bg-primary"
+            >
+              Gọi nhân viên
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsConfirmSupportModalOpen(false)}
+              className="liquid-glass-btn mt-3 flex w-full items-center justify-center gap-x-2 rounded-2xl py-2.5 text-white/85"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
               >
-                Đóng
-              </button>
-              <button
-                onClick={() => {
-                  setIsConfirmSupportModalOpen(false);
-                  handleNotification();
-                }}
-                className="flex-1 py-3 px-4 bg-gradient-to-r from-primary to-primary-deep hover:from-primary-hover hover:to-primary-deeper text-primary-foreground font-bold rounded-xl transition-all shadow-brand-glow"
-              >
-                Gọi nhân viên
-              </button>
-            </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+              Đóng
+            </button>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {/* Booking Code Modal */}
@@ -755,38 +739,43 @@ const Header: React.FC = () => {
         roomId={roomId}
       />
 
-      {/* Bill Modal (chỉ fetch khi mở) */}
-      {isBillModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[130]">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 w-[90%] max-w-xl shadow-2xl border border-gray-700 relative">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white">
+      {/* Bill Modal (chỉ fetch khi mở) — portal ra body vì header có backdrop-filter */}
+      {isBillModalOpen &&
+        ReactDOM.createPortal(
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md">
+          <div className="liquid-glass relative flex max-h-[min(85vh,36rem)] w-full max-w-xl flex-col overflow-hidden rounded-3xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
+            <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
+              <h2 className="text-lg font-bold text-white">
                 Thông tin phòng {roomDisplayNumber ?? "?"}
               </h2>
               <button
+                type="button"
                 onClick={() => setIsBillModalOpen(false)}
-                className="p-2 rounded-full hover:bg-white/10"
+                className="liquid-glass-btn flex size-9 items-center justify-center rounded-full text-white/80"
                 aria-label="Đóng bill"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6"
+                  className="size-6"
                 >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
+                    d="M6 18 18 6M6 6l12 12"
                   />
                 </svg>
               </button>
             </div>
-            <BillSummary autoFetch onClose={() => setIsBillModalOpen(false)} />
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <BillSummary autoFetch onClose={() => setIsBillModalOpen(false)} />
+            </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {isPinModalOpen && (

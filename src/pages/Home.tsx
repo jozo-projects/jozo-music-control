@@ -111,7 +111,7 @@ const Home: React.FC = () => {
               {Array.from({ length: 6 }, (_, index) => (
                 <div
                   key={index}
-                  className="h-60 animate-pulse rounded-lg bg-white/20"
+                  className="h-60 animate-pulse rounded-2xl bg-white/10"
                 />
               ))}
             </div>

@@ -6,10 +6,18 @@ import {
   usePlayChosenSong,
 } from "@/hooks/useQueueMutations";
 import { useQueueQuery } from "@/hooks/useQueueQuery";
+import { useNowPlayingExpand } from "@/contexts/NowPlayingExpandContext";
 import { useSocket } from "@/contexts/SocketContext";
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -32,7 +40,6 @@ interface Song {
   video_id: string;
 }
 
-// Play Now Modal Component as a portal
 const PlayNowModal = ({
   isOpen,
   onClose,
@@ -47,49 +54,47 @@ const PlayNowModal = ({
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white w-full md:w-3/4 lg:w-1/2 xl:w-1/3 rounded-lg shadow-lg p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">
-          Phát ngay bài hát
-        </h2>
-        <div className="flex items-center mb-4">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md">
+      <div className="liquid-glass w-full max-w-md rounded-3xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
+        <h2 className="mb-4 text-lg font-bold text-white">Phát ngay bài hát</h2>
+        <div className="mb-5 flex items-center gap-3">
           <img
             src={song.thumbnail}
             alt={song.title}
-            className="w-16 h-16 object-cover rounded-lg mr-4"
+            className="size-16 rounded-xl object-cover ring-1 ring-primary/40"
           />
-          <div>
-            <p className="font-bold text-gray-900">{song.title}</p>
-            <p className="text-gray-700">{song.author}</p>
+          <div className="min-w-0">
+            <p className="truncate font-semibold text-white">{song.title}</p>
+            <p className="truncate text-sm text-white/55">{song.author}</p>
           </div>
         </div>
 
-        <div className="flex items-center justify-center space-x-4">
-          <button
-            onClick={onPlayNow}
-            className="bg-primary text-primary-foreground py-2 w-full px-4 rounded-lg hover:bg-primary-hover transition-colors flex flex-col items-center gap-y-2"
+        <button
+          type="button"
+          onClick={onPlayNow}
+          className="flex w-full flex-col items-center gap-y-2 rounded-2xl border border-primary/40 bg-primary/80 px-4 py-3 text-sm font-medium text-primary-foreground shadow-brand-soft transition-colors hover:bg-primary"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
-              />
-            </svg>
-            Phát Ngay
-          </button>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+            />
+          </svg>
+          Phát ngay
+        </button>
 
         <button
+          type="button"
           onClick={onClose}
-          className="w-full mt-4 py-2 px-4 rounded-lg text-gray-900 hover:bg-primary/15 flex items-center gap-x-2 justify-center transition-colors"
+          className="liquid-glass-btn mt-3 flex w-full items-center justify-center gap-x-2 rounded-2xl py-2.5 text-white/85"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -146,8 +151,7 @@ const SortableQueueItem = ({
     touchAction: isDragging ? "none" : "auto",
     zIndex: isDragging ? 1000 : 1,
     position: "relative" as const,
-    opacity: isDragging ? 0.5 : 1,
-    backgroundColor: isDragging ? "rgba(255, 255, 255, 0.1)" : "transparent",
+    opacity: isDragging ? 0.7 : 1,
   };
 
   const handleItemClick = () => {
@@ -185,52 +189,53 @@ const SortableQueueItem = ({
         ref={setNodeRef}
         style={style}
         {...attributes}
-        className={`flex items-center space-x-4 mb-4 relative rounded-lg p-2 transition-colors${
-          isDragging ? "shadow-lg" : ""
+        onClick={handleItemClick}
+        className={`mb-2 flex w-full min-w-0 cursor-pointer items-center gap-2 rounded-xl bg-white/[0.07] p-2 ring-1 ring-white/10 ${
+          isDragging ? "shadow-brand-glow ring-white/25" : ""
         }`}
       >
-        <div className="flex items-center space-x-4 w-full">
+        <div className="relative shrink-0">
+          <img
+            src={song.thumbnail}
+            alt=""
+            className="size-11 rounded-lg object-cover ring-1 ring-white/10"
+          />
+          <span className="absolute -left-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-brand-soft">
+            {idx + 1}
+          </span>
+        </div>
+        <div className="min-w-0 flex-1 overflow-hidden">
+          <p className="line-clamp-2 text-sm font-semibold leading-snug text-white select-none">
+            {song.title}
+          </p>
+          <p className="mt-0.5 truncate text-xs text-white/55 select-none">
+            {song.author}
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col items-center gap-0.5">
           <div
             {...listeners}
-            className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-white touch-none select-none"
+            className="cursor-grab touch-none select-none rounded-md p-1 text-white/40 hover:text-white/80 active:cursor-grabbing"
             onClick={(e) => e.stopPropagation()}
+            aria-label="Kéo để sắp xếp"
+            role="button"
           >
-            <DragHandleIcon />
+            <DragHandleIcon className="size-4" />
           </div>
-          <div
-            className="flex items-center space-x-4 w-full cursor-pointer"
-            onClick={handleItemClick}
+          <button
+            type="button"
+            className="flex size-7 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(idx);
+            }}
+            aria-label="Xóa bài hát"
           >
-            <img
-              src={song.thumbnail}
-              alt={song.title}
-              className="w-12 h-12 object-cover rounded-lg"
-            />
-            <div className="flex justify-between items-center w-full max-w-[calc(100%-56px)]">
-              <div className="flex-1 min-w-0">
-                <p className="font-bold truncate marquee hover:marquee-animation max-w-[200px] user-select-none">
-                  {song.title}
-                </p>
-                <p className="text-sm text-gray-400 truncate marquee-text hover:marquee-animation user-select-none">
-                  {song.author}
-                </p>
-              </div>
-              <button
-                className="p-2 text-gray-400 hover:text-white transition-colors flex items-center min-w-[40px] min-h-[40px]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemove(idx);
-                }}
-                aria-label="Xóa bài hát"
-              >
-                <RemoveIcon />
-              </button>
-            </div>
-          </div>
+            <RemoveIcon />
+          </button>
         </div>
       </div>
 
-      {/* Play Now Modal as Portal */}
       <PlayNowModal
         isOpen={showPlayPopup}
         onClose={handleClosePopup}
@@ -243,6 +248,7 @@ const SortableQueueItem = ({
 
 const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true }) => {
   const { data: queueData } = useQueueQuery();
+  const { expand } = useNowPlayingExpand();
 
   const { mutate: removeSongFromQueue } = useRemoveSongFromQueue();
 
@@ -254,6 +260,12 @@ const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true }) => {
   const { mutate: removeAllSongs } = useRemoveAllSongs();
 
   const { mutate: updateQueueOrder } = useUpdateQueueOrder();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+  );
 
   const handleRemoveAll = () => {
     removeAllSongs({ roomId: roomId });
@@ -287,88 +299,134 @@ const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true }) => {
     }
   };
 
+  const nowPlaying = queueData?.result?.nowPlaying;
+  const queueCount = items.length;
+
   return (
     <div
-      className={`flex h-full min-h-0 w-full flex-col bg-transparent text-white shadow-md ${
+      className={`flex h-full min-h-0 w-full flex-col py-4 text-white ${
         isOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-100"
       }`}
     >
-      <div className="flex min-h-0 flex-1 flex-col">
-        {/* Now Playing */}
-        {queueData?.result?.nowPlaying && (
-          <div className="p-4 border-b border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-400">Đang phát</h3>
-            <div className="flex items-center space-x-4 mt-3">
-              <img
-                src={queueData?.result?.nowPlaying?.thumbnail}
-                alt={queueData?.result?.nowPlaying?.title}
-                className="w-16 h-16 object-cover rounded-lg"
-              />
-              <div>
-                <p className="font-bold truncate user-select-none">
-                  {queueData?.result?.nowPlaying?.title}
+      <div className="liquid-glass flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl">
+        {nowPlaying && (
+          <div className="shrink-0 px-3.5 pb-3 pt-3.5">
+            <div className="mb-2.5 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="now-playing-eq" aria-hidden>
+                  <span />
+                  <span />
+                  <span />
+                </span>
+                <h3 className="text-sm font-semibold text-white/70">Đang phát</h3>
+              </div>
+              <span className="text-[10px] text-white/45">Toàn màn hình</span>
+            </div>
+            <button
+              type="button"
+              onClick={expand}
+              className="flex min-w-0 w-full items-center gap-3 rounded-xl text-left transition-colors hover:bg-white/5"
+              aria-label="Mở toàn màn hình bài đang phát"
+            >
+              <span className="relative shrink-0">
+                <img
+                  src={nowPlaying.thumbnail}
+                  alt={nowPlaying.title}
+                  className="size-14 rounded-xl object-cover ring-1 ring-primary/45"
+                />
+                <span className="liquid-glass-orb absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="size-3"
+                    aria-hidden
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.75 9V3.75H9M20.25 9V3.75H15M20.25 15v5.25H15M3.75 15v5.25H9"
+                    />
+                  </svg>
+                </span>
+              </span>
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <p className="line-clamp-2 text-sm font-semibold leading-snug text-white select-none">
+                  {nowPlaying.title}
                 </p>
-                <p className="text-sm text-gray-400 truncate user-select-none">
-                  {queueData?.result?.nowPlaying?.author}
+                <p className="mt-0.5 truncate text-xs text-white/55 select-none">
+                  {nowPlaying.author}
                 </p>
               </div>
-            </div>
+            </button>
           </div>
         )}
 
-        {/* Waiting Queue - phần scroll */}
+        {nowPlaying && <div className="mx-3.5 h-px bg-primary/25" />}
+
         <div
-          className="flex-1 min-h-0 overflow-y-auto bg-black/50"
+          className="queue-scroll min-h-0 flex-1 overflow-y-auto"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
-          <div
-            className="p-4"
-            style={{
-              paddingBottom: `${Math.max(
-                100,
-                (queueData?.result?.queue?.length || 0) * 10,
-              )}px`,
-            }}
-          >
-            <div className="flex justify-between items-center mb-5">
-              <h3 className="text-sm font-semibold text-gray-400">
-                Danh sách chờ
+          <div className="px-3.5 pb-4 pt-3">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <h3 className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-white/70">
+                <span className="truncate">Danh sách chờ</span>
+                <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/35 px-1.5 text-[11px] font-semibold text-white">
+                  {queueCount}
+                </span>
               </h3>
-              {!!queueData?.result?.queue?.length && (
+              {queueCount > 0 && (
                 <button
-                  className="text-gray-400 hover:text-white flex items-center gap-x-3 p-2"
+                  type="button"
+                  className="liquid-glass-btn flex size-8 shrink-0 items-center justify-center rounded-xl text-white/70"
                   onClick={handleRemoveAll}
+                  aria-label="Xóa hết"
                 >
-                  Xóa tất cả
                   <RemoveIcon />
                 </button>
               )}
             </div>
-            <DndContext
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={items.map((song, idx) => `${idx}-${song.title}`)}
-                strategy={verticalListSortingStrategy}
+
+            {queueCount === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/15 px-4 py-10 text-center">
+                <p className="text-sm text-white/55">
+                  Chưa có bài hát trong hàng chờ
+                </p>
+                <p className="mt-1 text-xs text-white/35">
+                  Chọn một bài để thêm vào danh sách
+                </p>
+              </div>
+            ) : (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
               >
-                <div className="overflow-visible pb-20">
-                  {items.map((song, idx) => (
-                    <SortableQueueItem
-                      key={`${idx}-${song.title}`}
-                      song={song}
-                      idx={idx}
-                      onRemove={(idx) => {
-                        removeSongFromQueue({
-                          videoIndex: idx,
-                          roomId: roomId,
-                        });
-                      }}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
+                <SortableContext
+                  items={items.map((song, idx) => `${idx}-${song.title}`)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="w-full min-w-0">
+                    {items.map((song, idx) => (
+                      <SortableQueueItem
+                        key={`${idx}-${song.title}`}
+                        song={song}
+                        idx={idx}
+                        onRemove={(index) => {
+                          removeSongFromQueue({
+                            videoIndex: index,
+                            roomId: roomId,
+                          });
+                        }}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            )}
           </div>
         </div>
       </div>

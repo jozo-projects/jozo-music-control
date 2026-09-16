@@ -4,6 +4,7 @@ import GiftModal from "@/components/GiftModal";
 import Header from "@/components/Header";
 import QueueSidebar from "@/components/QueueSidebar";
 import { useImageBackground } from "@/contexts/ImageBackgroundContext";
+import { NowPlayingExpandProvider } from "@/contexts/NowPlayingExpandContext";
 import { QueueAddProvider } from "@/contexts/QueueAddContext";
 import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
@@ -18,27 +19,25 @@ const Layout: React.FC = () => {
 
   return (
     <QueueAddProvider>
-    <div className="flex flex-col h-screen bg-brand-950 text-white">
+    <NowPlayingExpandProvider>
+    <div
+      className="relative flex h-screen flex-col overflow-hidden bg-brand-950 text-white"
+      style={{
+        backgroundImage: selectedBackground
+          ? `url(${JSON.stringify(selectedBackground.imageUrl)})`
+          : undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="pointer-events-none absolute inset-0 z-0 bg-black/45" aria-hidden />
+
       {/* Header */}
       <Header />
 
-      {/* Queue Sidebar */}
-
       {/* Main */}
-      <main
-        className="flex-1 relative overflow-hidden rounded-3xl bg-secondary"
-        style={{
-          backgroundImage: selectedBackground
-            ? `url(${JSON.stringify(selectedBackground.imageUrl)})`
-            : undefined,
-          backgroundSize: "cover",
-          backgroundPosition: "center center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        {/* Background Overlay for Blur Effect */}
-        <div className="pointer-events-none absolute inset-0 bg-black/40" aria-hidden />
-
+      <main className="relative z-10 flex-1 overflow-hidden">
         {/* Outlet Content */}
         <div className="relative z-20 grid h-full min-h-0 grid-cols-12">
           <div
@@ -52,7 +51,7 @@ const Layout: React.FC = () => {
 
           {/* Queue Sidebar */}
           {canShowQueue && (
-            <div className="relative z-0 col-span-4 flex min-h-0 h-[calc(100vh-9.5rem)] flex-col overflow-hidden">
+            <div className="relative z-0 col-span-4 flex min-h-0 h-[calc(100vh-9.5rem)] flex-col overflow-hidden pr-2">
               <QueueSidebar />
             </div>
           )}
@@ -66,6 +65,7 @@ const Layout: React.FC = () => {
       {/* Gift Modal */}
       <GiftModal />
     </div>
+    </NowPlayingExpandProvider>
     </QueueAddProvider>
   );
 };

@@ -9,6 +9,8 @@ import {
   VolumeMutedIcon,
 } from "@/assets/icons/VolumeIcons";
 import { PlaybackState } from "@/constant/enum";
+import NowPlayingFullscreen from "@/components/NowPlayingFullscreen";
+import { useNowPlayingExpand } from "@/contexts/NowPlayingExpandContext";
 import { usePlayNextSong } from "@/hooks/useQueueMutations";
 import { useQueueQuery } from "@/hooks/useQueueQuery";
 import { useSocket } from "@/contexts/SocketContext";
@@ -40,6 +42,7 @@ const ControlBar: React.FC = () => {
   const [volume, setVolume] = useState(50);
 
   const { data: queueData, refetch } = useQueueQuery();
+  const { isExpanded, expand, collapse } = useNowPlayingExpand();
 
   const { mutate: playNextSong, isPending: isNextSongPending } =
     usePlayNextSong();
@@ -388,6 +391,12 @@ const ControlBar: React.FC = () => {
   const displayCurrentTime = isNowPlaying ? currentTime : 0;
   const displayDuration = isNowPlaying ? duration : 0;
 
+  useEffect(() => {
+    if (!nowPlayingId && isExpanded) {
+      collapse();
+    }
+  }, [nowPlayingId, isExpanded, collapse]);
+
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = Number(e.target.value);
     setVolume(newVolume);
@@ -412,15 +421,39 @@ const ControlBar: React.FC = () => {
 
   return (
     <>
-      <div className="z-30 flex items-center justify-between gap-x-3 rounded-2xl border border-primary/25 bg-brand-950 px-3 py-1.5 text-white shadow-md sm:px-4 sm:py-2">
+      <div className="liquid-glass z-30 flex items-center justify-between gap-x-3 rounded-2xl px-3 py-1.5 text-white sm:px-4 sm:py-2">
         <div className="flex min-w-0 flex-shrink-0 items-center space-x-2 sm:space-x-3">
           {nowPlayingId ? (
-            <>
-              <img
-                src={queueData.result.nowPlaying.thumbnail}
-                alt="Current Song"
-                className="h-10 w-10 shrink-0 rounded object-cover sm:h-11 sm:w-11"
-              />
+            <button
+              type="button"
+              onClick={expand}
+              className="flex min-w-0 items-center space-x-2 text-left sm:space-x-3"
+              aria-label="Mở toàn màn hình bài đang phát"
+            >
+              <span className="relative shrink-0">
+                <img
+                  src={queueData.result.nowPlaying.thumbnail}
+                  alt="Current Song"
+                  className="h-10 w-10 rounded-xl object-cover ring-1 ring-white/20 sm:h-11 sm:w-11"
+                />
+                <span className="liquid-glass-orb absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="size-3"
+                    aria-hidden
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.75 9V3.75H9M20.25 9V3.75H15M20.25 15v5.25H15M3.75 15v5.25H9"
+                    />
+                  </svg>
+                </span>
+              </span>
               <div className="min-w-0">
                 <div className="max-w-[9rem] overflow-hidden sm:max-w-[11rem] md:max-w-[14rem]">
                   <p className="animate-marquee text-xs font-bold whitespace-nowrap sm:text-sm">
@@ -431,7 +464,7 @@ const ControlBar: React.FC = () => {
                   {queueData.result.nowPlaying.author}
                 </p>
               </div>
-            </>
+            </button>
           ) : (
             <div className="text-[10px] text-gray-400 sm:text-xs">
               Hãy tìm kiếm và thêm bài hát vào danh sách phát
@@ -439,15 +472,15 @@ const ControlBar: React.FC = () => {
           )}
         </div>
         <div className="flex w-full min-w-0 flex-col items-center gap-y-2">
-          <div className="flex items-center space-x-4 sm:space-x-5">
+          <div className="flex items-center space-x-3 sm:space-x-4">
             <button
               onClick={handlePlayback}
               disabled={!nowPlayingId}
-              className={
+              className={`rounded-full p-1 text-white/90 transition-colors ${
                 !nowPlayingId
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:opacity-80"
-              }
+                  ? "cursor-not-allowed opacity-40"
+                  : "hover:bg-white/12"
+              }`}
             >
               {isPlaying ? <PauseIcon /> : <PlayIcon />}
             </button>
@@ -458,16 +491,16 @@ const ControlBar: React.FC = () => {
                 !queueData?.result?.queue?.length ||
                 isNextSongPending
               }
-              className={
+              className={`rounded-full p-1 text-white/90 transition-colors ${
                 !nowPlayingId ||
                 !queueData?.result?.queue?.length ||
                 isNextSongPending
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:opacity-80"
-              }
+                  ? "cursor-not-allowed opacity-40"
+                  : "hover:bg-white/12"
+              }`}
             >
               <ForwardIcon />
-              {isNextSongPending && <span className="ml-1">...</span>}
+              {isNextSongPending && <span className="ml-1 text-[10px]">...</span>}
             </button>
           </div>
 
@@ -477,9 +510,9 @@ const ControlBar: React.FC = () => {
                 {formatTime(displayCurrentTime)}
               </span>
               <div className="relative flex h-7 flex-1 touch-none items-center">
-                <div className="pointer-events-none absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-gray-500" />
+                <div className="pointer-events-none absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-white/15" />
                 <div
-                  className="pointer-events-none absolute top-1/2 left-0 z-[5] h-2 -translate-y-1/2 rounded-full bg-primary transition-all duration-75"
+                  className="pointer-events-none absolute top-1/2 left-0 z-[5] h-1.5 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_10px_rgba(195,10,10,0.55)] transition-all duration-75"
                   style={{
                     width: `${(displayCurrentTime / displayDuration) * 100}%`,
                   }}
@@ -499,7 +532,7 @@ const ControlBar: React.FC = () => {
                   }
                   onChange={(e) => handleDrag(Number(e.target.value))}
                   className="absolute inset-0 z-10 h-full w-full cursor-pointer appearance-none bg-transparent touch-none
-                    [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-30 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-[0_0_0_4px_rgba(0,0,0,0.2)] [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
+                    [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-30 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-white/40 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-[0_0_0_3px_rgba(195,10,10,0.28)] [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
                     [&::-moz-range-thumb]:relative [&::-moz-range-thumb]:z-30 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:transition-all [&::-moz-range-thumb]:duration-150
                     [&::-ms-thumb]:relative [&::-ms-thumb]:z-30 [&::-ms-thumb]:h-4 [&::-ms-thumb]:w-4 [&::-ms-thumb]:appearance-none [&::-ms-thumb]:rounded-full [&::-ms-thumb]:bg-primary [&::-ms-thumb]:transition-all [&::-ms-thumb]:duration-150"
                   style={{
@@ -520,9 +553,9 @@ const ControlBar: React.FC = () => {
           <div className="flex items-center space-x-1.5 sm:space-x-2">
             <div className="text-white">{renderVolumeIcon()}</div>
             <div className="relative w-20 sm:w-24">
-              <div className="absolute top-1/2 left-0 h-2 w-full bg-gray-500 rounded-full -translate-y-1/2"></div>
+              <div className="absolute top-1/2 left-0 h-1.5 w-full -translate-y-1/2 rounded-full bg-white/15"></div>
               <div
-                className="absolute z-10 top-1/2 left-0 h-2 bg-primary rounded-full -translate-y-1/2 transition-all duration-75"
+                className="absolute z-10 top-1/2 left-0 h-1.5 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_8px_rgba(195,10,10,0.5)] transition-all duration-75"
                 style={{
                   width: `${volume}%`,
                 }}
@@ -534,13 +567,46 @@ const ControlBar: React.FC = () => {
                 value={volume}
                 onChange={handleVolumeChange}
                 className="absolute z-10 w-full appearance-none bg-transparent h-2 cursor-pointer -translate-y-1/2
-                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-30
-                    [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:relative [&::-moz-range-thumb]:z-30"
+                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-white/40 [&::-webkit-slider-thumb]:relative [&::-webkit-slider-thumb]:z-30
+                    [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:relative [&::-moz-range-thumb]:z-30"
               />
             </div>
           </div>
+          {nowPlayingId && (
+            <button
+              type="button"
+              onClick={expand}
+              className="liquid-glass-orb flex size-10 items-center justify-center rounded-full text-white"
+              aria-label="Mở toàn màn hình"
+              title="Toàn màn hình"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.8}
+                stroke="currentColor"
+                className="size-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 9V3.75H9M20.25 9V3.75H15M20.25 15v5.25H15M3.75 15v5.25H9"
+                />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
+      {queueData?.result.nowPlaying && (
+        <NowPlayingFullscreen
+          open={isExpanded}
+          song={queueData.result.nowPlaying}
+          currentTime={displayCurrentTime}
+          duration={displayDuration}
+          onClose={collapse}
+        />
+      )}
     </>
   );
 };
