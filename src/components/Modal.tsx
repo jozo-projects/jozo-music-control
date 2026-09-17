@@ -55,7 +55,7 @@ const Modal: React.FC<ModalProps> = ({
   if (typeof document === "undefined") return null;
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
       <div className="liquid-glass w-full max-w-xl rounded-3xl p-8 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
         <h2 className="mb-2 text-xl font-bold text-white">Chọn hành động</h2>
         <p className="mb-8 text-base text-white/70">

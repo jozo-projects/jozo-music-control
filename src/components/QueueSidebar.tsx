@@ -54,7 +54,7 @@ const PlayNowModal = ({
   if (!isOpen) return null;
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
       <div className="liquid-glass w-full max-w-md rounded-3xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
         <h2 className="mb-4 text-lg font-bold text-white">Phát ngay bài hát</h2>
         <div className="mb-5 flex items-center gap-3">

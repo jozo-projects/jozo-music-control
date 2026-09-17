@@ -189,7 +189,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({
           <>
             {isEndConfirmOpen && (
               <div
-                className="fixed inset-0 z-[220] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md"
+                className="fixed inset-0 z-[220] flex items-center justify-center bg-black/50 p-4"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="end-session-confirm-title"
@@ -241,7 +241,7 @@ const BillSummary: React.FC<BillSummaryProps> = ({
 
             {isEndSuccessOpen && (
               <div
-                className="fixed inset-0 z-[220] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md"
+                className="fixed inset-0 z-[220] flex items-center justify-center bg-black/50 p-4"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="end-session-success-title"

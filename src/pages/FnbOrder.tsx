@@ -598,7 +598,7 @@ const FnbOrder: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-brand-50/90 to-neutral-50">
       {/* Compact Header */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-100">
         <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-2.5">
           <h1 className="text-base md:text-lg font-bold text-gray-800 shrink-0">
             Đặt món
@@ -691,9 +691,9 @@ const FnbOrder: React.FC = () => {
       <div className="pb-8">
         {activeTab === "menu" ? (
           <div className="relative">
-            {/* macOS-style Category Dock — glass, item cuộn phía sau */}
+            {/* Category dock — nền đục, không backdrop-blur (tablet 4GB) */}
             <div className="fixed left-1.5 md:left-2 top-1/2 z-20 -translate-y-1/2 pointer-events-none">
-              <div className="pointer-events-auto isolate flex flex-col items-center gap-1.5 rounded-xl border border-white/35 bg-white/15 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-2xl backdrop-saturate-150 md:rounded-2xl md:p-2">
+              <div className="pointer-events-auto isolate flex flex-col items-center gap-1.5 rounded-xl border border-gray-200 bg-white/95 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.12)] md:rounded-2xl md:p-2">
                 <p className="text-[8px] md:text-[9px] font-semibold text-gray-400 uppercase tracking-wide px-0.5 text-center leading-tight">
                   Chọn
                   <br />
@@ -708,7 +708,7 @@ const FnbOrder: React.FC = () => {
                       key={category.id}
                       className={`group flex flex-col items-center gap-0.5 w-[3.75rem] md:w-[4rem] py-1.5 px-0.5 rounded-lg md:rounded-xl transition-all duration-200 ${
                         isActive
-                          ? "bg-primary/15 ring-2 ring-primary shadow-brand-soft scale-105 backdrop-blur-sm"
+                          ? "bg-primary/15 ring-2 ring-primary shadow-brand-soft scale-105"
                           : "hover:bg-white/40 hover:shadow-md hover:scale-105"
                       }`}
                       onClick={() => setSelectedCategory(category.id)}
@@ -718,10 +718,10 @@ const FnbOrder: React.FC = () => {
                           isActive
                             ? "bg-primary text-primary-foreground"
                             : isSnackCategory(category.id)
-                              ? "bg-amber-50/70 text-amber-600 backdrop-blur-sm"
+                              ? "bg-amber-50 text-amber-600"
                               : isDrinkCategory(category.id)
-                                ? "bg-sky-50/70 text-sky-500 backdrop-blur-sm"
-                                : "bg-white/50 text-gray-600 backdrop-blur-sm"
+                                ? "bg-sky-50 text-sky-500"
+                                : "bg-gray-100 text-gray-600"
                         }`}
                       >
                         {config.icon}

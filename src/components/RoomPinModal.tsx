@@ -74,7 +74,7 @@ const RoomPinModal: React.FC<RoomPinModalProps> = ({
 
   return ReactDOM.createPortal(
     <div
-      className={`${fixed ? "fixed" : "absolute"} inset-0 z-[130] flex items-center justify-center bg-black/70 backdrop-blur-sm`}
+      className={`${fixed ? "fixed" : "absolute"} inset-0 z-[130] flex items-center justify-center bg-black/70`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="room-pin-title"

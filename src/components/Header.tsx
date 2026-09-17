@@ -682,10 +682,10 @@ const Header: React.FC = () => {
         </button>
       </div>
 
-      {/* Confirm Support Modal — portal ra body vì header có backdrop-filter (fixed bị giam trong header) */}
+      {/* Confirm Support Modal — portal ra body để overlay phủ cả màn hình */}
       {isConfirmSupportModalOpen &&
         ReactDOM.createPortal(
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
           <div className="liquid-glass w-full max-w-md rounded-3xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
             <div className="mb-4 flex items-center gap-3">
               <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/30 text-white">
@@ -739,10 +739,10 @@ const Header: React.FC = () => {
         roomId={roomId}
       />
 
-      {/* Bill Modal (chỉ fetch khi mở) — portal ra body vì header có backdrop-filter */}
+      {/* Bill Modal (chỉ fetch khi mở) — portal ra body để overlay phủ cả màn hình */}
       {isBillModalOpen &&
         ReactDOM.createPortal(
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4 backdrop-blur-md">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
           <div className="liquid-glass relative flex max-h-[min(85vh,36rem)] w-full max-w-xl flex-col overflow-hidden rounded-3xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
             <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
               <h2 className="text-lg font-bold text-white">

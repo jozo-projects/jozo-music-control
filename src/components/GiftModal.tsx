@@ -389,7 +389,7 @@ const GiftModal = () => {
       {/* Modal chúc mừng khi mở quà thành công — tối ưu cho màn ~10 inch */}
       {showCongratsModal && realGift && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-black/60"
           onClick={() => setShowCongratsModal(false)}
         >
           <div
@@ -449,7 +449,7 @@ const GiftModal = () => {
         onClick={handleClose}
       >
         <div
-          className="p-6 overflow-y-auto bg-black bg-opacity-70 backdrop-blur-md rounded-lg relative"
+          className="p-6 overflow-y-auto bg-black/80 rounded-lg relative"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close Button */}

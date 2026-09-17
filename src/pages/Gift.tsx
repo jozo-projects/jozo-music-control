@@ -402,7 +402,7 @@ const Gift: React.FC = () => {
       {/* Modal chúc mừng khi mở quà thành công — gọn, vừa màn hình */}
       {showCongratsModal && realGift && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-2 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 bg-black/60"
           onClick={() => setShowCongratsModal(false)}
         >
           <div
@@ -457,7 +457,7 @@ const Gift: React.FC = () => {
         </div>
       )}
 
-      <div className="h-full overflow-y-auto bg-black/70 backdrop-blur-md rounded-2xl p-6 text-white relative">
+      <div className="h-full overflow-y-auto bg-black/80 rounded-2xl p-6 text-white relative">
         {/* Nút quay lại */}
         {!isPending && (
           <button

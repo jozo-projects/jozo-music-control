@@ -91,7 +91,7 @@ const RoomSelectModal: React.FC<RoomSelectModalProps> = ({
 
   return ReactDOM.createPortal(
     <div
-      className="fixed inset-0 z-[125] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[125] flex items-center justify-center bg-black/60 p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Chọn phòng"
