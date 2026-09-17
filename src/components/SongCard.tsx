@@ -74,7 +74,7 @@ const SongCard: React.FC<SongCardProps> = React.memo(
     return (
       <>
         <div
-          className="liquid-glass-card cursor-pointer overflow-hidden rounded-2xl transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-brand-glow active:scale-[0.99] touch-manipulation select-none"
+          className="liquid-glass-card cursor-pointer overflow-hidden rounded-2xl transition-transform duration-200 active:scale-[0.99] touch-manipulation select-none"
           onTouchStart={handleTouchStart}
           onClick={openModal}
         >

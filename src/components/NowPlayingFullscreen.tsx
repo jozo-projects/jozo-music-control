@@ -87,7 +87,7 @@ const NowPlayingFullscreen: React.FC<NowPlayingFullscreenProps> = ({
       <img
         src={artwork}
         alt=""
-        className="pointer-events-none absolute inset-0 h-full w-full scale-125 object-cover blur-2xl brightness-[0.6] saturate-150"
+        className="now-playing-backdrop pointer-events-none absolute inset-0 h-full w-full object-cover"
         aria-hidden
       />
       <div
