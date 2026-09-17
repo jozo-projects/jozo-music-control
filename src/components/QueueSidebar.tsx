@@ -194,6 +194,15 @@ const SortableQueueItem = ({
           isDragging ? "shadow-brand-glow ring-white/25" : ""
         }`}
       >
+        <div
+          {...listeners}
+          className="flex size-8 shrink-0 cursor-grab touch-none select-none items-center justify-center rounded-md text-white/45 hover:bg-white/10 hover:text-white/85 active:cursor-grabbing"
+          onClick={(e) => e.stopPropagation()}
+          aria-label="Kéo để sắp xếp"
+          role="button"
+        >
+          <DragHandleIcon className="size-6" />
+        </div>
         <div className="relative shrink-0">
           <img
             src={song.thumbnail}
@@ -212,28 +221,17 @@ const SortableQueueItem = ({
             {song.author}
           </p>
         </div>
-        <div className="flex shrink-0 flex-col items-center gap-0.5">
-          <div
-            {...listeners}
-            className="cursor-grab touch-none select-none rounded-md p-1 text-white/40 hover:text-white/80 active:cursor-grabbing"
-            onClick={(e) => e.stopPropagation()}
-            aria-label="Kéo để sắp xếp"
-            role="button"
-          >
-            <DragHandleIcon className="size-4" />
-          </div>
-          <button
-            type="button"
-            className="flex size-7 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove(idx);
-            }}
-            aria-label="Xóa bài hát"
-          >
-            <RemoveIcon />
-          </button>
-        </div>
+        <button
+          type="button"
+          className="flex size-7 shrink-0 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(idx);
+          }}
+          aria-label="Xóa bài hát"
+        >
+          <RemoveIcon />
+        </button>
       </div>
 
       <PlayNowModal
