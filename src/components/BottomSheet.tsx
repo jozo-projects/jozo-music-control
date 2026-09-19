@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -59,40 +60,40 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     e.stopPropagation();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === "undefined") return null;
 
-  return (
+  return ReactDOM.createPortal(
     <>
       {/* Backdrop */}
       <div
         ref={backdropRef}
-        className="fixed inset-0 bg-black bg-opacity-0 z-50 transition-all duration-300 ease-out backdrop"
+        className="backdrop fixed inset-0 z-[140] bg-black/55 transition-all duration-300 ease-out"
         onClick={handleBackdropClick}
       />
 
       {/* Bottom Sheet */}
       <div
         ref={sheetRef}
-        className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 overflow-hidden transform translate-y-full transition-all duration-300 ease-out bottom-sheet"
+        className="bottom-sheet fixed bottom-0 left-0 right-0 z-[140] flex flex-col overflow-hidden rounded-t-3xl bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl transition-all duration-300 ease-out"
         style={{ maxHeight }}
         onClick={handleSheetClick}
       >
         {/* Handle */}
-        <div className="flex justify-center pt-3 pb-2">
-          <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
+        <div className="flex shrink-0 justify-center pt-3 pb-2">
+          <div className="h-1 w-12 rounded-full bg-gray-300"></div>
         </div>
 
         {/* Header */}
         {title && (
-          <div className="px-6 py-3 border-b border-gray-100">
+          <div className="shrink-0 border-b border-gray-100 px-6 py-3">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-gray-800">{title}</h2>
               <button
                 onClick={onClose}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                className="rounded-full p-1 transition-colors hover:bg-gray-100"
               >
                 <svg
-                  className="w-5 h-5 text-gray-500"
+                  className="h-5 w-5 text-gray-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -110,14 +111,12 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
         )}
 
         {/* Content */}
-        <div
-          className="overflow-y-auto"
-          style={{ maxHeight: `calc(${maxHeight} - 80px)` }}
-        >
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {children}
         </div>
       </div>
-    </>
+    </>,
+    document.body,
   );
 };
 

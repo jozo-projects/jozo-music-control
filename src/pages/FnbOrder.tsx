@@ -802,9 +802,9 @@ const FnbOrder: React.FC = () => {
         title={`Giỏ hàng (${cart.length})`}
         maxHeight="85vh"
       >
-        <div className="flex flex-col h-full">
+        <div className="flex min-h-0 flex-1 flex-col">
           {cart.length === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center py-12">
+            <div className="flex flex-1 flex-col items-center justify-center py-12">
               <div className="text-6xl mb-4">🛒</div>
               <h3 className="text-lg font-semibold text-gray-600 mb-2">
                 Giỏ hàng trống
@@ -816,7 +816,7 @@ const FnbOrder: React.FC = () => {
           ) : (
             <>
               {/* Cart Items */}
-              <div className="flex-1 px-6 py-4">
+              <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
                 <div className="space-y-3">
                   {cart.map((cartItem, index) => {
                     const item = fnbMenu?.items.find(
@@ -958,8 +958,8 @@ const FnbOrder: React.FC = () => {
                 </div>
               </div>
 
-              {/* Footer with Total and Order Button */}
-              <div className="border-t border-gray-200 bg-white px-6 py-4">
+              {/* Footer with Total and Order Button — luôn hiện, không bị ControlBar che */}
+              <div className="shrink-0 border-t border-gray-200 bg-white px-6 py-4">
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-base font-semibold text-gray-800">
                     Tổng cộng:
