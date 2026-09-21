@@ -2,7 +2,9 @@ import BellAlertIcon from "@/assets/icons/BellAlertIcon";
 import HomeIcon from "@/assets/icons/HomeIcon";
 import ListIcon from "@/assets/icons/ListIcon";
 import { logo } from "@/assets/images";
-import useRoom from "@/hooks/useRoom";
+import { useCreateSupportRequest } from "@/hooks/useRoom";
+import type { SupportRequest } from "@/hooks/useRoom";
+import { useSocket } from "@/contexts/SocketContext";
 import { useSongName } from "@/hooks/useSongName";
 import { getRoomDisplayNumber } from "@/utils/roomDisplayNumber";
 import { FNB_ORDER_ENABLED } from "@/utils/fnbOrder";
@@ -84,7 +86,15 @@ const Header: React.FC = () => {
   const touchStartXRef = useRef<number | null>(null);
 
   const queryClient = useQueryClient();
-  const { mutate: sendNotification } = useRoom();
+  const { socket } = useSocket();
+  const { mutate: createSupportRequest } = useCreateSupportRequest();
+  const [supportRequest, setSupportRequest] = useState<SupportRequest | null>(
+    null,
+  );
+  const [supportCountdown, setSupportCountdown] = useState(0);
+  const previousSupportStatusRef = useRef<SupportRequest["status"] | null>(
+    null,
+  );
 
   // Tính toán các biến thường dùng
   const isSearchPage = location.pathname.includes("/search");
@@ -409,28 +419,112 @@ const Header: React.FC = () => {
     const timeSinceLastNotification = now - lastNotificationTime;
 
     if (!ensureRoomSelected()) return;
-    // Nếu chưa gửi notification nào hoặc đã qua 2 giây từ lần cuối
-    if (lastNotificationTime === 0 || timeSinceLastNotification >= 2000) {
-      // Gửi ngay lập tức
-      sendNotification(
-        { roomId, message: "Yêu cầu hỗ trợ" },
-        {
-          onSuccess: () => {
-            toast.success("Đã yêu cầu nhân viên hỗ trợ");
-          },
-          onError: () => {
-            toast.error("Gặp lỗi khi yêu cầu nhân viên hỗ trợ");
-          },
-        },
-      );
-      setLastNotificationTime(now);
-    } else {
-      // Nếu spam quá nhanh, hiển thị thông báo
-      toast.warning("Vui lòng đợi một chút trước khi gửi yêu cầu tiếp theo");
+    if (
+      supportRequest &&
+      ["pending", "not_supported", "acknowledged"].includes(supportRequest.status)
+    ) {
+      toast.warning("Nhân viên đang xử lý yêu cầu này rồi nhé.");
+      return;
     }
+    if (lastNotificationTime !== 0 && timeSinceLastNotification < 2000) {
+      toast.warning("Khách iu chờ một chút rồi gọi lại nhé.");
+      return;
+    }
+
+    createSupportRequest(roomId, {
+      onSuccess: (request) => {
+        setSupportRequest(request);
+        toast.success("Đã gọi nhân viên rồi, khách iu chờ một chút nhé.");
+      },
+      onError: () => {
+        toast.error("Chưa gọi được nhân viên, khách iu thử lại nhé.");
+      },
+    });
+    setLastNotificationTime(now);
   };
 
-  // Hủy debounce khi component unmount
+  useEffect(() => {
+    if (!socket || !roomId) return;
+
+    const handleSupportRequestEvent = (payload: unknown) => {
+      const candidate =
+        (payload as { result?: SupportRequest } | null)?.result ?? payload;
+      if (
+        !candidate ||
+        typeof candidate !== "object" ||
+        !("requestId" in candidate) ||
+        !("roomId" in candidate)
+      ) {
+        console.warn("Ignoring malformed support request event", payload);
+        return;
+      }
+      const request = candidate as SupportRequest;
+      const normalizedPayload = {
+        ...request,
+        requestId: String(request.requestId),
+        roomId: String(request.roomId),
+      };
+      if (String(normalizedPayload.roomId) !== String(roomId)) return;
+      const previousStatus = previousSupportStatusRef.current;
+      previousSupportStatusRef.current = normalizedPayload.status;
+      setSupportRequest(normalizedPayload);
+
+      if (
+        normalizedPayload.status === "acknowledged" &&
+        previousStatus !== "acknowledged"
+      ) {
+        toast.success("Nhân viên đã nhận yêu cầu, sẽ ra hỗ trợ khách iu ngay.");
+      } else if (
+        normalizedPayload.status === "resolved" &&
+        previousStatus !== "resolved"
+      ) {
+        toast.success("Nhân viên đã hoàn tất hỗ trợ khách iu.");
+        setSupportRequest(null);
+        previousSupportStatusRef.current = null;
+      }
+    };
+
+    socket.on("support_request_created", handleSupportRequestEvent);
+    socket.on("support_request_acknowledged", handleSupportRequestEvent);
+    socket.on("support_request_not_supported", handleSupportRequestEvent);
+    socket.on("support_request_expired", handleSupportRequestEvent);
+    socket.on("support_request_resolved", handleSupportRequestEvent);
+
+    return () => {
+      socket.off("support_request_created", handleSupportRequestEvent);
+      socket.off("support_request_acknowledged", handleSupportRequestEvent);
+      socket.off("support_request_not_supported", handleSupportRequestEvent);
+      socket.off("support_request_expired", handleSupportRequestEvent);
+      socket.off("support_request_resolved", handleSupportRequestEvent);
+    };
+  }, [roomId, socket]);
+
+  useEffect(() => {
+    if (!supportRequest || supportRequest.status !== "pending") {
+      setSupportCountdown(0);
+      return;
+    }
+
+    const updateCountdown = () => {
+      const remaining = Math.max(
+        0,
+        Math.ceil(
+          (new Date(supportRequest.expiresAt).getTime() - Date.now()) / 1000,
+        ),
+      );
+      setSupportCountdown(remaining);
+      if (remaining === 0) {
+        setSupportRequest((current) =>
+          current?.requestId === supportRequest.requestId ? null : current,
+        );
+      }
+    };
+
+    updateCountdown();
+    const timer = window.setInterval(updateCountdown, 250);
+    return () => window.clearInterval(timer);
+  }, [supportRequest]);
+
   useEffect(() => {
     return () => {
       debouncedNavigate.cancel();
@@ -519,49 +613,49 @@ const Header: React.FC = () => {
               </svg>
             </button>
           )}
-        {/* Auto Complete Suggestions */}
-        {searchState.showSuggestions &&
-          songNameSuggestions &&
-          songNameSuggestions.length > 0 && (
-            <div className="liquid-glass absolute left-0 top-full z-50 mt-1.5 max-h-[min(50vh,320px)] w-full overflow-y-auto rounded-2xl">
-              <div className="flex items-center justify-between border-b border-white/10">
-                <div className="p-1.5 text-xs font-medium text-white">
-                  Gợi ý
-                </div>
-                <button
-                  type="button"
-                  className="p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-                  onClick={closeSuggestions}
-                  onPointerDown={keepSearchInputFocus}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="h-4 w-4"
+          {/* Auto Complete Suggestions */}
+          {searchState.showSuggestions &&
+            songNameSuggestions &&
+            songNameSuggestions.length > 0 && (
+              <div className="liquid-glass absolute left-0 top-full z-50 mt-1.5 max-h-[min(50vh,320px)] w-full overflow-y-auto rounded-2xl">
+                <div className="flex items-center justify-between border-b border-white/10">
+                  <div className="p-1.5 text-xs font-medium text-white">
+                    Gợi ý
+                  </div>
+                  <button
+                    type="button"
+                    className="p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+                    onClick={closeSuggestions}
+                    onPointerDown={keepSearchInputFocus}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-              {songNameSuggestions?.map((suggestion, index) => (
-                <div
-                  key={index}
-                  className="cursor-pointer border-b border-white/5 p-2 text-xs text-white/90 last:border-b-0 hover:bg-white/10 hover:text-white"
-                  onPointerDown={keepSearchInputFocus}
-                  onClick={() => handleSelectSuggestion(suggestion)}
-                >
-                  {suggestion}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="h-4 w-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
                 </div>
-              ))}
-            </div>
-          )}
+                {songNameSuggestions?.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className="cursor-pointer border-b border-white/5 p-2 text-xs text-white/90 last:border-b-0 hover:bg-white/10 hover:text-white"
+                    onPointerDown={keepSearchInputFocus}
+                    onClick={() => handleSelectSuggestion(suggestion)}
+                  >
+                    {suggestion}
+                  </div>
+                ))}
+              </div>
+            )}
         </form>
 
         <div
@@ -685,74 +779,31 @@ const Header: React.FC = () => {
       {/* Confirm Support Modal — portal ra body để overlay phủ cả màn hình */}
       {isConfirmSupportModalOpen &&
         ReactDOM.createPortal(
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
-          <div className="liquid-glass w-full max-w-md rounded-3xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/30 text-white">
-                <BellAlertIcon />
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
+            <div className="liquid-glass w-full max-w-md rounded-3xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/30 text-white">
+                  <BellAlertIcon />
+                </div>
+                <h2 className="text-lg font-bold text-white">Gọi nhân viên</h2>
               </div>
-              <h2 className="text-lg font-bold text-white">Gọi nhân viên</h2>
-            </div>
-            <p className="mb-6 text-sm text-white/70">
-              Bạn có muốn yêu cầu nhân viên hỗ trợ không?
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setIsConfirmSupportModalOpen(false);
-                handleNotification();
-              }}
-              className="flex w-full items-center justify-center rounded-2xl border border-primary/40 bg-primary/80 px-4 py-3 text-sm font-medium text-primary-foreground shadow-brand-soft transition-colors hover:bg-primary"
-            >
-              Gọi nhân viên
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsConfirmSupportModalOpen(false)}
-              className="liquid-glass-btn mt-3 flex w-full items-center justify-center gap-x-2 rounded-2xl py-2.5 text-white/85"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="size-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18 18 6M6 6l12 12"
-                />
-              </svg>
-              Đóng
-            </button>
-          </div>
-        </div>,
-        document.body,
-      )}
-
-      {/* Booking Code Modal */}
-      <BookingCodeModal
-        isOpen={isBookingCodeModalOpen}
-        onClose={() => setIsBookingCodeModalOpen(false)}
-        roomId={roomId}
-      />
-
-      {/* Bill Modal (chỉ fetch khi mở) — portal ra body để overlay phủ cả màn hình */}
-      {isBillModalOpen &&
-        ReactDOM.createPortal(
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
-          <div className="liquid-glass relative flex max-h-[min(85vh,36rem)] w-full max-w-xl flex-col overflow-hidden rounded-3xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
-            <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
-              <h2 className="text-lg font-bold text-white">
-                Thông tin phòng {roomDisplayNumber ?? "?"}
-              </h2>
+              <p className="mb-6 text-sm text-white/70">
+                Khách iu có muốn gọi nhân viên hỗ trợ không?
+              </p>
               <button
                 type="button"
-                onClick={() => setIsBillModalOpen(false)}
-                className="liquid-glass-btn flex size-9 items-center justify-center rounded-full text-white/80"
-                aria-label="Đóng bill"
+                onClick={() => {
+                  setIsConfirmSupportModalOpen(false);
+                  handleNotification();
+                }}
+                className="flex w-full items-center justify-center rounded-2xl border border-primary/40 bg-primary/80 px-4 py-3 text-sm font-medium text-primary-foreground shadow-brand-soft transition-colors hover:bg-primary"
+              >
+                Gọi nhân viên
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsConfirmSupportModalOpen(false)}
+                className="liquid-glass-btn mt-3 flex w-full items-center justify-center gap-x-2 rounded-2xl py-2.5 text-white/85"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -768,15 +819,97 @@ const Header: React.FC = () => {
                     d="M6 18 18 6M6 6l12 12"
                   />
                 </svg>
+                Đóng
               </button>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto">
-              <BillSummary autoFetch onClose={() => setIsBillModalOpen(false)} />
-            </div>
+          </div>,
+          document.body,
+        )}
+
+      {supportRequest?.status === "pending" && supportCountdown > 0 && (
+        <div className="pointer-events-none fixed bottom-24 right-4 z-[180] flex items-center gap-3 rounded-2xl border border-white/15 bg-black/55 px-3 py-2 text-white shadow-lg backdrop-blur-xl">
+          <div className="relative size-11 shrink-0">
+            <svg
+              className="size-11 -rotate-90"
+              viewBox="0 0 44 44"
+              aria-hidden="true"
+            >
+              <circle
+                cx="22"
+                cy="22"
+                r="18"
+                fill="none"
+                stroke="rgba(255,255,255,0.2)"
+                strokeWidth="4"
+              />
+              <circle
+                cx="22"
+                cy="22"
+                r="18"
+                fill="none"
+                stroke="#f59e0b"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray={`${(supportCountdown / 10) * 113.1} 113.1`}
+              />
+            </svg>
+            <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold">
+              {supportCountdown}s
+            </span>
           </div>
-        </div>,
-        document.body,
+          <div className="pr-1">
+            <p className="text-sm font-medium">Đang gọi nhân viên</p>
+          </div>
+        </div>
       )}
+
+      <BookingCodeModal
+        isOpen={isBookingCodeModalOpen}
+        onClose={() => setIsBookingCodeModalOpen(false)}
+        roomId={roomId}
+      />
+
+      {/* Bill Modal (chỉ fetch khi mở) — portal ra body để overlay phủ cả màn hình */}
+      {isBillModalOpen &&
+        ReactDOM.createPortal(
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
+            <div className="liquid-glass relative flex max-h-[min(85vh,36rem)] w-full max-w-xl flex-col overflow-hidden rounded-3xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.45)]">
+              <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
+                <h2 className="text-lg font-bold text-white">
+                  Thông tin phòng {roomDisplayNumber ?? "?"}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setIsBillModalOpen(false)}
+                  className="liquid-glass-btn flex size-9 items-center justify-center rounded-full text-white/80"
+                  aria-label="Đóng bill"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="size-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18 18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                <BillSummary
+                  autoFetch
+                  onClose={() => setIsBillModalOpen(false)}
+                />
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
 
       {isPinModalOpen && (
         <RoomPinModal
