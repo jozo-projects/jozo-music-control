@@ -247,6 +247,8 @@ const SortableQueueItem = ({
 const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true }) => {
   const { data: queueData } = useQueueQuery();
   const { expand } = useNowPlayingExpand();
+  const { socket } = useSocket();
+  const queryClient = useQueryClient();
 
   const { mutate: removeSongFromQueue } = useRemoveSongFromQueue();
 
@@ -272,6 +274,31 @@ const QueueSidebar: React.FC<QueueSidebarProps> = ({ isOpen = true }) => {
   useEffect(() => {
     setItems(queueData?.result?.queue || []);
   }, [queueData?.result?.queue]);
+
+  useEffect(() => {
+    if (!socket || !roomId) return;
+
+    type QueueResponse = NonNullable<typeof queueData>;
+    type QueueResult = NonNullable<QueueResponse["result"]>;
+    type QueueItem = QueueResult["queue"][number];
+    const handleQueueUpdated = (queue: QueueItem[]) => {
+      queryClient.setQueryData(["queue", roomId], (current: QueueResponse | undefined) => {
+        if (!current) return current;
+        return {
+          ...current,
+          result: {
+            ...current.result,
+            queue,
+          },
+        };
+      });
+    };
+
+    socket.on("queue_updated", handleQueueUpdated);
+    return () => {
+      socket.off("queue_updated", handleQueueUpdated);
+    };
+  }, [queryClient, roomId, socket]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
