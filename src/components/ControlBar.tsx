@@ -10,6 +10,7 @@ import {
 } from "@/assets/icons/VolumeIcons";
 import { PlaybackState } from "@/constant/enum";
 import NowPlayingFullscreen from "@/components/NowPlayingFullscreen";
+import { clearNowPlayingCache } from "@/components/clearNowPlayingCache";
 import { useNowPlayingExpand } from "@/contexts/NowPlayingExpandContext";
 import { usePlayNextSong } from "@/hooks/useQueueMutations";
 import { useQueueQuery } from "@/hooks/useQueueQuery";
@@ -159,6 +160,7 @@ const ControlBar: React.FC = () => {
     };
 
     const onNowPlayingCleared = () => {
+      clearNowPlayingCache(queryClient, roomId);
       setIsPlaying(false);
       setCurrentTime(0);
       endOfSongHandledRef.current = false;
