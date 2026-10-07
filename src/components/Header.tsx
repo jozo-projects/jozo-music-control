@@ -314,6 +314,7 @@ const Header: React.FC = () => {
 
   // Query cho auto complete suggestions
   const { data: songNameSuggestions } = useSongName(searchState.debouncedTerm, {
+    karaoke: isKaraoke,
     enabled:
       !!roomId &&
       searchState.showSuggestions &&
@@ -647,7 +648,8 @@ const Header: React.FC = () => {
                 {songNameSuggestions?.map((suggestion, index) => (
                   <div
                     key={index}
-                    className="cursor-pointer border-b border-white/5 p-2 text-xs text-white/90 last:border-b-0 hover:bg-white/10 hover:text-white"
+                    className="cursor-pointer truncate border-b border-white/5 p-2 text-xs text-white/90 last:border-b-0 hover:bg-white/10 hover:text-white"
+                    title={suggestion}
                     onPointerDown={keepSearchInputFocus}
                     onClick={() => handleSelectSuggestion(suggestion)}
                   >

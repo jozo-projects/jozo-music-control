@@ -5,6 +5,8 @@ import { useQueries } from "@tanstack/react-query";
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import debounce from "lodash/debounce";
+import { buildSearchQuery } from "./searchQuery";
+import { mergeSearchResults } from "./mergeSearchResults";
 
 // Skeleton Card Component
 const SkeletonCard: React.FC = () => (
@@ -23,7 +25,7 @@ const SkeletonCard: React.FC = () => (
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("query") || "";
-  const karaoke = searchParams.get("karaoke") === "true";
+  const karaoke = searchParams.get("karaoke") !== "false";
   const isRoomAccessEnabled = useRoomAccessEnabled();
 
   // State để kiểm soát khi nào thực hiện tìm kiếm
@@ -56,19 +58,11 @@ const SearchPage: React.FC = () => {
     };
   }, [query]);
 
-  // Tạo search query với keywords phù hợp
-  const searchQuery = useMemo(() => {
-    if (!processedQuery) return "";
-    const normalizedQuery = processedQuery.toLowerCase().trim();
-    const isEnglishQuery = /^[a-zA-Z\s]+$/.test(normalizedQuery);
-    return isEnglishQuery
-      ? `${normalizedQuery} ${
-          karaoke ? "karaoke beat #song #music" : "song #music"
-        }`
-      : `${normalizedQuery} ${
-          karaoke ? "nhạc beat #karaoke" : "bài hát nhạc #hat #music #nhac"
-        }`;
-  }, [processedQuery, karaoke]);
+  // Chọn loại video theo chế độ; không thêm hashtag vào query.
+  const searchQuery = useMemo(
+    () => buildSearchQuery(processedQuery, karaoke),
+    [processedQuery, karaoke],
+  );
 
   // Parallel queries — giữ placeholderData để tránh nhấp nháy khi đổi query
   const queries = useQueries({
@@ -101,27 +95,11 @@ const SearchPage: React.FC = () => {
   const isRemoteLoading = remoteQuery.isLoading;
   const isRemoteError = remoteQuery.isError;
 
-  // Combine results: local + remote (loại bỏ trùng lặp)
-  // Hiển thị local ngay khi có, không cần đợi remote
+  // Hiển thị local ngay; khi remote về thì gộp theo độ khớp, giữ local nếu trùng ID.
   const combinedResults = useMemo(() => {
     const localResults = (localQuery.data as Video[]) || [];
     const remoteResults = (remoteQuery.data as Video[]) || [];
-
-    // Nếu chưa có local results, trả về remote (nếu có)
-    if (localResults.length === 0) {
-      return remoteResults;
-    }
-
-    // Tạo Set chứa các video_id từ local để check trùng lặp
-    const localVideoIds = new Set(localResults.map((video) => video.video_id));
-
-    // Filter remote để loại bỏ các video_id đã có trong local
-    const uniqueRemoteResults = remoteResults.filter(
-      (video) => !localVideoIds.has(video.video_id),
-    );
-
-    // Merge local với remote đã được filter (local trước, remote sau)
-    return [...localResults, ...uniqueRemoteResults];
+    return mergeSearchResults(localResults, remoteResults);
   }, [localQuery.data, remoteQuery.data]);
 
   // Loading state: chỉ hiển thị loading khi local đang loading
