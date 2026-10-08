@@ -14,6 +14,11 @@ interface Video {
   source?: string;
   is_saved?: boolean;
   match_score?: number; // Điểm khớp từ tìm kiếm (cao hơn = khớp tốt hơn)
+  views?: number; // Lượt xem YouTube
+  recall?: number; // Tỉ lệ từ khóa khớp
+  title_match?: boolean; // Tên bài khớp ở đầu một đoạn tiêu đề
+  hls_url?: string;
+  media_status?: 'pending' | 'downloading' | 'encoding' | 'uploading' | 'ready' | 'failed';
 }
 
 interface MusicCategory {

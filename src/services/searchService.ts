@@ -17,6 +17,11 @@ const normalizeVideos = (
     source: item.source || sourceFallback,
     is_saved: item.is_saved ?? true,
     match_score: item.match_score,
+    recall: item.recall,
+    title_match: item.title_match,
+    views: item.views,
+    hls_url: item.hls_url,
+    media_status: item.media_status,
   }));
 
 /**

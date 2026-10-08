@@ -99,8 +99,8 @@ const SearchPage: React.FC = () => {
   const combinedResults = useMemo(() => {
     const localResults = (localQuery.data as Video[]) || [];
     const remoteResults = (remoteQuery.data as Video[]) || [];
-    return mergeSearchResults(localResults, remoteResults);
-  }, [localQuery.data, remoteQuery.data]);
+    return mergeSearchResults(localResults, remoteResults, searchQuery);
+  }, [localQuery.data, remoteQuery.data, searchQuery]);
 
   // Loading state: chỉ hiển thị loading khi local đang loading
   // (vì local nhanh, nên nếu local xong thì hiển thị ngay, không cần đợi remote)
