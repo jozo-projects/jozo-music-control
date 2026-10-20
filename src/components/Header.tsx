@@ -422,7 +422,9 @@ const Header: React.FC = () => {
     if (!ensureRoomSelected()) return;
     if (
       supportRequest &&
-      ["pending", "not_supported", "acknowledged"].includes(supportRequest.status)
+      ["pending", "not_supported", "acknowledged"].includes(
+        supportRequest.status,
+      )
     ) {
       toast.warning("Nhân viên đang xử lý yêu cầu này rồi nhé.");
       return;
@@ -726,7 +728,7 @@ const Header: React.FC = () => {
         <button
           onClick={() => setIsBillModalOpen(true)}
           className={headerActionClass}
-          title="Thông tin"
+          title="Kết thúc"
         >
           <div className="flex flex-col items-center gap-0.5 text-[10px] leading-tight text-inherit sm:text-xs">
             <svg
@@ -743,7 +745,7 @@ const Header: React.FC = () => {
                 d="M9 7.5h6M9 12h6m-6 4.5h3M7.5 3.75h9A1.5 1.5 0 0118 5.25v13.5a1.5 1.5 0 01-1.5 1.5h-9a1.5 1.5 0 01-1.5-1.5V5.25a1.5 1.5 0 011.5-1.5z"
               />
             </svg>
-            <span>Thông tin</span>
+            <span>Kết thúc</span>
           </div>
         </button>
 
