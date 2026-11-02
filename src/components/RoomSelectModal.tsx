@@ -19,6 +19,7 @@ const RoomSelectModal: React.FC<RoomSelectModalProps> = ({
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId") || "";
+  const canDismiss = Boolean(roomId.trim());
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
@@ -96,7 +97,11 @@ const RoomSelectModal: React.FC<RoomSelectModalProps> = ({
       aria-modal="true"
       aria-label="Chọn phòng"
     >
-      <div className="absolute inset-0" onClick={onClose} aria-hidden />
+      <div
+        className="absolute inset-0"
+        onClick={canDismiss ? onClose : undefined}
+        aria-hidden
+      />
       <div className="relative z-10 w-full max-w-2xl rounded-2xl border border-white/10 bg-gray-900 p-6 text-white shadow-2xl">
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
@@ -108,27 +113,29 @@ const RoomSelectModal: React.FC<RoomSelectModalProps> = ({
               Chọn phòng bạn đang sử dụng
             </p>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full p-2 hover:bg-white/10"
-            aria-label="Đóng chọn phòng"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="h-6 w-6"
+          {canDismiss && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full p-2 hover:bg-white/10"
+              aria-label="Đóng chọn phòng"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="h-6 w-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">

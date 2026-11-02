@@ -14,6 +14,15 @@ const axiosInstance = axios.create({
 // Interceptor xử lý request (nếu cần thêm logic cho request)
 axiosInstance.interceptors.request.use(
   (config) => {
+    const roomMatch = config.url?.match(/^\/?room-music\/([^/?#]*)/);
+    if (
+      roomMatch &&
+      (!roomMatch[1].trim() || ["undefined", "null"].includes(roomMatch[1]))
+    ) {
+      const message = "Vui lòng chọn phòng trước khi thao tác.";
+      toast.error(message);
+      throw new axios.CanceledError(message);
+    }
     return config;
   },
   (error) => {

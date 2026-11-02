@@ -1,10 +1,15 @@
+import SocketConnectionNotice from "@/components/SocketConnectionNotice";
 import { toast } from "@/components/ToastContainer";
 import { getDeviceId } from "@/utils/deviceId";
+import { attachSocketRecovery } from "@/utils/socketRecovery";
+import { useQueryClient } from "@tanstack/react-query";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
+  useState,
   ReactNode,
 } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -13,125 +18,103 @@ import io from "socket.io-client";
 interface SocketContextType {
   socket: ReturnType<typeof io> | null;
   isConnected: boolean;
+  isDisconnectedTooLong: boolean;
+  reconnect: () => void;
 }
 
 const SocketContext = createContext<SocketContextType>({
   socket: null,
   isConnected: false,
+  isDisconnectedTooLong: false,
+  reconnect: () => {},
 });
 
-export const useSocket = () => {
-  const context = useContext(SocketContext);
-  if (!context) {
-    throw new Error("useSocket must be used within a SocketProvider");
-  }
-  return context;
-};
+export const useSocket = () => useContext(SocketContext);
 
 interface SocketProviderProps {
   children: ReactNode;
 }
 
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
-  const socketRef = useRef<ReturnType<typeof io> | null>(null);
-  const roomIdRef = useRef<string>("");
-  const hasShownConnectToastRef = useRef(false);
-  const [isConnected, setIsConnected] = React.useState(false);
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
-  const roomId = searchParams.get("roomId") || "";
+  const roomId = searchParams.get("roomId")?.trim() || "";
+  const recoveryRef = useRef<ReturnType<typeof attachSocketRecovery> | null>(null);
+  const [connection, setConnection] = useState<{
+    roomId: string;
+    socket: ReturnType<typeof io> | null;
+    isConnected: boolean;
+    isDisconnectedTooLong: boolean;
+  }>({ roomId: "", socket: null, isConnected: false, isDisconnectedTooLong: false });
 
-  const showConnectToastOnce = () => {
-    if (hasShownConnectToastRef.current) return;
-    hasShownConnectToastRef.current = true;
-    toast.success("Kết nối máy chủ thành công");
-  };
-
-  const disconnectSocket = () => {
-    if (socketRef.current) {
-      socketRef.current.disconnect();
-      socketRef.current = null;
-      setIsConnected(false);
-      hasShownConnectToastRef.current = false;
-    }
-  };
+  const reconnect = useCallback(() => recoveryRef.current?.reconnect(), []);
 
   useEffect(() => {
-    if (!roomId) {
-      disconnectSocket();
-      return;
-    }
+    if (!roomId) return;
 
-    roomIdRef.current = roomId;
+    const socket = io(import.meta.env.VITE_SOCKET_URL, {
+      query: { roomId, deviceId: getDeviceId(), clientType: "control" },
+      transports: ["websocket"],
+      autoConnect: false,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 10000,
+      reconnectionAttempts: Infinity,
+      timeout: 10000,
+    });
+    let hasConnected = false;
+    setConnection({ roomId, socket, isConnected: false, isDisconnectedTooLong: false });
 
-    if (!socketRef.current) {
-      console.log(`[Socket] Creating new connection for room: ${roomId}`);
-
-      socketRef.current = io(import.meta.env.VITE_SOCKET_URL, {
-        query: {
-          roomId,
-          deviceId: getDeviceId(),
-          clientType: "control",
-        },
-        transports: ["websocket"],
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 10000,
-        reconnectionAttempts: Infinity,
-      });
-
-      socketRef.current.on("connect", () => {
-        const currentSocket = socketRef.current;
-        const currentRoomId = roomIdRef.current;
-        if (currentSocket && currentRoomId) {
-          console.log(
-            `[Socket] Connected to server, joining room: ${currentRoomId}`,
-          );
-          setIsConnected(true);
-          currentSocket.emit("join", currentRoomId);
-          showConnectToastOnce();
+    const recovery = attachSocketRecovery(socket, {
+      onConnected: () => {
+        setConnection({ roomId, socket, isConnected: true, isDisconnectedTooLong: false });
+        if (!hasConnected) {
+          hasConnected = true;
+          toast.success("Kết nối máy chủ thành công");
         }
-      });
-
-      socketRef.current.on("disconnect", (reason: string) => {
-        console.log(`[Socket] Disconnected: ${reason}`);
-        setIsConnected(false);
-      });
-
-      socketRef.current.on("reconnect_attempt", (attemptNumber: number) => {
-        console.log(`[Socket] Reconnect attempt ${attemptNumber}`);
-      });
-
-      socketRef.current.on("reconnect", (attemptNumber: number) => {
-        const currentRoomId = roomIdRef.current;
-        console.log(`[Socket] Reconnected after ${attemptNumber} attempts`);
-        setIsConnected(true);
-        if (socketRef.current && currentRoomId) {
-          console.log(`[Socket] Rejoining room: ${currentRoomId}`);
-          socketRef.current.emit("join", currentRoomId);
-          showConnectToastOnce();
-        }
-      });
-
-      socketRef.current.on("connect_error", (error: Error) => {
-        console.error(`[Socket] Connection error:`, error);
-        setIsConnected(false);
-      });
-    } else if (socketRef.current.connected) {
-      console.log(`[Socket] Rejoining room: ${roomId}`);
-      socketRef.current.emit("join", roomId);
-    }
+        // The backend joins the room from the handshake on every connection.
+        // Read canonical state; never replay add-song or playback mutations.
+        void queryClient.invalidateQueries({ queryKey: ["queue", roomId], exact: true });
+      },
+      onDisconnected: () => {
+        setConnection((previous) =>
+          previous.socket === socket && previous.isConnected
+            ? { ...previous, isConnected: false }
+            : previous,
+        );
+      },
+      onLongDisconnect: () => {
+        setConnection((previous) =>
+          previous.socket === socket
+            ? { ...previous, isDisconnectedTooLong: true }
+            : previous,
+        );
+      },
+    });
+    recoveryRef.current = recovery;
+    window.addEventListener("online", recovery.reconnect);
+    socket.connect();
 
     return () => {
-      disconnectSocket();
+      window.removeEventListener("online", recovery.reconnect);
+      recovery.dispose();
+      if (recoveryRef.current === recovery) recoveryRef.current = null;
+      socket.disconnect();
     };
-  }, [roomId]);
+  }, [roomId, queryClient]);
 
-  const value = {
-    socket: socketRef.current,
-    isConnected,
+  const isCurrentRoom = Boolean(roomId) && connection.roomId === roomId;
+  const value: SocketContextType = {
+    socket: isCurrentRoom ? connection.socket : null,
+    isConnected: isCurrentRoom && connection.isConnected,
+    isDisconnectedTooLong: isCurrentRoom && connection.isDisconnectedTooLong,
+    reconnect,
   };
 
   return (
-    <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={value}>
+      {roomId && <SocketConnectionNotice {...value} />}
+      {children}
+    </SocketContext.Provider>
   );
 };
