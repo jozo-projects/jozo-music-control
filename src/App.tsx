@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import RoutesWrapper from "@/routes/RoutesWrapper";
 import { RoomPinProvider } from "@/contexts/RoomPinContext";
 import { SocketProvider } from "@/contexts/SocketContext";
+import DeviceAuthorizationGate from "@/components/DeviceAuthorizationGate";
 import { GiftProvider } from "@/contexts/GiftContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -25,6 +26,7 @@ const App: React.FC = () => {
       <ToastContainer />
       <BrowserRouter>
         <RoomPinProvider>
+          <DeviceAuthorizationGate>
           <SocketProvider>
             <GiftProvider>
               <ImageBackgroundProvider>
@@ -32,6 +34,7 @@ const App: React.FC = () => {
               </ImageBackgroundProvider>
             </GiftProvider>
           </SocketProvider>
+          </DeviceAuthorizationGate>
         </RoomPinProvider>
       </BrowserRouter>
     </QueryClientProvider>

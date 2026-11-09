@@ -14,6 +14,7 @@ import React, {
 } from "react";
 import { useSearchParams } from "react-router-dom";
 import io from "socket.io-client";
+import { getActiveDeviceProof } from "@/utils/deviceAuthorization";
 
 interface SocketContextType {
   socket: ReturnType<typeof io> | null;
@@ -52,7 +53,15 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!roomId) return;
 
+    const proof = getActiveDeviceProof();
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || "";
+    let trustedSocket = false;
+    try {
+      const url = new URL(socketUrl);
+      trustedSocket = (url.protocol === "https:" || url.protocol === "http:") && !url.username && !url.password && !url.search && !url.hash;
+    } catch { /* Never send a proof to an invalid or unspecified socket URL. */ }
     const socket = io(import.meta.env.VITE_SOCKET_URL, {
+      ...(proof && trustedSocket ? { auth: { deviceProof: proof } } : {}),
       query: { roomId, deviceId: getDeviceId(), clientType: "control" },
       transports: ["websocket"],
       autoConnect: false,

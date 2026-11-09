@@ -1,5 +1,6 @@
 import { toast } from "@/components/ToastContainer";
 import axios from "axios";
+import { getActiveDeviceProof, sameBackend } from "@/utils/deviceAuthorization";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; // Thay bằng URL của backend
 
@@ -14,6 +15,12 @@ const axiosInstance = axios.create({
 // Interceptor xử lý request (nếu cần thêm logic cho request)
 axiosInstance.interceptors.request.use(
   (config) => {
+    const proof = getActiveDeviceProof();
+    if (proof) {
+      const base = API_BASE_URL || window.location.href;
+      const destination = axiosInstance.getUri(config);
+      if (sameBackend(destination, base)) config.headers.set("X-Jozo-Device-Proof", proof);
+    }
     const roomMatch = config.url?.match(/^\/?room-music\/([^/?#]*)/);
     if (
       roomMatch &&
