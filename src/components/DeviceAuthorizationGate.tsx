@@ -62,7 +62,7 @@ function RoomGate({ room, children }: { room: number; children: ReactNode }) {
           try {
             const url = new URL(endpoint);
             if (!url.username && !url.password && !url.search && !url.hash &&
-                (url.protocol === "https:" || url.protocol === "http:")) {
+                (url.protocol === "https:" || url.protocol === "http:" || url.protocol === "wss:")) {
               socket = io(`${url.origin}/device-authorization`, {
                 auth: { roomId: room, clientType: "control", id: request.id, proof: request.proof },
                 transports: ["websocket"], forceNew: true,

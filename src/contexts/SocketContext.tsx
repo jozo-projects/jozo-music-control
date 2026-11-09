@@ -58,7 +58,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     let trustedSocket = false;
     try {
       const url = new URL(socketUrl);
-      trustedSocket = (url.protocol === "https:" || url.protocol === "http:") && !url.username && !url.password && !url.search && !url.hash;
+      trustedSocket = (url.protocol === "https:" || url.protocol === "http:" || url.protocol === "wss:") && !url.username && !url.password && !url.search && !url.hash;
     } catch { /* Never send a proof to an invalid or unspecified socket URL. */ }
     const socket = io(import.meta.env.VITE_SOCKET_URL, {
       ...(proof && trustedSocket ? { auth: { deviceProof: proof } } : {}),
