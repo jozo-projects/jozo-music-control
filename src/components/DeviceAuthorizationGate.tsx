@@ -116,7 +116,46 @@ function RoomGate({ room, children }: { room: number; children: ReactNode }) {
 }
 
 export default function DeviceAuthorizationGate({ children }: { children: ReactNode }) {
-  if (import.meta.env.VITE_DEVICE_AUTHORIZATION !== "true") return <>{children}</>;
+  // Until a valid response explicitly disables the gate, keep it enabled.
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  useEffect(() => {
+    let stopped = false;
+    let running = false;
+    let dirty = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const controller = new AbortController();
+    const refresh = () => {
+      if (stopped) return;
+      clearTimeout(timer);
+      if (running) { dirty = true; return; }
+      void poll();
+    };
+    const poll = async () => {
+      running = true;
+      dirty = false;
+      try {
+        const { data } = await http.get("/room-device-authorization/config", {
+          skipErrorToast: true, timeout: 10000, signal: controller.signal,
+          params: { _: Date.now() },
+        } as never);
+        if (!data || typeof data.enabled !== "boolean") throw new Error("Invalid authorization config");
+        if (!stopped && !dirty) setEnabled(data.enabled);
+      } catch {
+        if (!stopped) setEnabled(true);
+      } finally {
+        running = false;
+        if (!stopped) {
+          if (dirty) refresh();
+          else timer = setTimeout(refresh, 30000);
+        }
+      }
+    };
+    window.addEventListener("focus", refresh);
+    refresh();
+    return () => { stopped = true; clearTimeout(timer); controller.abort(); window.removeEventListener("focus", refresh); };
+  }, []);
+  if (enabled === null) return <main role="status">Đang kiểm tra cấu hình thiết bị...</main>;
+  if (!enabled) return <>{children}</>;
   return <EnabledGate>{children}</EnabledGate>;
 }
 
