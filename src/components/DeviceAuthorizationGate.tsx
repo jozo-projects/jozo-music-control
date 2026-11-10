@@ -7,7 +7,7 @@ import RoomPinModal from "@/components/RoomPinModal";
 import { logo } from "@/assets/images";
 import { useRoomIdGuard } from "@/hooks/useRoomIdGuard";
 import http from "@/utils/http";
-import { checkAuthorization, createProof, isRequestCurrent, loadOrCreateRequest, saveRequest, saveRequestIfCurrent, setActiveDeviceProof, validRoomId, type AuthorizationStatus } from "@/utils/deviceAuthorization";
+import { checkAuthorization, createProof, InvalidStoredAuthorization, isRequestCurrent, loadOrCreateRequest, replaceInvalidStoredAuthorization, saveRequest, saveRequestIfCurrent, setActiveDeviceProof, validRoomId, type AuthorizationStatus } from "@/utils/deviceAuthorization";
 
 const post = (url: string, body: unknown) => http.post(url, body, { skipErrorToast: true, timeout: 10000 } as never);
 
@@ -18,8 +18,10 @@ function isTransientFailure(error: unknown): boolean {
 }
 
 function RoomGate({ room, children }: { room: number; children: ReactNode }) {
-  const [status, setStatus] = useState<AuthorizationStatus | "loading" | "network" | "error">("loading");
+  const [status, setStatus] = useState<AuthorizationStatus | "loading" | "network" | "error" | "room-not-found" | "invalid-storage">("loading");
   const [retry, setRetry] = useState(0);
+  const [invalidStorage, setInvalidStorage] = useState<InvalidStoredAuthorization | null>(null);
+  const [storageError, setStorageError] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
   const [roomSelectOpen, setRoomSelectOpen] = useState(false);
   useEffect(() => {
@@ -32,10 +34,13 @@ function RoomGate({ room, children }: { room: number; children: ReactNode }) {
     let blockedUntil = 0;
     let current: AuthorizationStatus | "loading" | "network" | "error" = "loading";
     let approvedProof: string | undefined;
+    let halted = false;
+    setInvalidStorage(null);
+    setStorageError(false);
     setActiveDeviceProof();
     setStatus("loading");
     const trigger = () => {
-      if (stopped) return;
+      if (stopped || halted) return;
       if (Date.now() < blockedUntil) {
         clearTimeout(timer);
         timer = setTimeout(trigger, blockedUntil - Date.now());
@@ -85,6 +90,20 @@ function RoomGate({ room, children }: { room: number; children: ReactNode }) {
         setStatus(current);
       } catch (error) {
         if (stopped) return;
+        if (error instanceof InvalidStoredAuthorization || (axios.isAxiosError(error) && error.response?.status === 404 && error.response.data?.error === "ROOM_NOT_FOUND")) {
+          halted = true;
+          dirty = false;
+          socket?.disconnect();
+          approvedProof = undefined;
+          setActiveDeviceProof();
+          if (error instanceof InvalidStoredAuthorization) {
+            setInvalidStorage(error);
+            setStatus("invalid-storage");
+          } else {
+            setStatus("room-not-found");
+          }
+          return;
+        }
         if (axios.isAxiosError(error) && error.response?.status === 429) {
           const seconds = Number(error.response.headers?.["retry-after"] ?? error.response.data?.retryAfterSeconds);
           blockedUntil = Date.now() + (Number.isFinite(seconds) && seconds > 0 ? seconds : 30) * 1000;
@@ -99,7 +118,7 @@ function RoomGate({ room, children }: { room: number; children: ReactNode }) {
         }
       } finally {
         running = false;
-        if (!stopped) {
+        if (!stopped && !halted) {
           if (dirty) void poll();
           else timer = setTimeout(trigger, Math.max(30000, blockedUntil - Date.now()));
         }
@@ -118,6 +137,18 @@ function RoomGate({ room, children }: { room: number; children: ReactNode }) {
     {status === "pending" && <p>Vui lòng chờ quản trị viên phê duyệt thiết bị.</p>}
     {status === "network" && <p>Không thể kết nối. Đang thử lại...</p>}
     {status === "error" && <p>Không thể xác thực thiết bị. Đang thử lại...</p>}
+    {status === "room-not-found" && <p>Không tìm thấy phòng. Bấm logo Jozo để chọn lại phòng.</p>}
+    {status === "invalid-storage" && <>
+      <p className="text-center">Dữ liệu xác thực trên thiết bị bị lỗi. Cần gửi yêu cầu cấp quyền mới.</p>
+      {storageError && <p className="text-center">Không thể lưu dữ liệu. Vui lòng kiểm tra bộ nhớ trình duyệt hoặc liên hệ nhân viên.</p>}
+      <button className="rounded bg-blue-600 px-5 py-3" onClick={() => {
+        if (!invalidStorage || !window.confirm("Gửi yêu cầu cấp quyền mới? Quyền cũ không tự bị thu hồi và nhân viên có thể cần xác nhận thay thế thiết bị.")) return;
+        try {
+          replaceInvalidStoredAuthorization(room, invalidStorage);
+          setRetry((v) => v + 1);
+        } catch { setStorageError(true); }
+      }}>Gửi yêu cầu cấp quyền mới</button>
+    </>}
     {(status === "expired" || status === "revoked" || status === "rejected") && <><p>{status === "expired" ? "Yêu cầu đã hết hạn." : status === "rejected" ? "Yêu cầu bị từ chối. Liên hệ nhân viên" : "Quyền thiết bị đã bị thu hồi."}</p><button className="rounded bg-blue-600 px-5 py-3" onClick={() => { try { saveRequest(room, { proof: createProof() }); setRetry((v) => v + 1); } catch { setStatus("network"); } }}>Gửi yêu cầu mới</button></>}
     {pinOpen && <RoomPinModal roomId={String(room)} fixed onClose={() => setPinOpen(false)} onVerified={() => { setPinOpen(false); setRoomSelectOpen(true); }} />}
     <RoomSelectModal isOpen={roomSelectOpen} onClose={() => setRoomSelectOpen(false)} />

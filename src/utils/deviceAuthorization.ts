@@ -3,6 +3,18 @@ export interface DeviceRequest { proof: string; id?: string | number; createdAt?
 type Post = (url: string, body: any) => Promise<{ data: any }>;
 const key = (room: number) => `jozo.device-authorization.control.${room}`;
 
+export class InvalidStoredAuthorization extends Error {
+  constructor(public readonly stored: string) {
+    super("Invalid stored authorization");
+  }
+}
+
+export function replaceInvalidStoredAuthorization(room: number, invalid: InvalidStoredAuthorization): boolean {
+  if (localStorage.getItem(key(room)) !== invalid.stored) return false;
+  saveRequest(room, { proof: createProof() });
+  return true;
+}
+
 export function validRoomId(value: string): number | null {
   if (!/^[0-9]+$/.test(value)) return null;
   const id = Number(value);
@@ -30,9 +42,14 @@ export async function loadOrCreateRequest(room: number, post: Post, rotate = fal
   let request: DeviceRequest | undefined;
   if (!rotate) {
     const stored = localStorage.getItem(key(room));
-    if (stored) {
-      const parsed = JSON.parse(stored) as DeviceRequest;
-      if (!/^[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]$/.test(parsed.proof)) throw new Error("Invalid stored authorization");
+    if (stored !== null) {
+      let parsed: DeviceRequest;
+      try {
+        parsed = JSON.parse(stored) as DeviceRequest;
+      } catch {
+        throw new InvalidStoredAuthorization(stored);
+      }
+      if (!parsed || typeof parsed !== "object" || typeof parsed.proof !== "string" || !/^[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]$/.test(parsed.proof)) throw new InvalidStoredAuthorization(stored);
       request = parsed;
     }
   }
