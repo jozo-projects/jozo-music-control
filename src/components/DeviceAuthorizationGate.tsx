@@ -168,6 +168,19 @@ export default function DeviceAuthorizationGate({ children }: { children: ReactN
   return <EnabledGate>{children}</EnabledGate>;
 }
 
+function InvalidRoom() {
+  const [pinOpen, setPinOpen] = useState(false);
+  const [roomSelectOpen, setRoomSelectOpen] = useState(false);
+  return <main className="min-h-screen bg-black text-white flex items-center justify-center p-6">
+    <button type="button" onClick={() => setPinOpen(true)} aria-label="Chọn phòng" className="absolute right-4 top-4 p-2">
+      <img src={logo} alt="Jozo" className="h-10 w-auto object-contain" />
+    </button>
+    <p role="alert">Mã phòng không hợp lệ. Vui lòng chọn phòng hợp lệ.</p>
+    {pinOpen && <RoomPinModal fixed onClose={() => setPinOpen(false)} onVerified={() => { setPinOpen(false); setRoomSelectOpen(true); }} />}
+    <RoomSelectModal isOpen={roomSelectOpen} onClose={() => setRoomSelectOpen(false)} />
+  </main>;
+}
+
 function EnabledGate({ children }: { children: ReactNode }) {
   const [params] = useSearchParams();
   const raw = params.get("roomId")?.trim() || "";
@@ -175,6 +188,6 @@ function EnabledGate({ children }: { children: ReactNode }) {
   useRoomIdGuard();
   if (!raw) return <RoomSelectModal isOpen onClose={() => {}} />;
   const room = validRoomId(raw);
-  if (!room) return <main role="alert">Mã phòng không hợp lệ. Vui lòng chọn phòng hợp lệ.</main>;
+  if (!room) return <InvalidRoom />;
   return <RoomGate key={room} room={room}>{children}</RoomGate>;
 }
