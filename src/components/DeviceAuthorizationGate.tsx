@@ -3,6 +3,8 @@ import axios from "axios";
 import io from "socket.io-client";
 import { useSearchParams } from "react-router-dom";
 import RoomSelectModal from "@/components/RoomSelectModal";
+import RoomPinModal from "@/components/RoomPinModal";
+import { logo } from "@/assets/images";
 import { useRoomIdGuard } from "@/hooks/useRoomIdGuard";
 import http from "@/utils/http";
 import { checkAuthorization, createProof, isRequestCurrent, loadOrCreateRequest, saveRequest, saveRequestIfCurrent, setActiveDeviceProof, validRoomId, type AuthorizationStatus } from "@/utils/deviceAuthorization";
@@ -18,6 +20,8 @@ function isTransientFailure(error: unknown): boolean {
 function RoomGate({ room, children }: { room: number; children: ReactNode }) {
   const [status, setStatus] = useState<AuthorizationStatus | "loading" | "network" | "error">("loading");
   const [retry, setRetry] = useState(0);
+  const [pinOpen, setPinOpen] = useState(false);
+  const [roomSelectOpen, setRoomSelectOpen] = useState(false);
   useEffect(() => {
     let stopped = false;
     let timer: ReturnType<typeof setTimeout>;
@@ -106,12 +110,17 @@ function RoomGate({ room, children }: { room: number; children: ReactNode }) {
   }, [room, retry]);
   if (status === "approved") return <>{children}</>;
   return <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center gap-4 p-6" role="status">
+    <button type="button" onClick={() => setPinOpen(true)} aria-label="Chọn phòng" className="absolute right-4 top-4 p-2">
+      <img src={logo} alt="Jozo" className="h-10 w-auto object-contain" />
+    </button>
     <h1 className="text-2xl">Xác thực thiết bị phòng {room}</h1>
     {status === "loading" && <p>Đang kiểm tra yêu cầu...</p>}
     {status === "pending" && <p>Vui lòng chờ quản trị viên phê duyệt thiết bị.</p>}
     {status === "network" && <p>Không thể kết nối. Đang thử lại...</p>}
     {status === "error" && <p>Không thể xác thực thiết bị. Đang thử lại...</p>}
     {(status === "expired" || status === "revoked" || status === "rejected") && <><p>{status === "expired" ? "Yêu cầu đã hết hạn." : status === "rejected" ? "Yêu cầu bị từ chối. Liên hệ nhân viên" : "Quyền thiết bị đã bị thu hồi."}</p><button className="rounded bg-blue-600 px-5 py-3" onClick={() => { try { saveRequest(room, { proof: createProof() }); setRetry((v) => v + 1); } catch { setStatus("network"); } }}>Gửi yêu cầu mới</button></>}
+    {pinOpen && <RoomPinModal roomId={String(room)} fixed onClose={() => setPinOpen(false)} onVerified={() => { setPinOpen(false); setRoomSelectOpen(true); }} />}
+    <RoomSelectModal isOpen={roomSelectOpen} onClose={() => setRoomSelectOpen(false)} />
   </main>;
 }
 
