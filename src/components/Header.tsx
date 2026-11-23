@@ -26,6 +26,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import Switch from "./Switch";
 import { toast } from "./ToastContainer";
 import BookingCodeModal from "./BookingCodeModal";
+import { QuizLauncher } from "./QuizLauncher";
 
 // Icon component for F&B
 const FoodIcon: React.FC = () => (
@@ -555,6 +556,7 @@ const Header: React.FC = () => {
         onClick={handleLogoClick}
       />
 
+      <QuizLauncher roomId={roomId} />
       {/* Search Input */}
       <div
         className="relative flex w-1/2 min-w-0 items-center gap-x-2 px-2"
